@@ -15,7 +15,6 @@ import org.beetl.core.statement.Type;
 public  
 class SQLPlaceholderST extends Statement
 {
-
 	public Expression expression;
 	public Type type = null;
 	FormatExpression format;
