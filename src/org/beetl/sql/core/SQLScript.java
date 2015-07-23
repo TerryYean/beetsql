@@ -1,6 +1,8 @@
 package org.beetl.sql.core;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -53,12 +55,10 @@ public class SQLScript {
 		String sql = result.jdbcSql;
 		List<Object> objs = result.jdbcPara;
 		ResultSet rs = null;
-		Statement stmt = null;
 		PreparedStatement ps = null;
 		Object model = null;
 		// 执行jdbc
 		try {
-			stmt = conn.createStatement();
 			ps = conn.prepareStatement(sql);
 			for (int i = 0; i < objs.size(); i++)
 				ps.setObject(i+1, objs.get(i));
@@ -71,7 +71,6 @@ public class SQLScript {
 			try {
 				if (rs != null)rs.close();
 				if (ps != null)ps.close();
-				if (stmt != null)stmt.close();
 				// if(conn != null)conn.close();由连接池来管理？
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -100,13 +99,15 @@ public class SQLScript {
 		Object model = null;
 		try {
 			model = mapping.newInstance();
-			Field[] fields = mapping.getDeclaredFields();
+			Method[] methods = mapping.getDeclaredMethods();
 			try {
 				while (rs.next()) {
-					for (Field field : fields) {
-						Class type = field.getType();
-						field.setAccessible(true);
-						field.set(model, rs.getObject(field.getName(), type));
+					for (Method method : methods) {
+						String methodName = method.getName();
+						if(methodName.startsWith("set")){
+							String attrName = toLowerCaseFirstOne(methodName.substring(3));
+							method.invoke(model, rs.getObject(attrName));
+						}
 					}
 				}
 			} catch (SecurityException e) {
@@ -116,6 +117,9 @@ public class SQLScript {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -128,4 +132,20 @@ public class SQLScript {
 		}
 		return model;
 	}
+	//首字母转小写
+    public String toLowerCaseFirstOne(String s)
+    {
+        if(Character.isLowerCase(s.charAt(0)))
+            return s;
+        else
+            return (new StringBuilder()).append(Character.toLowerCase(s.charAt(0))).append(s.substring(1)).toString();
+    }
+    //首字母转大写
+    public String toUpperCaseFirstOne(String s)
+    {
+        if(Character.isUpperCase(s.charAt(0)))
+            return s;
+        else
+            return (new StringBuilder()).append(Character.toUpperCase(s.charAt(0))).append(s.substring(1)).toString();
+    }
 }
