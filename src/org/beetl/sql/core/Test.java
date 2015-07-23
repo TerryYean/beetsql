@@ -1,7 +1,7 @@
 package org.beetl.sql.core;
 
+import java.sql.Connection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Test {
@@ -19,32 +19,36 @@ public class Test {
 		user.setId(12);
 		Map paras = new HashMap();
 		paras.put("user", user);
-		SQLScript script = new SQLScript("selectUser",sql,paras);
-		script.run();
-		String jdbcSQL = script.getJdbcSQL();
-		List jdbcParas = script.getJDBCParas();
-		System.out.println(jdbcSQL);
-		System.out.println(jdbcParas);
+		SQLScript script = new SQLScript(sql);
+		//一下方法需要完成
+		User result = (User)script.singleSelect(getConn(), paras, User.class);
+		
+		// 
+		
 	}
 	
-	public static void testIf(){
-		String sql =" select * from user where 1=1 \n"
-				+"#if(user.name!=null){\n"
-				+"and name=${user.name}\n"
-				+"#}\n"
-				+" and id = ${user.id}";
-		User user = new User();
-		user.setId(12);
-		user.setName("xiandafu");
-		Map paras = new HashMap();
-		paras.put("user", user);
-		SQLScript script = new SQLScript("selectUserByCondition",sql,paras);
-		script.run();
-		String jdbcSQL = script.getJdbcSQL();
-		List jdbcParas = script.getJDBCParas();
-		System.out.println(jdbcSQL);
-		System.out.println(jdbcParas);
+	private static Connection getConn(){
+		return null;
 	}
+	
+//	public static void testIf(){
+//		String sql =" select * from user where 1=1 \n"
+//				+"#if(user.name!=null){\n"
+//				+"and name=${user.name}\n"
+//				+"#}\n"
+//				+" and id = ${user.id}";
+//		User user = new User();
+//		user.setId(12);
+//		user.setName("xiandafu");
+//		Map paras = new HashMap();
+//		paras.put("user", user);
+//		SQLScript script = new SQLScript("selectUserByCondition",sql,paras);
+//		script.run();
+//		String jdbcSQL = script.getJdbcSQL();
+//		List jdbcParas = script.getJDBCParas();
+//		System.out.println(jdbcSQL);
+//		System.out.println(jdbcParas);
+//	}
 
 	static class User{
 		int id;

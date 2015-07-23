@@ -1,5 +1,6 @@
 package org.beetl.sql.core;
 
+import java.sql.Connection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -7,35 +8,66 @@ import java.util.Map.Entry;
 
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
+import org.beetl.sql.core.Beetl;
 
 public class SQLScript {
-	String sql;
-	Map<String,Object> paras;
-	String sqlId;
+	String sql;	
 	String jdbcSql;
-	List jdbcPara;
-	public SQLScript(String sqlId,String sql,Map<String,Object> paras){
-		this.sqlId = sqlId;
+	
+	public SQLScript(String sql){
 		this.sql = sql ;
-		this.paras = paras;
+		
+		
 	}
 	
-	public void run(){
+	private SQLResult run(Map<String,Object> paras){
 		GroupTemplate gt = Beetl.instance().getGroupTemplate();
 		Template t = gt.getTemplate(sql);
-		jdbcPara = new LinkedList();
+		List jdbcPara = new LinkedList();
 		for(Entry<String,Object> entry:paras.entrySet()){
 			t.binding(entry.getKey(), entry.getValue());
 		}
 		t.binding("_paras",jdbcPara);
 		
-		jdbcSql = t.render();
+		String jdbcSql = t.render();
+		SQLResult result = new SQLResult();
+		result.jdbcSql = jdbcSql;
+		result.jdbcPara = jdbcPara;
+		return result ;
 	}
 	
-	public String getJdbcSQL(){
-		return this.jdbcSql;
+	/** 查询，返回一个mapping类实例
+	 * @param conn
+	 * @param paras
+	 * @param mapping
+	 * @return
+	 */
+	public Object singleSelect(Connection conn,Map<String,Object> paras,Class mapping ){
+		SQLResult result = run(paras);
+		String sql = result.jdbcSql;
+		List<Object> objs = result.jdbcPara;
+		
+		//执行jdbc 
+		// PreparedStatment ps = conn.....
+		//for(Object obj :objs) ps.setObject(i++,obj);
+		//
+		
+		throw new UnsupportedOperationException("等你完成");
 	}
-	public List<Object> getJDBCParas(){
-		return this.jdbcPara;
+	
+	
+	
+	public List<Object> select(Connection conn,Map<String,Object> paras,Class mapping ){
+		throw new UnsupportedOperationException();
 	}
+	
+	public List<Object> select(Connection conn,Map<String,Object> paras,Class mapping,long start,long end ){
+		throw new UnsupportedOperationException();
+	}
+	
+	class SQLResult{
+		String jdbcSql ;
+		List jdbcPara ;
+	}
+	
 }
