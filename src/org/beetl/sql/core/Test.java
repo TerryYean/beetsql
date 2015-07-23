@@ -1,12 +1,14 @@
 package org.beetl.sql.core;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Test {
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 		testSimple();
 //		testIf();
 		
@@ -16,19 +18,36 @@ public class Test {
 	public static void testSimple(){
 		String sql =" select * from user where id = ${user.id}";
 		User user = new User();
-		user.setId(12);
+		user.setId(2);
 		Map paras = new HashMap();
 		paras.put("user", user);
 		SQLScript script = new SQLScript(sql);
 		//一下方法需要完成
 		User result = (User)script.singleSelect(getConn(), paras, User.class);
-		
 		// 
 		
 	}
 	
 	private static Connection getConn(){
-		return null;
+		String driver = "com.mysql.jdbc.Driver";
+        String dbName = "test";
+        String passwrod = "root";
+        String userName = "root";
+        String url = "jdbc:mysql://localhost:3306/" + dbName;
+        String sql = "select * from users";
+        Connection conn = null;
+        try {
+			Class.forName(driver);
+			conn = DriverManager.getConnection(url, userName,
+	                passwrod);
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return conn;
 	}
 	
 //	public static void testIf(){
