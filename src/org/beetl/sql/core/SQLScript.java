@@ -50,7 +50,8 @@ public class SQLScript {
 		//执行jdbc 
 		// PreparedStatment ps = conn.....
 		//for(Object obj :objs) ps.setObject(i++,obj);
-		//
+		//ResultSet rs = ps.executeQuery();
+		//将rs 自动赋值给mapping类
 		
 		throw new UnsupportedOperationException("等你完成");
 	}
