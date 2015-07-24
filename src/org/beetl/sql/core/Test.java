@@ -6,23 +6,34 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.beetl.sql.SQLLoader;
+import org.beetl.sql.SQLManager;
+
 public class Test {
 
     public static void main(String[] args) {
-		testSimple();
+//		testSimple();
 //		testIf();
-		
+    		testManager();
 
 	}
+    
+    public static void testManager(){
+    		SQLLoader loader = new ClasspathLoader("/sql/mysql");
+		SQLManager manager = new SQLManager(loader);
+		SQLScript script = manager.getScript("user.selectUser");
+		Map paras = getUserParas();
+		User result = (User)script.singleSelect(getConn(), paras, User.class);
+	
+	
+    }
 	
 	public static void testSimple(){
 		String sql =" select * from user where id = ${user.id}";
-		User user = new User();
-		user.setId(2);
-		Map paras = new HashMap();
-		paras.put("user", user);
+		
 		SQLScript script = new SQLScript(sql);
 		//一下方法需要完成
+		Map paras = getUserParas();
 		User result = (User)script.singleSelect(getConn(), paras, User.class);
 		// 
 		
@@ -48,6 +59,14 @@ public class Test {
 			e.printStackTrace();
 		}
 		return conn;
+	}
+	
+	private static Map getUserParas(){
+		User user = new User();
+		user.setId(2);
+		Map paras = new HashMap();
+		paras.put("user", user);
+		return paras;
 	}
 	
 //	public static void testIf(){

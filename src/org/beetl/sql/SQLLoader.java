@@ -1,6 +1,8 @@
 package org.beetl.sql;
 
+import org.beetl.sql.core.SQLSource;
+
 public interface SQLLoader {
-	public String getSQL(String id);
+	public SQLSource getSQL(String id);
 	
 }
