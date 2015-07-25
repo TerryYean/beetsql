@@ -7,7 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +62,7 @@ public class SQLScript {
 		try {
 			ps = conn.prepareStatement(sql);
 			for (int i = 0; i < objs.size(); i++)
-				ps.setObject(i+1, objs.get(i));
+				ps.setObject(i + 1, objs.get(i));
 			rs = ps.executeQuery();
 			model = getModel(rs, mapping);
 		} catch (SQLException e) {
@@ -69,8 +70,10 @@ public class SQLScript {
 			e.printStackTrace();
 		} finally {
 			try {
-				if (rs != null)rs.close();
-				if (ps != null)ps.close();
+				if (rs != null)
+					rs.close();
+				if (ps != null)
+					ps.close();
 				// if(conn != null)conn.close();由连接池来管理？
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
@@ -95,20 +98,30 @@ public class SQLScript {
 		List jdbcPara;
 	}
 
+	/***
+	 * 获取一个实例
+	 * 
+	 * @param rs
+	 * @param mapping
+	 * @return
+	 */
 	public Object getModel(ResultSet rs, Class mapping) {
 		Object model = null;
 		try {
 			model = mapping.newInstance();
 			Method[] methods = mapping.getDeclaredMethods();
 			try {
-				while (rs.next()) {
+				if (rs.next()) {
 					for (Method method : methods) {
 						String methodName = method.getName();
-						if(methodName.startsWith("set")){
-							String attrName = toLowerCaseFirstOne(methodName.substring(3));
+						if (methodName.startsWith("set")) {
+							String attrName = toLowerCaseFirstOne(methodName
+									.substring(3));
 							method.invoke(model, rs.getObject(attrName));
 						}
 					}
+				} else {
+					return null;
 				}
 			} catch (SecurityException e) {
 				// TODO Auto-generated catch block
@@ -132,20 +145,76 @@ public class SQLScript {
 		}
 		return model;
 	}
-	//首字母转小写
-    public String toLowerCaseFirstOne(String s)
-    {
-        if(Character.isLowerCase(s.charAt(0)))
-            return s;
-        else
-            return (new StringBuilder()).append(Character.toLowerCase(s.charAt(0))).append(s.substring(1)).toString();
-    }
-    //首字母转大写
-    public String toUpperCaseFirstOne(String s)
-    {
-        if(Character.isUpperCase(s.charAt(0)))
-            return s;
-        else
-            return (new StringBuilder()).append(Character.toUpperCase(s.charAt(0))).append(s.substring(1)).toString();
-    }
+
+	public int update(Connection conn, Object obj) {
+		Class cls = obj.getClass();
+		String tableName = cls.getSimpleName().toLowerCase();
+		sql = "update " + tableName + " set ";
+		String id = "";
+		String fieldName = null;
+		Field[] fields = cls.getDeclaredFields();
+		int rs = 0;
+		for (Field field : fields) {
+			try {
+				fieldName = field.getName();
+				if(fieldName.toLowerCase().equals("id")){
+					id = getFieldValue(field, obj);
+				}
+				sql = sql +fieldName+"='"+getFieldValue(field, obj)+"',";
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		sql = sql.subSequence(0, sql.lastIndexOf(","))+" where id="+id;
+		System.out.println(sql);
+		PreparedStatement ps = null;
+		// 执行jdbc
+			try {
+				ps = conn.prepareStatement(sql);
+				rs = ps.executeUpdate();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		return rs;
+	}
+
+	public Object getById(Connection conn, Object obj) {
+		Map<String, Object> paras = new HashMap<String, Object>();
+		String tableName = obj.getClass().getSimpleName().toLowerCase();
+		this.sql = "select * from "+tableName+" where id=${"+tableName+".id}";
+		paras.put(tableName, obj);
+		return singleSelect(conn,paras,obj.getClass());
+	}
+
+	public String getFieldValue(Field field, Object obj)
+			throws IllegalArgumentException, IllegalAccessException {
+		if (field.getType().equals(java.sql.Date.class)
+				|| field.getType().equals(java.util.Date.class)) {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			return sdf.format(field.get(obj));
+		}
+		return field.get(obj).toString();
+	}
+
+	// 首字母转小写
+	public String toLowerCaseFirstOne(String s) {
+		if (Character.isLowerCase(s.charAt(0)))
+			return s;
+		else
+			return (new StringBuilder())
+					.append(Character.toLowerCase(s.charAt(0)))
+					.append(s.substring(1)).toString();
+	}
+
+	// 首字母转大写
+	public String toUpperCaseFirstOne(String s) {
+		if (Character.isUpperCase(s.charAt(0)))
+			return s;
+		else
+			return (new StringBuilder())
+					.append(Character.toUpperCase(s.charAt(0)))
+					.append(s.substring(1)).toString();
+	}
 }
