@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -31,33 +33,34 @@ public class ClasspathLoader implements SQLLoader {
     String sqlRoot = null;
 
 	Map<String, SQLSource> sqlSourceMap = new HashMap<String, SQLSource>();
-
+	Map<String,String> modelMap = new HashMap<String, String>();
+	
 	public ClasspathLoader(String sqlRoot) {
-		this.sqlRoot = System.getProperty("user.dir") + File.separator + "bin"
-				+ sqlRoot;//这个地址应该通过web容器来获取？？
-		File root = new File(this.sqlRoot);
-		File[] sqlFiles = root.listFiles();
-		for (File file : sqlFiles) {
-			loadSql(file);
-		}
+		this.sqlRoot = sqlRoot;
 	}
 
 	@Override
 	public SQLSource getSQL(String id) {
 		// real path = sqlRoot\xx\yy.sql
-		return this.sqlSourceMap.get(id);
+		SQLSource ss = this.sqlSourceMap.get(id);
+		if(ss == null){
+			loadSql(id);
+		}
+		ss = this.sqlSourceMap.get(id);
+		return ss;
 	}
+
 	/***
 	 * 加载sql文件，并放入sqlSourceMap中
 	 * @param file
 	 * @return
 	 */
-	private boolean loadSql(File file) {
-		byte[] b = new byte[1024];
-		String fileName = file.getName().substring(0,file.getName().lastIndexOf(".")+1);
+	private boolean loadSql(String id) {
+		String modelName = id.substring(0,id.lastIndexOf(".")+1);
+		InputStream ins = this.getClass().getResourceAsStream(sqlRoot+File.separator+modelName+"md");
 		LinkedList<String> list = new LinkedList<String>();
 		try {
-			BufferedReader bf = new BufferedReader(new FileReader(file));
+			BufferedReader bf = new BufferedReader(new InputStreamReader(ins));
 			String temp = null;
 			StringBuffer sql = null;
 			String key = null;
@@ -68,10 +71,10 @@ public class ClasspathLoader implements SQLLoader {
 						sql = new StringBuffer();
 						key = list.pollFirst();
 						while (!list.isEmpty()) {//拼装成一句sql
-							sql.append(list.pollFirst());
+							sql.append(list.pollFirst()+"\n");
 						}
 						System.out.println(sql.toString());
-						this.sqlSourceMap.put(fileName+key, new SQLSource(sql.toString()));//放入map
+						this.sqlSourceMap.put(modelName+key, new SQLSource(sql.toString()));//放入map
 						list.addLast(tempKey);//把下一句的key又放进来
 					}
 				} else {
@@ -84,7 +87,7 @@ public class ClasspathLoader implements SQLLoader {
 			while (!list.isEmpty()) {
 				sql.append(list.pollFirst());
 			}
-			this.sqlSourceMap.put(fileName+key, new SQLSource(sql.toString()));
+			this.sqlSourceMap.put(modelName+key, new SQLSource(sql.toString()));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
