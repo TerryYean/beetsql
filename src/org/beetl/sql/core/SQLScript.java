@@ -147,45 +147,40 @@ public class SQLScript {
 	}
 
 	public int update(Connection conn, Object obj) {
-		Class cls = obj.getClass();
-		String tableName = cls.getSimpleName().toLowerCase();
-		sql = "update " + tableName + " set ";
-		String id = "";
-		String fieldName = null;
-		Field[] fields = cls.getDeclaredFields();
+		Map<String, Object> paras = new HashMap<String, Object>();
+		String tableName = obj.getClass().getSimpleName().toLowerCase();
+		paras.put(tableName, obj);
+		SQLResult result = run(paras);
+		String sql = result.jdbcSql;
+		List<Object> objs = result.jdbcPara;
 		int rs = 0;
-		for (Field field : fields) {
-			try {
-				fieldName = field.getName();
-				if(fieldName.toLowerCase().equals("id")){
-					id = getFieldValue(field, obj);
-				}
-				sql = sql +fieldName+"='"+getFieldValue(field, obj)+"',";
-			} catch (IllegalArgumentException | IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		sql = sql.subSequence(0, sql.lastIndexOf(","))+" where id="+id;
-		System.out.println(sql);
 		PreparedStatement ps = null;
 		// 执行jdbc
+		try {
+			ps = conn.prepareStatement(sql);
+			for (int i = 0; i < objs.size(); i++)
+				ps.setObject(i + 1, objs.get(i));
+			rs = ps.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
 			try {
-				ps = conn.prepareStatement(sql);
-				rs = ps.executeUpdate();
+				if (ps != null)
+					ps.close();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
 		return rs;
 	}
 
 	public Object getById(Connection conn, Object obj) {
 		Map<String, Object> paras = new HashMap<String, Object>();
 		String tableName = obj.getClass().getSimpleName().toLowerCase();
-		this.sql = "select * from "+tableName+" where id=${"+tableName+".id}";
 		paras.put(tableName, obj);
-		return singleSelect(conn,paras,obj.getClass());
+		return singleSelect(conn, paras, obj.getClass());
 	}
 
 	public String getFieldValue(Field field, Object obj)
