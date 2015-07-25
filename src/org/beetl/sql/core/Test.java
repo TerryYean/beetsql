@@ -12,22 +12,33 @@ import org.beetl.sql.SQLManager;
 public class Test {
 
     public static void main(String[] args) {
-//		testSimple();
+    	testSimple();
 //		testIf();
     		testManager();
 
 	}
     
     public static void testManager(){
-    		SQLLoader loader = new ClasspathLoader("/sql/mysql");
+    	SQLLoader loader = new ClasspathLoader("/sql/mysql");
 		SQLManager manager = new SQLManager(loader);
 		SQLScript script = manager.getScript("user.selectUser");
 		Map paras = getUserParas();
 		User result = (User)script.singleSelect(getConn(), paras, User.class);
-	
-	
+		
+		SQLScript script2 = manager.getScript(User.class);
+		User u = (User) script2.getById(getConn(), result);//默认返回的是user.getById
+		printUser(u);
+		
+		SQLScript script3 = manager.getScript("user.update");//已经在30行生成了update语句
+		System.out.println("sql === "+script3.sql);
+		result.setName("xxxx");
+		script3.update(getConn(), result);
+		
     }
-	
+    //便于测试
+	public static void printUser(User user){
+		System.out.println("user:{id:"+user.getId()+",name:"+user.getName()+"}");
+	}
 	public static void testSimple(){
 		String sql =" select * from user where id = ${user.id}";
 		
