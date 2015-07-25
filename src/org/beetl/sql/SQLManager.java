@@ -1,10 +1,9 @@
 package org.beetl.sql;
 
-import org.beetl.sql.core.ClasspathLoader;
 import org.beetl.sql.core.SQLScript;
 
 public class SQLManager {
-	private SQLLoader sqlLoader;
+    private SQLLoader sqlLoader;
 	public SQLManager(SQLLoader loader){
 		this.sqlLoader = loader;
 	}
@@ -14,7 +13,12 @@ public class SQLManager {
 		SQLScript script = new SQLScript(template);
 		return script;
 	}
-	
+	public SQLScript getScript(Class cls){
+		sqlLoader.generationUpdate(cls);
+		String template = sqlLoader.generationGetByid(cls).getTemplate();
+		SQLScript script = new SQLScript(template);
+		return script;
+	}
 	
 	
 	
