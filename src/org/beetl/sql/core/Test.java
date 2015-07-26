@@ -34,7 +34,7 @@ public class Test {
 		SQLScript script3 = manager.getScript(User.class,SQLManager.UPDATE_VALUE);//已经在30行生成了update语句
 		System.out.println("====sql==== \n"+script3.sql);
 		result.setName("xxxx");
-		script3.update(getConn(), result);
+		System.out.println("更新影响的行数："+script3.update(getConn(), result));
 		
     }
     //便于测试
@@ -105,14 +105,14 @@ public class Test {
 		int id;
 		String name;
 		int age;
-		
+		@ID
 		public int getId() {
 			return id;
 		}
 		public void setId(int id) {
 			this.id = id;
 		}
-		@ID
+		
 		public String getName() {
 			return name;
 		}

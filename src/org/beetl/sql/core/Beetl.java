@@ -2,7 +2,6 @@ package org.beetl.sql.core;
 
 import org.beetl.core.Configuration;
 import org.beetl.core.GroupTemplate;
-import org.beetl.core.Template;
 import org.beetl.core.resource.StringTemplateResourceLoader;
 
 public class Beetl {

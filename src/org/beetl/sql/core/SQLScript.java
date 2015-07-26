@@ -152,7 +152,6 @@ public class SQLScript {
 		paras.put(tableName, obj);
 		SQLResult result = run(paras);
 		String sql = result.jdbcSql;
-		System.out.println("sql====="+sql);
 		List<Object> objs = result.jdbcPara;
 		int rs = 0;
 		PreparedStatement ps = null;
