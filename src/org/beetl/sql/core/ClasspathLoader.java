@@ -6,11 +6,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
 import org.beetl.sql.SQLLoader;
+import org.beetl.sql.annotation.ID;
 
 /**
  * 从classpath系统加载sql模板，id应该格式是"xx.yyy",xx代表了文件名，yyy代表了sql标识 sql 模板格式如下：
@@ -24,9 +26,9 @@ import org.beetl.sql.SQLLoader;
  */
 public class ClasspathLoader implements SQLLoader {
 
-    String sqlRoot = null;
+	String sqlRoot = null;
 
-	public static Map<String, SQLSource> sqlSourceMap = new HashMap<String,SQLSource>();
+	public static Map<String, SQLSource> sqlSourceMap = new HashMap<String, SQLSource>();
 
 	public ClasspathLoader(String sqlRoot) {
 		this.sqlRoot = sqlRoot;
@@ -49,13 +51,24 @@ public class ClasspathLoader implements SQLLoader {
 	@Override
 	public SQLSource generationGetByid(Class cls) {
 		String className = cls.getSimpleName().toLowerCase();
-		SQLSource tempSource = this.sqlSourceMap.get(className+".getById");
-		if(tempSource != null){
+		SQLSource tempSource = this.sqlSourceMap.get(className + ".getById");
+		if (tempSource != null) {
 			return tempSource;
 		}
-		String sql = "select * from "+className+" where id=${"+className+".id}";
+		Method[] methods = cls.getDeclaredMethods();
+		String condition = null;
+		for (Method method : methods) {
+			if (method.isAnnotationPresent(ID.class)) {
+				String fieldName = method.getName().substring(3).toLowerCase();
+				condition = " where " + fieldName + "=${" + cls.getSimpleName()+ "." + fieldName + "}";
+			}
+		}
+		if (condition == null) {
+			condition = " where id=${" + className + ".id}";
+		}
+		String sql = "select * from " + className + condition;
 		tempSource = new SQLSource(sql);
-		this.sqlSourceMap.put(className+".getById",tempSource);
+		this.sqlSourceMap.put(className + ".getById", tempSource);
 		return tempSource;
 	}
 
@@ -72,22 +85,25 @@ public class ClasspathLoader implements SQLLoader {
 		String sql = "update " + className + " set ";
 		String clsField = null;
 		String fieldName = null;
-		Field[] fields = cls.getDeclaredFields();
-		for (Field field : fields) {
-			try {
-				fieldName = field.getName();
-				clsField = className+"."+fieldName;
-				sql = sql +"\n@if(!isEmpty("+clsField+")){\n"+fieldName+"='${"+clsField+"}',\n@}";
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		Method[] methods = cls.getDeclaredMethods();
+		String condition = null;
+		for (Method method : methods) {
+			fieldName = method.getName().substring(3).toLowerCase();
+			clsField = className+"."+fieldName;
+			sql = sql +"\n@if(!isEmpty("+clsField+")){\n"+fieldName+"='${"+clsField+"}',\n@}";
+			if (method.isAnnotationPresent(ID.class)) {
+				condition = " where " + fieldName + "=${" +clsField+ "}";
 			}
 		}
-		sql = sql.subSequence(0, sql.lastIndexOf(","))+"\n@}\n where id=${"+className+".id}";
+		if(condition == null){
+			 condition = " where id=${"+className+".id}";
+		}
+		sql = sql.subSequence(0, sql.lastIndexOf(","))+"\n@}\n "+condition;
 		tempSource = new SQLSource(sql);
 		this.sqlSourceMap.put(className+".update",tempSource);
 		return tempSource;
 	}
+
 	/***
 	 * 加载sql文件，并放入sqlSourceMap中
 	 * 
@@ -114,7 +130,6 @@ public class ClasspathLoader implements SQLLoader {
 						while (!list.isEmpty()) {// 拼装成一句sql
 							sql.append(list.pollFirst() + "\n");
 						}
-						System.out.println(sql.toString());
 						this.sqlSourceMap.put(modelName + key, new SQLSource(
 								sql.toString()));// 放入map
 						list.addLast(tempKey);// 把下一句的key又放进来
