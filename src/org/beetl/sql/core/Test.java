@@ -54,7 +54,7 @@ public class Test {
 	
 	private static Connection getConn(){
 		String driver = "com.mysql.jdbc.Driver";
-        String dbName = "test";
+        String dbName = "beetlSql";
         String passwrod = "root";
         String userName = "root";
         String url = "jdbc:mysql://localhost:3306/" + dbName;
