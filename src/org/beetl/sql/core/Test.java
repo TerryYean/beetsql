@@ -101,8 +101,9 @@ public class Test {
 //	}
 	
 	static class User{
-		@ID int id;
+		int id;
 		String name;
+		@ID
 		public int getId() {
 			return id;
 		}
