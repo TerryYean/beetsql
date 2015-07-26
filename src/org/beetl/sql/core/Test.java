@@ -13,7 +13,7 @@ import org.beetl.sql.annotation.ID;
 public class Test {
 
     public static void main(String[] args) {
-    	testSimple();
+    	//testSimple();
 //		testIf();
     		testManager();
 
@@ -27,11 +27,12 @@ public class Test {
 		User result = (User)script.singleSelect(getConn(), paras, User.class);
 		
 		SQLScript script2 = manager.getScript(User.class,SQLManager.SELECT_ID);
+		System.out.println("====sql==== \n"+script2.sql);
 		User u = (User) script2.getById(getConn(), result);//默认返回的是user.getById
 		printUser(u);
 		
 		SQLScript script3 = manager.getScript(User.class,SQLManager.UPDATE_VALUE);//已经在30行生成了update语句
-		System.out.println("sql === "+script3.sql);
+		System.out.println("====sql==== \n"+script3.sql);
 		result.setName("xxxx");
 		script3.update(getConn(), result);
 		
@@ -103,18 +104,26 @@ public class Test {
 	static class User{
 		int id;
 		String name;
-		@ID
+		int age;
+		
 		public int getId() {
 			return id;
 		}
 		public void setId(int id) {
 			this.id = id;
 		}
+		@ID
 		public String getName() {
 			return name;
 		}
 		public void setName(String name) {
 			this.name = name;
+		}
+		public int getAge() {
+			return age;
+		}
+		public void setAge(int age) {
+			this.age = age;
 		}
 		
 	}

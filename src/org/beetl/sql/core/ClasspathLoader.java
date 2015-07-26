@@ -44,7 +44,8 @@ public class ClasspathLoader implements SQLLoader {
 		ss = this.sqlSourceMap.get(id);
 		return ss;
 	}
-
+	final String SYMBOL_BEGIN = "#";
+	final String SYMBOL_END = "\n";
 	/***
 	 * 生成getbyid语句
 	 */
@@ -60,7 +61,7 @@ public class ClasspathLoader implements SQLLoader {
 		for (Method method : methods) {
 			if (method.isAnnotationPresent(ID.class)) {
 				String fieldName = method.getName().substring(3).toLowerCase();
-				condition = " where " + fieldName + "=${" + cls.getSimpleName()+ "." + fieldName + "}";
+				condition = " where " + fieldName + "=${" + className+ "." + fieldName + "}";
 			}
 		}
 		if (condition == null) {
@@ -82,23 +83,25 @@ public class ClasspathLoader implements SQLLoader {
 		if(tempSource != null){
 			return tempSource;
 		}
-		String sql = "update " + className + " set ";
+		String sql = "update " + className + " set \n";
 		String clsField = null;
 		String fieldName = null;
 		Method[] methods = cls.getDeclaredMethods();
 		String condition = null;
 		for (Method method : methods) {
-			fieldName = method.getName().substring(3).toLowerCase();
-			clsField = className+"."+fieldName;
-			sql = sql +"\n@if(!isEmpty("+clsField+")){\n"+fieldName+"='${"+clsField+"}',\n@}";
-			if (method.isAnnotationPresent(ID.class)) {
-				condition = " where " + fieldName + "=${" +clsField+ "}";
+			if(method.getName().startsWith("get")){
+				fieldName = method.getName().substring(3).toLowerCase();
+				clsField = className+"."+fieldName;
+				sql = sql+SYMBOL_BEGIN+"if(!isEmpty("+clsField+")){"+SYMBOL_END+fieldName+"='${"+clsField+"}',\n"+SYMBOL_BEGIN+"}"+SYMBOL_END;
+				if (method.isAnnotationPresent(ID.class)) {
+					condition = " where " + fieldName + "=${" +clsField+ "}";
+				}
 			}
 		}
 		if(condition == null){
 			 condition = " where id=${"+className+".id}";
 		}
-		sql = sql.subSequence(0, sql.lastIndexOf(","))+"\n@}\n "+condition;
+		sql = sql.subSequence(0, sql.lastIndexOf(","))+"\n"+SYMBOL_BEGIN+"}\n "+condition;
 		tempSource = new SQLSource(sql);
 		this.sqlSourceMap.put(className+".update",tempSource);
 		return tempSource;
