@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.beetl.sql.SQLLoader;
 import org.beetl.sql.SQLManager;
+import org.beetl.sql.annotation.ID;
 
 public class Test {
 
@@ -25,11 +26,11 @@ public class Test {
 		Map paras = getUserParas();
 		User result = (User)script.singleSelect(getConn(), paras, User.class);
 		
-		SQLScript script2 = manager.getScript(User.class);
+		SQLScript script2 = manager.getScript(User.class,SQLManager.SELECT_ID);
 		User u = (User) script2.getById(getConn(), result);//默认返回的是user.getById
 		printUser(u);
 		
-		SQLScript script3 = manager.getScript("user.update");//已经在30行生成了update语句
+		SQLScript script3 = manager.getScript(User.class,SQLManager.UPDATE_VALUE);//已经在30行生成了update语句
 		System.out.println("sql === "+script3.sql);
 		result.setName("xxxx");
 		script3.update(getConn(), result);
@@ -98,9 +99,9 @@ public class Test {
 //		System.out.println(jdbcSQL);
 //		System.out.println(jdbcParas);
 //	}
-
+	
 	static class User{
-		int id;
+		@ID int id;
 		String name;
 		public int getId() {
 			return id;
