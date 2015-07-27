@@ -4,7 +4,6 @@ import java.util.Stack;
 
 import org.beetl.core.Event;
 import org.beetl.core.Listener;
-import org.beetl.core.statement.GeneralForStatement;
 import org.beetl.core.statement.PlaceholderST;
 
 public class PlaceHolderListener implements Listener
