@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Properties;
 
 import org.beetl.sql.SQLLoader;
 import org.beetl.sql.annotation.ID;
@@ -28,11 +29,27 @@ public class ClasspathLoader implements SQLLoader {
 	String sqlRoot = null;
 
 	public static Map<String, SQLSource> sqlSourceMap = new HashMap<String, SQLSource>();
-
+	
+	private String SYMBOL_BEGIN = "#";
+	private String SYMBOL_END = "\n";
+	
 	public ClasspathLoader(String sqlRoot) {
 		this.sqlRoot = sqlRoot;
+		loadConfig();
 	}
-
+	
+	public void loadConfig(){
+		InputStream ins = this.getClass().getResourceAsStream("/beetl.properties");
+		Properties ps = new Properties();
+		try {
+			ps.load(ins);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		SYMBOL_BEGIN = ps.getProperty("beetl.SYMBOL_BEGIN");
+		SYMBOL_END = ps.getProperty("beetl.SYMBOL_END");
+	}
 	@Override
 	public SQLSource getSQL(String id) {
 		// real path = sqlRoot\xx\yy.sql
@@ -43,8 +60,7 @@ public class ClasspathLoader implements SQLLoader {
 		ss = this.sqlSourceMap.get(id);
 		return ss;
 	}
-	final String SYMBOL_BEGIN = "#";
-	final String SYMBOL_END = "\n";
+	
 	/***
 	 * 生成getbyid语句
 	 */
