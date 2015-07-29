@@ -81,7 +81,7 @@ SQLScript
 DataMapper
 ===
 自定义ResultSet到Pojo的映射类
-	List<User> list SQLScript.query(Map paras,mapper);
+	*List<User> list  = SQLScript.query(Map paras,mapper);
 
 
 SQL例子
