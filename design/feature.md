@@ -15,8 +15,22 @@
 代码例子
 ===
 
-	List<User>  list = SQLManager.getSQLScript("select").select(paras,User.class);
+	List<User>  list = SQLManager.getSQLScript("selectUser").select(paras,User.class);
 	User user = SQLManager.getSQLScript(User.class,SELECT_BY_ID).unque(id);
+
+SQL例子
+===
+
+	selectUser
+	===
+	    select * from user where 1=1
+	    @if(user.age==1){
+	    and age = ${user.age}
+	    @}
+	    
+	selectAll
+	===
+	    select * from user 
 	
 
 API
@@ -84,17 +98,4 @@ DataMapper
 	*List<User> list  = SQLScript.query(Map paras,mapper);
 
 
-SQL例子
-===
-
-	selectUser
-	===
-	    select * from user where 1=1
-	    @if(user.age==1){
-	    and age = ${user.age}
-	    @}
-	    
-	selectAll
-	===
-	    select * from user 
 
