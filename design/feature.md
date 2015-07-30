@@ -1,24 +1,24 @@
-ÌØµã
+ç‰¹ç‚¹
 ===
 
-* SQL ÒÔSQL·½Ê½¼¯ÖĞ¹ÜÀí£¬Êı¾İ¿âSQLÄÜºÜÈİÒ×µÄ±»¼¯³Éµ½¿ª·¢SQLÀï£¬¿ª·¢SQLÒ²ºÜÈİÒ×±»Êı¾İ¿âµ÷ÊÔ
+* SQL ä»¥SQLæ–¹å¼é›†ä¸­ç®¡ç†ï¼Œæ•°æ®åº“SQLèƒ½å¾ˆå®¹æ˜“çš„è¢«é›†æˆåˆ°å¼€å‘SQLé‡Œï¼Œå¼€å‘SQLä¹Ÿå¾ˆå®¹æ˜“è¢«æ•°æ®åº“è°ƒè¯•
 
-* ¶ÔÓÚ¼òµ¥µÄµ¥±í²Ù×÷£¬Èç¸üĞÂ£¬²åÈë£¬ÒÔ¼°Í¨¹ıÖ÷¼ü£¬Ä£°å²éÑ¯µÈ£¬ÎŞĞèSQL
+* å¯¹äºç®€å•çš„å•è¡¨æ“ä½œï¼Œå¦‚æ›´æ–°ï¼Œæ’å…¥ï¼Œä»¥åŠé€šè¿‡ä¸»é”®ï¼Œæ¨¡æ¿æŸ¥è¯¢ç­‰ï¼Œæ— éœ€SQL
 
-* ½«DAO´úÂëÀïÍ¨³£µÄÂß¼­ÅĞ¶Ï£¬¹ØÏµÓ³Éä ¶¼·Åµ½ SQLScriptÀï£¬ÓÃ»§ÎŞĞè±àĞ´java´úÂë
+* å°†DAOä»£ç é‡Œé€šå¸¸çš„é€»è¾‘åˆ¤æ–­ï¼Œå…³ç³»æ˜ å°„ éƒ½æ”¾åˆ° SQLScripté‡Œï¼Œç”¨æˆ·æ— éœ€ç¼–å†™javaä»£ç 
 
-* ¿çÆ½Ì¨Éè¼Æ
-	* Í¨¹ı×éÖ¯sqlÎÄ¼ş£¬Ä¬ÈÏÔÚdefaultÄ¿Â¼ÏÂ£¬¿çÊı¾İ¿âµÄsql·ÅÔÚ²»Í¬Ä¿Â¼£¬ÔÚÔËĞĞµÄÊ±ºòÑ¡È¡ÏàÓ¦Êı¾İ¿âÄ¿Â¼
-	* Ìá¹©Ò»Ğ©À©Õ¹º¯Êı£¬À´ÆÁ±Î¸÷¸öÊı¾İ¿âµÄº¯Êı²îÒì
+* è·¨å¹³å°è®¾è®¡
+	* é€šè¿‡ç»„ç»‡sqlæ–‡ä»¶ï¼Œé»˜è®¤åœ¨defaultç›®å½•ä¸‹ï¼Œè·¨æ•°æ®åº“çš„sqlæ”¾åœ¨ä¸åŒç›®å½•ï¼Œåœ¨è¿è¡Œçš„æ—¶å€™é€‰å–ç›¸åº”æ•°æ®åº“ç›®å½•
+	* æä¾›ä¸€äº›æ‰©å±•å‡½æ•°ï¼Œæ¥å±è”½å„ä¸ªæ•°æ®åº“çš„å‡½æ•°å·®å¼‚
 
 
-´úÂëÀı×Ó
+ä»£ç ä¾‹å­
 ===
 
 	List<User>  list = SQLManager.getSQLScript("selectUser").select(paras,User.class);
 	User user = SQLManager.getSQLScript(User.class,SELECT_BY_ID).unque(id);
 
-SQLÀı×Ó
+SQLä¾‹å­
 ===
 
 	selectUser
@@ -30,7 +30,12 @@ SQLÀı×Ó
 	    
 	selectAll
 	===
-	    select * from user 
+	    select * from user  
+	    @include("selectWhere")
+	    
+	selectWhere
+	===
+	    where 
 	
 
 API
@@ -39,62 +44,62 @@ API
 SQLManager
 ---
 
-* SQLManager.getSQLScript(String id) : ¸ù¾İidµÃµ½SQLScript
+* SQLManager.getSQLScript(String id) : æ ¹æ®idå¾—åˆ°SQLScript
 
-* SQLManager.getSQLScript(Class t, int Type) : ¸ù¾İÀàĞÍµÃµ½SQLScript£¬typeËµÃ÷ÈçÏÂ
+* SQLManager.getSQLScript(Class t, int Type) : æ ¹æ®ç±»å‹å¾—åˆ°SQLScriptï¼Œtypeè¯´æ˜å¦‚ä¸‹
 
-		* SELECT_BY_ID,¸ù¾İÖ÷¼üÉú³Éµ¥¶ÔÏóµÄ²éÑ¯Óï¾ä£¬²Î¿¼SQLScript.unque(Object id)
-		* SELECT_BY_TEMPLATE, ¸ù¾İ¶ÔÏóÉú³ÉÒ»¸ö¸ù¾İ¶ÔÏóÀïµÄÊôĞÔÖµÓĞÎŞ×÷ÎªÌõ¼şµÄSQL£¬²Î¿¼SQLScript.selectByTemplate(Object obj)
+		* SELECT_BY_ID,æ ¹æ®ä¸»é”®ç”Ÿæˆå•å¯¹è±¡çš„æŸ¥è¯¢è¯­å¥ï¼Œå‚è€ƒSQLScript.unque(Object id)
+		* SELECT_BY_TEMPLATE, æ ¹æ®å¯¹è±¡ç”Ÿæˆä¸€ä¸ªæ ¹æ®å¯¹è±¡é‡Œçš„å±æ€§å€¼æœ‰æ— ä½œä¸ºæ¡ä»¶çš„SQLï¼Œå‚è€ƒSQLScript.selectByTemplate(Object obj)
 		* DELETE_BY_ID
 		* DELETE_BY_TEMPLATE
 		* SELECT_ALL
 		* UPDATE_BY_ID
 		* UPDATE_BY_TEMPLATE
 	
-ÀàĞÍ»á¼ÙÉè idÎªÖ÷¼ü£¬Èç¹û²»ÊÇ£¬ÇëÓÃannotatonÉêÃ÷
+ç±»å‹ä¼šå‡è®¾ idä¸ºä¸»é”®ï¼Œå¦‚æœä¸æ˜¯ï¼Œè¯·ç”¨annotatonç”³æ˜
 
 SQLScript
 ===
-### ¼òµ¥²éÑ° ###
-*  SQLScript.unque(Object id)  µÃµ½Î¨Ò»¶ÔÏó£¬Èç¹ûÓĞ¶à¸ö£¬Ó¦¸ÃÅ×´í
-*  SQLScript.query(Map paras,User.class)  ¸ù¾İÊäÈëÌõ¼ş²éÑ¯£¬½á¹ûÓ³Éä³ÉUserÀà
-*  SQLScript.query(Object[] array,User.class)  ¸ù¾İÊäÈëÌõ¼ş²éÑ¯£¬½á¹ûÓ³Éä³ÉUserÀà,sql Ó¦¸Ã¶¼ÊÇ£¿ºÅ
-*  SQLScript.query(Object paras,User.class)  ¸ù¾İÊäÈëÌõ¼ş²éÑ¯.paras ¶ÔÏóµÄÊôĞÔ×ª»¯Îªmap£¬ÔÚµ÷ÓÃ
+### ç®€å•æŸ¥å¯» ###
+*  SQLScript.unque(Object id)  å¾—åˆ°å”¯ä¸€å¯¹è±¡ï¼Œå¦‚æœæœ‰å¤šä¸ªï¼Œåº”è¯¥æŠ›é”™
+*  SQLScript.query(Map paras,User.class)  æ ¹æ®è¾“å…¥æ¡ä»¶æŸ¥è¯¢ï¼Œç»“æœæ˜ å°„æˆUserç±»
+*  SQLScript.query(Object[] array,User.class)  æ ¹æ®è¾“å…¥æ¡ä»¶æŸ¥è¯¢ï¼Œç»“æœæ˜ å°„æˆUserç±»,sql åº”è¯¥éƒ½æ˜¯ï¼Ÿå·
+*  SQLScript.query(Object paras,User.class)  æ ¹æ®è¾“å…¥æ¡ä»¶æŸ¥è¯¢.paras å¯¹è±¡çš„å±æ€§è½¬åŒ–ä¸ºmapï¼Œåœ¨è°ƒç”¨
 
-### Ò»¶Ô¶à²éÑ° ###
+### ä¸€å¯¹å¤šæŸ¥å¯» ###
 
-* SQLScript.one2Many(Map paras,User.class,Role.class£¬new String{"id","roleId","roles"})£¬×îºóÒ»¸ö²ÎÊıÊÇÊı¾İ¿â·µ»ØµÄÇ°Á©ÁĞ£¬±íÊ¾ÁË¹ØÏµ£¬×îºóÒ»¸öÊÇ ÊôĞÔÓ³Éä¡£
+* SQLScript.one2Many(Map paras,User.class,Role.classï¼Œnew String{"id","roleId","roles"})ï¼Œæœ€åä¸€ä¸ªå‚æ•°æ˜¯æ•°æ®åº“è¿”å›çš„å‰ä¿©åˆ—ï¼Œè¡¨ç¤ºäº†å…³ç³»ï¼Œæœ€åä¸€ä¸ªæ˜¯ å±æ€§æ˜ å°„ã€‚
 		
 		select id,name,roleId,rolename from user ,left join roles ......
 
 * SQLScript.one2Many(Object paras,,User.class,Role.class,new String{"id","roleId","roles"})
 * SQLScript.one2Many(Object[] array,,User.class,Role.clas,new String{"id","roleId","roles"})
 
-### Ò»¶ÔÒ» ²éÑ° ###
+### ä¸€å¯¹ä¸€ æŸ¥å¯» ###
 
-* Í¬ÉÏ
+* åŒä¸Š
 
 
-### ÆäËû²éÑ¯ ###
-*  SQLScript.queryInt(Object paras)  ·µ»ØÒ»¸öÕûĞÎ
-*  SQLScript.queryInt(Map paras)  ·µ»ØÒ»¸öÕûĞÎ
-*  SQLScript.queryInt(Object[] paras)  ·µ»ØÒ»¸öÕûĞÎ
-*  SQLScript.queryLong(Object paras)  ·µ»ØÒ»¸ö³¤ÕûĞÎ
-*  SQLScript.queryArray(Object paras)  ·µ»ØÒ»¸öList£¬ListÓÖ°üº¬Map
-*  SQLScript.queryMap(Object paras)  ·µ»ØÒ»ĞĞ£¬Ã»ÁĞ·Åµ½mapÀï
+### å…¶ä»–æŸ¥è¯¢ ###
+*  SQLScript.queryInt(Object paras)  è¿”å›ä¸€ä¸ªæ•´å½¢
+*  SQLScript.queryInt(Map paras)  è¿”å›ä¸€ä¸ªæ•´å½¢
+*  SQLScript.queryInt(Object[] paras)  è¿”å›ä¸€ä¸ªæ•´å½¢
+*  SQLScript.queryLong(Object paras)  è¿”å›ä¸€ä¸ªé•¿æ•´å½¢
+*  SQLScript.queryArray(Object paras)  è¿”å›ä¸€ä¸ªListï¼ŒListåˆåŒ…å«Map
+*  SQLScript.queryMap(Object paras)  è¿”å›ä¸€è¡Œï¼Œæ²¡åˆ—æ”¾åˆ°mapé‡Œ
 
-### Ìí¼Ó  ##
+### æ·»åŠ   ##
 
 * SQLScript.insert(Object paras)
 * SQLScript.insert(Map paras)
 * SQLScript.insert(Object[] paras)
-*  SQLScript.enableKeyHolder() ÔÚ²åÈë²Ù×÷Ö´ĞĞÇ°ÉèÖÃ£¬Ôò²åÈëºó£¬¿ÉÒÔ»ñÈ¡×é¼ş
-*  SQLScript.getKeyHolder() ·µ»Ø²åÈëµÄ×é¼ş
+*  SQLScript.enableKeyHolder() åœ¨æ’å…¥æ“ä½œæ‰§è¡Œå‰è®¾ç½®ï¼Œåˆ™æ’å…¥åï¼Œå¯ä»¥è·å–ç»„ä»¶
+*  SQLScript.getKeyHolder() è¿”å›æ’å…¥çš„ç»„ä»¶
 
 
 DataMapper
 ===
-×Ô¶¨ÒåResultSetµ½PojoµÄÓ³ÉäÀà
+è‡ªå®šä¹‰ResultSetåˆ°Pojoçš„æ˜ å°„ç±»
 	*List<User> list  = SQLScript.query(Map paras,mapper);
 
 

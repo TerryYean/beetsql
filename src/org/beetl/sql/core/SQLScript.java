@@ -18,15 +18,17 @@ import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
 
 public class SQLScript {
+	SQLManager sm;
     String sql;
 	String jdbcSql;
 
-	public SQLScript(String sql) {
+	public SQLScript(String sql,SQLManager sm) {
 		this.sql = sql;
+		this.sm = sm ;
 
 	}
 
-	private SQLResult run(Map<String, Object> paras) {
+	protected SQLResult run(Map<String, Object> paras) {
 		GroupTemplate gt = Beetl.instance().getGroupTemplate();
 		Template t = gt.getTemplate(sql);
 		List jdbcPara = new LinkedList();
@@ -34,6 +36,7 @@ public class SQLScript {
 			t.binding(entry.getKey(), entry.getValue());
 		}
 		t.binding("_paras", jdbcPara);
+		t.binding("_manager", this.sm);
 
 		String jdbcSql = t.render();
 		SQLResult result = new SQLResult();
@@ -42,13 +45,14 @@ public class SQLScript {
 		return result;
 	}
 	
-	public Object singleSelect(Connection conn, Object paras,
+	public Object singleSelect(Object paras,
 			Class mapping) {
 		Map map = new HashMap();
-		map.put("_$", paras);
+		map.put("_root", paras);
 		SQLResult result = run(map);
 		String sql = result.jdbcSql;
 		List<Object> objs = result.jdbcPara;
+		//todo:
 		return null;
 	}
 
@@ -60,7 +64,7 @@ public class SQLScript {
 	 * @param mapping
 	 * @return
 	 */
-	public Object singleSelect(Connection conn, Map<String, Object> paras,
+	public Object singleSelect(Map<String, Object> paras,
 			Class mapping) {
 		SQLResult result = run(paras);
 		String sql = result.jdbcSql;
@@ -70,7 +74,7 @@ public class SQLScript {
 		Object model = null;
 		// 执行jdbc
 		try {
-			ps = conn.prepareStatement(sql);
+			ps = sm.ds.getConn().prepareStatement(sql);
 			for (int i = 0; i < objs.size(); i++)
 				ps.setObject(i + 1, objs.get(i));
 			rs = ps.executeQuery();
@@ -103,10 +107,7 @@ public class SQLScript {
 		throw new UnsupportedOperationException();
 	}
 
-	class SQLResult {
-		String jdbcSql;
-		List jdbcPara;
-	}
+	
 
 	/***
 	 * 获取一个实例
@@ -156,7 +157,7 @@ public class SQLScript {
 		return model;
 	}
 
-	public int update(Connection conn, Object obj) {
+	public int update(Object obj) {
 		Map<String, Object> paras = new HashMap<String, Object>();
 		String tableName = obj.getClass().getSimpleName().toLowerCase();
 		paras.put(tableName, obj);
@@ -167,7 +168,7 @@ public class SQLScript {
 		PreparedStatement ps = null;
 		// 执行jdbc
 		try {
-			ps = conn.prepareStatement(sql);
+			ps = sm.ds.getConn().prepareStatement(sql);
 			for (int i = 0; i < objs.size(); i++)
 				ps.setObject(i + 1, objs.get(i));
 			rs = ps.executeUpdate();
@@ -186,11 +187,11 @@ public class SQLScript {
 		return rs;
 	}
 
-	public Object getById(Connection conn, Object obj) {
+	public Object getById( Object obj) {
 		Map<String, Object> paras = new HashMap<String, Object>();
 		String tableName = obj.getClass().getSimpleName().toLowerCase();
 		paras.put(tableName, obj);
-		return singleSelect(conn, paras, obj.getClass());
+		return singleSelect( paras, obj.getClass());
 	}
 
 	public String getFieldValue(Field field, Object obj)
