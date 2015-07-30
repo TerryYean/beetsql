@@ -13,9 +13,11 @@ public class Beetl {
 			StringTemplateResourceLoader resourceLoader = new StringTemplateResourceLoader();
 			Configuration cfg = Configuration.defaultConfiguration();
 			cfg.setEngine("org.beetl.sql.core.SQLTemplateEngine");
-			cfg.setStatementStart("#");
+			cfg.setStatementStart("@");
 			cfg.setStatementEnd(null);
+			
 			gt = new GroupTemplate(resourceLoader, cfg);
+			gt.registerFunction("use", new UseFunction());
 		
 		}catch(Exception ex){
 			throw new RuntimeException(ex.getMessage());

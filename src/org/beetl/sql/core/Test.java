@@ -13,8 +13,8 @@ public class Test {
     public static void main(String[] args) {
 //    	testSimple();
 //		testIf();
-    		testManager();
-
+//    		testManager();
+    	testUse();
 	}
     
     public static void testManager(){
@@ -39,6 +39,14 @@ public class Test {
 		System.out.println("user:{id:"+user.getId()+",name:"+user.getName()+"}");
 	}
 	
+	public static void testUse(){
+		SQLLoader loader = new ClasspathLoader("/sql/mysql");
+		SQLManager manager = new SQLManager(loader,ds);
+		SQLScript script = manager.getScript("user.selectByExample");
+		User user = (User)script.singleSelect(new User(), User.class);
+		// 
+		
+	}
 	
 	public static void testSimple(){
 		SQLLoader loader = new ClasspathLoader("/sql/mysql");

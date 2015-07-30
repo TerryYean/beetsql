@@ -8,3 +8,16 @@ selectUser
 selectAll
 ===
     select * from user 
+    
+selectByExample
+===
+    select * from user  
+    @use("example");
+  
+example
+===  
+   where 1=1 and name = ${name}
+
+ 
+  
+    

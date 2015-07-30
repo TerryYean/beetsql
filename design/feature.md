@@ -23,19 +23,19 @@ SQL例子
 
 	selectUser
 	===
-	    select * from user where 1=1
-	    @if(user.age==1){
-	    and age = ${user.age}
-	    @}
-	    
+		    select * from user where 1=1
+		    @if(user.age==1){
+		    and age = ${user.age}
+		    @}
+		    
 	selectAll
 	===
-	    select * from user  
-	    @include("selectWhere")
-	    
+		    select * from user  
+		    @use("selectWhere");
+		    
 	selectWhere
 	===
-	    where 
+		    where  age = ${age}
 	
 
 API

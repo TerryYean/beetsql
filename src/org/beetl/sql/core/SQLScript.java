@@ -19,6 +19,7 @@ import org.beetl.core.Template;
 
 public class SQLScript {
 	SQLManager sm;
+	String id ;
     String sql;
 	String jdbcSql;
 
@@ -37,6 +38,7 @@ public class SQLScript {
 		}
 		t.binding("_paras", jdbcPara);
 		t.binding("_manager", this.sm);
+		t.binding("_id", id);
 
 		String jdbcSql = t.render();
 		SQLResult result = new SQLResult();
@@ -223,4 +225,14 @@ public class SQLScript {
 					.append(Character.toUpperCase(s.charAt(0)))
 					.append(s.substring(1)).toString();
 	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+	
+	
 }

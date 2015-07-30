@@ -22,6 +22,7 @@ public class SQLManager {
 	public SQLScript getScript(String id){
 		String template = sqlLoader.getSQL(id).getTemplate();
 		SQLScript script = new SQLScript(template,this);
+		script.setId(id);
 		return script;
 	}
 	
