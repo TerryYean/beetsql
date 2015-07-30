@@ -15,7 +15,7 @@ public class Test {
     public static void main(String[] args) {
     	testSimple();
 //		testIf();
-    		testManager();
+//    		testManager();
 
 	}
     
@@ -41,12 +41,13 @@ public class Test {
 		System.out.println("user:{id:"+user.getId()+",name:"+user.getName()+"}");
 	}
 	public static void testSimple(){
-		String sql =" select * from user where id = ${user.id}";
+		String sql =" select * from user where id = ${id}";
 		
 		SQLScript script = new SQLScript(sql);
 		//一下方法需要完成
-		Map paras = getUserParas();
-		User result = (User)script.singleSelect(getConn(), paras, User.class);
+		User user = new User();
+		user.setId(13);
+		User result = (User)script.singleSelect(getConn(), user, User.class);
 		// 
 		
 	}

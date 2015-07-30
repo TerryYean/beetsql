@@ -41,6 +41,16 @@ public class SQLScript {
 		result.jdbcPara = jdbcPara;
 		return result;
 	}
+	
+	public Object singleSelect(Connection conn, Object paras,
+			Class mapping) {
+		Map map = new HashMap();
+		map.put("_$", paras);
+		SQLResult result = run(map);
+		String sql = result.jdbcSql;
+		List<Object> objs = result.jdbcPara;
+		return null;
+	}
 
 	/**
 	 * 查询，返回一个mapping类实例
