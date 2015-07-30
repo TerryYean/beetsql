@@ -10,6 +10,7 @@ import org.beetl.core.engine.StatementParser;
 import org.beetl.core.statement.PlaceholderST;
 import org.beetl.core.statement.Program;
 import org.beetl.core.statement.Statement;
+import org.beetl.core.statement.VarRef;
 
 public class SQLTemplateEngine extends DefaultTemplateEngine
 {
@@ -24,6 +25,8 @@ public class SQLTemplateEngine extends DefaultTemplateEngine
             Statement[] sts = program.metaData.statements;
             StatementParser parser = new StatementParser(sts, gt, resource.getId());
             parser.addListener(PlaceholderST.class, new PlaceHolderListener());
+            parser.addListener(VarRef.class, new PlaceHolderListener());
+            
             parser.parse();
     }
     

@@ -6,73 +6,97 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.beetl.sql.SQLLoader;
-import org.beetl.sql.SQLManager;
 import org.beetl.sql.annotation.ID;
 
 public class Test {
-
+	static MySqlConnectoinSource ds = new MySqlConnectoinSource();
     public static void main(String[] args) {
-    	//testSimple();
+//    	testSimple();
 //		testIf();
-    		testManager();
-
+//    		testManager();
+    	testManagergenera();
+    	//testUse();
 	}
-    
+    public static void testManagergenera(){
+    	SQLLoader loader = new ClasspathLoader("/sql/mysql");
+		SQLManager manager = new SQLManager(loader,ds);
+    	SQLScript script3 = manager.getScript(User.class,SQLManager.UPDATE_BY_TEMPLATE);
+    }
     public static void testManager(){
     	SQLLoader loader = new ClasspathLoader("/sql/mysql");
-		SQLManager manager = new SQLManager(loader);
+		SQLManager manager = new SQLManager(loader,ds);
+		
 		SQLScript script = manager.getScript("user.selectUser");
 		Map paras = getUserParas();
-		User result = (User)script.singleSelect(getConn(), paras, User.class);
+		User result = (User)script.singleSelect( paras, User.class);
 		
-		SQLScript script2 = manager.getScript(User.class,SQLManager.SELECT_ID);
+		SQLScript script2 = manager.getScript(User.class,SQLManager.SELECT_BY_ID);
 		System.out.println("====sql==== \n"+script2.sql);
-		User u = (User) script2.getById(getConn(), result);//默认返回的是user.getById
+		User u = (User) script2.getById(result);//默认返回的是user.getById
 		printUser(u);
 		
-		SQLScript script3 = manager.getScript(User.class,SQLManager.UPDATE_VALUE);//已经在30行生成了update语句
+		SQLScript script3 = manager.getScript(User.class,SQLManager.UPDATE_BY_ID);//已经在30行生成了update语句
 		System.out.println("====sql==== \n"+script3.sql);
 		result.setName("xxxx");
-		System.out.println("更新影响的行数："+script3.update(getConn(), result));
+		System.out.println("更新影响的行数："+script3.update(result));
 		
     }
     //便于测试
 	public static void printUser(User user){
 		System.out.println("user:{id:"+user.getId()+",name:"+user.getName()+"}");
 	}
-	public static void testSimple(){
-		String sql =" select * from user where id = ${user.id}";
-		
-		SQLScript script = new SQLScript(sql);
-		//一下方法需要完成
-		Map paras = getUserParas();
-		User result = (User)script.singleSelect(getConn(), paras, User.class);
+	
+	public static void testUse(){
+		SQLLoader loader = new ClasspathLoader("/sql/mysql");
+		SQLManager manager = new SQLManager(loader,ds);
+		SQLScript script = manager.getScript("user.selectByExample");
+		User user = (User)script.singleSelect(new User(), User.class);
 		// 
 		
 	}
 	
-	private static Connection getConn(){
-		String driver = "com.mysql.jdbc.Driver";
-        String dbName = "beetlSql";
-        String passwrod = "root";
-        String userName = "root";
-        String url = "jdbc:mysql://localhost:3306/" + dbName;
-        String sql = "select * from users";
-        Connection conn = null;
-        try {
-			Class.forName(driver);
-			conn = DriverManager.getConnection(url, userName,
-	                passwrod);
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return conn;
+	public static void testSimple(){
+		SQLLoader loader = new ClasspathLoader("/sql/mysql");
+		SQLManager manager = new SQLManager(loader,ds);
+		String sql =" select * from user where id = ${id}";
+		
+		SQLScript script = new SQLScript(sql,manager);
+		//一下方法需要完成
+		User user = new User();
+		user.setId(13);
+		User result = (User)script.singleSelect(user, User.class);
+		// 
+		
 	}
+	
+	static class MySqlConnectoinSource implements ConnectionSource{
+
+		@Override
+		public Connection getConn() {
+			String driver = "com.mysql.jdbc.Driver";
+	        String dbName = "test";
+	        String passwrod = "root";
+	        String userName = "root";
+	        String url = "jdbc:mysql://localhost:3306/" + dbName;
+	        String sql = "select * from users";
+	        Connection conn = null;
+	        try {
+				Class.forName(driver);
+				conn = DriverManager.getConnection(url, userName,
+		                passwrod);
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return conn;
+		}
+		
+	}
+	
+	
 	
 	private static Map getUserParas(){
 		User user = new User();

@@ -17,9 +17,15 @@ public class Beetl {
 			StringTemplateResourceLoader resourceLoader = new StringTemplateResourceLoader();
 			Configuration cfg = Configuration.defaultConfiguration();
 			cfg.setEngine("org.beetl.sql.core.SQLTemplateEngine");
+			System.out.println("实例化。。。");
+			cfg.setStatementStart("@");
+			cfg.setStatementEnd(null);
 			cfg = loadConfig(cfg);
+			
 			gt = new GroupTemplate(resourceLoader, cfg);
-		} catch (Exception ex) {
+			gt.registerFunction("use", new UseFunction());
+			
+		}catch(Exception ex){
 			throw new RuntimeException(ex.getMessage());
 		}
 
@@ -35,7 +41,7 @@ public class Beetl {
 		InputStream ins = this.getClass().getResourceAsStream(
 				"/beetl.properties");
 		Properties ps = new Properties();
-		ClasspathLoader.SYMBOL_BEGIN = "#";
+		ClasspathLoader.SYMBOL_BEGIN = "@";
 		ClasspathLoader.SYMBOL_END = null;
 		if (ins != null) {
 			try {
@@ -47,7 +53,7 @@ public class Beetl {
 			ClasspathLoader.SYMBOL_BEGIN = ps.getProperty("beetl.SYMBOL_BEGIN");
 			ClasspathLoader.SYMBOL_END = ps.getProperty("beetl.SYMBOL_END");
 		} else {
-			ClasspathLoader.SYMBOL_BEGIN = "#";
+			ClasspathLoader.SYMBOL_BEGIN = "@";
 			ClasspathLoader.SYMBOL_END = null;
 		}
 		cfg.setStatementStart(ClasspathLoader.SYMBOL_BEGIN);
