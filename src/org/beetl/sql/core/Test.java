@@ -18,12 +18,23 @@ public class Test {
     	//testUse();
 	}
     public static void testManagergenera(){
-    	SQLLoader loader = new ClasspathLoader("/sql/mysql");
+    	SQLLoader loader = ClasspathLoader.instance("/sql/mysql");
 		SQLManager manager = new SQLManager(loader,ds);
-    	SQLScript script3 = manager.getScript(User.class,SQLManager.UPDATE_BY_TEMPLATE);
+    	SQLScript script = manager.getScript(User.class,SQLManager.SELECT_BY_ID);
+    	System.out.println("SELECT_BY_ID==="+script.sql);
+    	script = manager.getScript(User.class,SQLManager.DELETE_BY_ID);
+    	System.out.println("DELETE_BY_ID==="+script.sql);
+    	script = manager.getScript(User.class,SQLManager.SELECT_ALL);
+    	System.out.println("SELECT_ALL==="+script.sql);
+    	script = manager.getScript(User.class,SQLManager.SELECT_BY_TEMPLATE);
+    	System.out.println("SELECT_BY_TEMPLATE==="+script.sql);
+    	script = manager.getScript(User.class,SQLManager.UPDATE_ALL);
+    	System.out.println("UPDATE_ALL==="+script.sql);
+    	script = manager.getScript(User.class,SQLManager.UPDATE_BY_ID);
+    	System.out.println("UPDATE_BY_ID==="+script.sql);
     }
     public static void testManager(){
-    	SQLLoader loader = new ClasspathLoader("/sql/mysql");
+    	SQLLoader loader = ClasspathLoader.instance("/sql/mysql");
 		SQLManager manager = new SQLManager(loader,ds);
 		
 		SQLScript script = manager.getScript("user.selectUser");
@@ -47,7 +58,7 @@ public class Test {
 	}
 	
 	public static void testUse(){
-		SQLLoader loader = new ClasspathLoader("/sql/mysql");
+		SQLLoader loader = ClasspathLoader.instance("/sql/mysql");
 		SQLManager manager = new SQLManager(loader,ds);
 		SQLScript script = manager.getScript("user.selectByExample");
 		User user = (User)script.singleSelect(new User(), User.class);
@@ -56,7 +67,7 @@ public class Test {
 	}
 	
 	public static void testSimple(){
-		SQLLoader loader = new ClasspathLoader("/sql/mysql");
+		SQLLoader loader = ClasspathLoader.instance("/sql/mysql");
 		SQLManager manager = new SQLManager(loader,ds);
 		String sql =" select * from user where id = ${id}";
 		
