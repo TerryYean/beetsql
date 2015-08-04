@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
+import org.beetl.sql.core.kit.StringKit;
 
 public class SQLScript {
 	SQLManager sm;
@@ -128,7 +129,7 @@ public class SQLScript {
 					for (Method method : methods) {
 						String methodName = method.getName();
 						if (methodName.startsWith("set")) {
-							String attrName = toLowerCaseFirstOne(methodName
+							String attrName = StringKit.toLowerCaseFirstOne(methodName
 									.substring(3));
 							method.invoke(model, rs.getObject(attrName));
 						}
@@ -204,26 +205,6 @@ public class SQLScript {
 			return sdf.format(field.get(obj));
 		}
 		return field.get(obj).toString();
-	}
-
-	// 首字母转小写
-	public String toLowerCaseFirstOne(String s) {
-		if (Character.isLowerCase(s.charAt(0)))
-			return s;
-		else
-			return (new StringBuilder())
-					.append(Character.toLowerCase(s.charAt(0)))
-					.append(s.substring(1)).toString();
-	}
-
-	// 首字母转大写
-	public String toUpperCaseFirstOne(String s) {
-		if (Character.isUpperCase(s.charAt(0)))
-			return s;
-		else
-			return (new StringBuilder())
-					.append(Character.toUpperCase(s.charAt(0)))
-					.append(s.substring(1)).toString();
 	}
 
 	public String getId() {

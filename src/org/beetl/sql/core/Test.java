@@ -14,9 +14,27 @@ public class Test {
 //    	testSimple();
 //		testIf();
 //    		testManager();
-    	testManagergenera();
+//    	testManagergenera();
     	//testUse();
+    	testNameConve();
 	}
+    public static void testNameConve(){
+    	NameConversion hnc = new HumpNameConversion(ds);
+    	NameConversion unc = new UnderlinedNameConversion(ds);
+    	System.out.println("========HumpNameConversion======");
+    	System.out.println("tableName--->className==="+hnc.getClassName("user"));
+    	System.out.println("className--->tableName==="+hnc.getTableName(User.class));
+    	System.out.println("attrName--->ColName==="+hnc.getColName(User.class, "name"));
+    	System.out.println("ColName--->attrName==="+hnc.getPropertyName(User.class, "name"));
+    	System.out.println("idlist==="+hnc.getId(User.class).toString());
+    	System.out.println("========UnderlinedNameConversion======");
+    	System.out.println("tableName--->className==="+unc.getClassName("user"));
+    	System.out.println("className--->tableName==="+unc.getTableName(User.class));
+    	System.out.println("attrName--->ColName==="+unc.getColName(User.class, "userName"));
+    	System.out.println("ColName--->attrName==="+unc.getPropertyName(User.class, "user_name"));
+    	System.out.println("idlist==="+unc.getId(User.class).toString());
+    	
+    }
     public static void testManagergenera(){
     	SQLLoader loader = ClasspathLoader.instance("/sql/mysql");
 		SQLManager manager = new SQLManager(loader,ds);
@@ -140,6 +158,7 @@ public class Test {
 		int id;
 		String name;
 		int age;
+		String userName;
 		@ID
 		public int getId() {
 			return id;
@@ -159,6 +178,12 @@ public class Test {
 		}
 		public void setAge(int age) {
 			this.age = age;
+		}
+		public String getUserName() {
+			return userName;
+		}
+		public void setUserName(String userName) {
+			this.userName = userName;
 		}
 		
 	}
