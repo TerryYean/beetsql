@@ -52,7 +52,7 @@ public abstract class NameConversion {
 		super();
 		this.ds = ds;
 		try {
-			this.dbmd = ds.getConn().getMetaData(); 
+			this.dbmd = ds.getReadConn().getMetaData(); 
 		} catch (SQLException e) {
 			// TODO: handle exception
 		}

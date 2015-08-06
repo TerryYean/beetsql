@@ -77,7 +77,7 @@ public class SQLScript {
 		Object model = null;
 		// 执行jdbc
 		try {
-			ps = sm.ds.getConn().prepareStatement(sql);
+			ps = sm.ds.getReadConn().prepareStatement(sql);
 			for (int i = 0; i < objs.size(); i++)
 				ps.setObject(i + 1, objs.get(i));
 			rs = ps.executeQuery();
@@ -171,7 +171,7 @@ public class SQLScript {
 		PreparedStatement ps = null;
 		// 执行jdbc
 		try {
-			ps = sm.ds.getConn().prepareStatement(sql);
+			ps = sm.ds.getWriteConn().prepareStatement(sql);
 			for (int i = 0; i < objs.size(); i++)
 				ps.setObject(i + 1, objs.get(i));
 			rs = ps.executeUpdate();

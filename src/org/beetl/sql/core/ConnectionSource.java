@@ -3,5 +3,7 @@ package org.beetl.sql.core;
 import java.sql.Connection;
 
 public interface ConnectionSource {
-	public Connection getConn();
+	
+	public Connection getReadConn();
+	public Connection getWriteConn();
 }

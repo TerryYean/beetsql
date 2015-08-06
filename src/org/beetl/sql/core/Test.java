@@ -100,8 +100,8 @@ public class Test {
 	
 	static class MySqlConnectoinSource implements ConnectionSource{
 
-		@Override
-		public Connection getConn() {
+//		@Override
+		private  Connection getConn() {
 			String driver = "com.mysql.jdbc.Driver";
 	        String dbName = "test";
 	        String passwrod = "root";
@@ -121,6 +121,16 @@ public class Test {
 				e.printStackTrace();
 			}
 			return conn;
+		}
+
+		@Override
+		public Connection getReadConn() {
+			return this.getConn();
+		}
+
+		@Override
+		public Connection getWriteConn() {
+			return this.getConn();
 		}
 		
 	}
