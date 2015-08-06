@@ -350,6 +350,10 @@ public class BeanProcessor {
 		else if (propType.equals(Float.TYPE) || propType.equals(Float.class)) return Float.valueOf(rs.getFloat(index));
 		else if (propType.equals(Short.TYPE) || propType.equals(Short.class)) return Short.valueOf(rs.getShort(index));
 		else if (propType.equals(Byte.TYPE) || propType.equals(Byte.class)) return Byte.valueOf(rs.getByte(index));
+		
+		else if(propType.equals(char[].class)) return rs.getString(index).toCharArray();
+		else if(propType.equals(byte[].class)) return rs.getBytes(index);
+		
 		else if (propType.equals(Timestamp.class)) return rs.getTimestamp(index);
 		else if (propType.equals(SQLXML.class)) return rs.getSQLXML(index);
 		else return rs.getObject(index);
