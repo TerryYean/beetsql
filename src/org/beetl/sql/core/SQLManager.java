@@ -18,6 +18,7 @@ public class SQLManager {
 		this.sqlLoader = loader;
 		this.ds = ds;
 		this.nc = new HumpNameConversion(ds);
+		this.sqlLoader.setNameConversion(nc);
 	}
 	
 	public SQLManager(SQLLoader sqlLoader, ConnectionSource ds,
@@ -25,6 +26,7 @@ public class SQLManager {
 		this.sqlLoader = sqlLoader;
 		this.ds = ds;
 		this.nc = nc;
+		this.sqlLoader.setNameConversion(nc);
 	}
 
 	public NameConversion getNc() {
@@ -33,6 +35,7 @@ public class SQLManager {
 
 	public void setNc(NameConversion nc) {
 		this.nc = nc;
+		this.sqlLoader.setNameConversion(nc);
 	}
 
 	protected SQLResult getSQLResult(String id,Map paras){

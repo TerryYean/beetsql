@@ -43,7 +43,6 @@ public class HumpNameConversion extends NameConversion {
 				return colName;
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
