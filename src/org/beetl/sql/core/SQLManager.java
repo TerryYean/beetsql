@@ -18,7 +18,7 @@ public class SQLManager {
 	public SQLManager(SQLLoader loader,ConnectionSource ds){
 		this.sqlLoader = loader;
 		this.ds = ds;
-		this.nc = new HumpNameConversion(ds);
+		this.nc = new HumpNameConversion();
 		this.sqlLoader.setNameConversion(nc);
 	}
 	
