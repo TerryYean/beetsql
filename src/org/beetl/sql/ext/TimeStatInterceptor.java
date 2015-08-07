@@ -33,13 +33,13 @@ public class TimeStatInterceptor implements Interceptor {
 		long end = System.currentTimeMillis();
 		long start = (Long)ctx.get("stat.time");
 		if((end-start)>max){
-			print(ctx.getSqlId(),ctx.getSql(),ctx.getParas());
+			print(ctx.getSqlId(),ctx.getSql(),ctx.getParas(),(end-start));
 		}
 
 	}
 	
-	protected void print(String sqlId,String sql,List<Object> paras){
-		System.out.println("sqlId="+sqlId);
+	protected void print(String sqlId,String sql,List<Object> paras,long time){
+		System.err.println("sqlId="+sqlId+" time:"+time);
 		System.out.println("=====================");
 		System.out.println(sql);
 		
