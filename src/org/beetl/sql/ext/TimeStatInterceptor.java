@@ -6,6 +6,10 @@ import java.util.List;
 import org.beetl.sql.core.Interceptor;
 import org.beetl.sql.core.InterceptorContext;
 
+/** 用来统计sql执行时间
+ * @author joelli
+ *
+ */
 public class TimeStatInterceptor implements Interceptor {
 
 	List<String> excludes = null;
