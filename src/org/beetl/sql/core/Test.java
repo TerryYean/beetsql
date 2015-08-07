@@ -124,12 +124,12 @@ public class Test {
 		}
 
 		@Override
-		public Connection getReadConn() {
+		public Connection getReadConn(InterceptorContext ctx) {
 			return this.getConn();
 		}
 
 		@Override
-		public Connection getWriteConn() {
+		public Connection getWriteConn(InterceptorContext ctx) {
 			return this.getConn();
 		}
 		

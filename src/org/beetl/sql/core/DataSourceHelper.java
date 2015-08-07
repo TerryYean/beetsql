@@ -7,10 +7,10 @@ import java.util.Random;
 import javax.sql.DataSource;
 
 public class DataSourceHelper {
-	public  ConnectionSource getSingle(DataSource ds){
+	public  static ConnectionSource getSingle(DataSource ds){
 		return new DefaultConnectionSource(ds,null);
 	}
-	public  ConnectionSource getMasterSlave(DataSource ds,DataSource[] slaves){
+	public  static ConnectionSource getMasterSlave(DataSource ds,DataSource[] slaves){
 		return new DefaultConnectionSource(ds,slaves);
 	}
 }
@@ -25,8 +25,8 @@ class DefaultConnectionSource implements ConnectionSource{
 		
 	}
 	@Override
-	public Connection getReadConn() {
-		if(slaves==null||slaves.length==0) return getWriteConn();
+	public Connection getReadConn(InterceptorContext ctx) {
+		if(slaves==null||slaves.length==0) return getWriteConn(ctx);
 		else{
 			//随机，todo，换成顺序
 			DataSource ds = slaves[new Random().nextInt(slaves.length)];
@@ -39,7 +39,7 @@ class DefaultConnectionSource implements ConnectionSource{
 		}
 	}
 	@Override
-	public Connection getWriteConn() {
+	public Connection getWriteConn(InterceptorContext ctx) {
 		try {
 			return master.getConnection();
 		} catch (SQLException e) {

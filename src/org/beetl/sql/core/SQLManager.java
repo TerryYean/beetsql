@@ -6,6 +6,7 @@ public class SQLManager {
     private SQLLoader sqlLoader;
     ConnectionSource ds = null;
     NameConversion nc = null;
+    Interceptor[] inters = null;
     public static final int  SELECT_BY_ID = 0;
     public static final int  SELECT_BY_TEMPLATE = 1;
     public static final int  DELETE_BY_ID = 2;
@@ -25,6 +26,14 @@ public class SQLManager {
 		this.sqlLoader = sqlLoader;
 		this.ds = ds;
 		this.nc = nc;
+	}
+	
+	public SQLManager(SQLLoader sqlLoader, ConnectionSource ds,
+			NameConversion nc,Interceptor[] inters) {
+		this.sqlLoader = sqlLoader;
+		this.ds = ds;
+		this.nc = nc;
+		this.inters = inters;
 	}
 
 	public NameConversion getNc() {
