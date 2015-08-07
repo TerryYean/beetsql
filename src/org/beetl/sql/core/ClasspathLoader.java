@@ -6,8 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.beetl.core.Configuration;
@@ -26,29 +28,32 @@ import org.beetl.sql.annotation.ID;
 public class ClasspathLoader implements SQLLoader {
 
 	private static ClasspathLoader classpathLoader = new ClasspathLoader();
-	
+
 	String sqlRoot = null;
 
 	private static Map<String, SQLSource> sqlSourceMap = new HashMap<String, SQLSource>();
 
-	private String STATEMENTSTART;//定界符开始符号
-	private String STATEMENTEND;//定界符结束符号
+	private String STATEMENTSTART;// 定界符开始符号
+	private String STATEMENTEND;// 定界符结束符号
 
 	private String lineSeparator = System.getProperty("line.separator", "\n");
+
+	private NameConversion nameConversion;
 
 	private ClasspathLoader() {
 		Configuration cf = Beetl.instance().getGroupTemplate().getConf();
 		STATEMENTSTART = cf.getStatementStart();
 		STATEMENTEND = cf.getStatementEnd();
 	}
-	public static ClasspathLoader instance(String sqlRoot){
-		if(classpathLoader == null){
+
+	public static ClasspathLoader instance(String sqlRoot) {
+		if (classpathLoader == null) {
 			classpathLoader = new ClasspathLoader();
 		}
 		classpathLoader.sqlRoot = sqlRoot;
 		return classpathLoader;
 	}
-	
+
 	@Override
 	public SQLSource getSQL(String id) {
 		// real path = sqlRoot\xx\yy.sql
@@ -59,6 +64,7 @@ public class ClasspathLoader implements SQLLoader {
 		ss = this.sqlSourceMap.get(id);
 		return ss;
 	}
+
 	/***
 	 * 加载sql文件，并放入sqlSourceMap中
 	 * 
@@ -115,6 +121,7 @@ public class ClasspathLoader implements SQLLoader {
 		}
 		return true;
 	}
+
 	/***
 	 * 生成selectbyid语句
 	 */
@@ -126,23 +133,28 @@ public class ClasspathLoader implements SQLLoader {
 			return tempSource;
 		}
 		String condition = null;
-		Field[] fields = cls.getDeclaredFields();
-		for (Field field : fields) {
-			if (field.isAnnotationPresent(ID.class)) {
-				String fieldName = field.getName();
-				condition = " where " + fieldName + "=${" + fieldName + "}";
-				break;
+		List<String> ids = nameConversion.getId(cls);
+		if (ids.size() > 0) {
+			String attrName = null;
+			condition = " where 1=1";
+			for (int i = 0; i < ids.size(); i++) {
+				attrName = nameConversion.getPropertyName(cls, ids.get(0));
+				if (attrName != null) {
+					condition = condition + " and " + ids.get(i) + "= ${"
+							+ nameConversion.getPropertyName(cls, ids.get(i))
+							+ "}";
+				}
 			}
 		}
+		// 这一步还需不需要？
 		if (condition == null) {
 			condition = " where id=${id}";
 		}
-		String sql = "select * from " + className + condition;
+		String sql = "select * from " + nameConversion.getTableName(cls) + condition;
 		tempSource = new SQLSource(sql);
 		this.sqlSourceMap.put(className + ".selectByid", tempSource);
 		return tempSource;
 	}
-
 
 	@Override
 	public SQLSource generationSelectByTemplate(Class cls) {
@@ -153,13 +165,15 @@ public class ClasspathLoader implements SQLLoader {
 			return tempSource;
 		}
 		String fieldName = null;
-		String condition = " where 1=1 "+lineSeparator;
-		Field[] fields = cls.getDeclaredFields();
-		for (Field field : fields) {
-			fieldName = field.getName();
-			condition = condition + appendColumn(fieldName,"and");
+		String condition = " where 1=1 " + lineSeparator;
+		Method[] methods = cls.getDeclaredMethods();
+		for (Method method : methods) {
+			if(method.getName().startsWith("get")){
+				fieldName = method.getName().substring(3);
+				condition = condition + appendColumn(cls,fieldName, "and");
+			}
 		}
-		String sql = "select * from " + className + condition;
+		String sql = "select * from " + nameConversion.getTableName(cls) + condition;
 		tempSource = new SQLSource(sql);
 		this.sqlSourceMap.put(className + ".getByTemplate", tempSource);
 		return tempSource;
@@ -173,18 +187,23 @@ public class ClasspathLoader implements SQLLoader {
 			return tempSource;
 		}
 		String condition = null;
-		Field[] fields = cls.getDeclaredFields();
-		for (Field field : fields) {
-			if (field.isAnnotationPresent(ID.class)) {
-				String fieldName = field.getName();
-				condition = " where " + fieldName + "=${" + fieldName + "}";
-				break;
+		List<String> ids = nameConversion.getId(cls);
+		if (ids.size() > 0) {
+			String attrName = null;
+			condition = " where 1=1";
+			for (int i = 0; i < ids.size(); i++) {
+				attrName = nameConversion.getPropertyName(cls, ids.get(0));
+				if (attrName != null) {
+					condition = condition + " and " + ids.get(i) + "= ${"
+							+ nameConversion.getPropertyName(cls, ids.get(i))
+							+ "}";
+				}
 			}
 		}
 		if (condition == null) {
 			condition = " where id=${id}";
 		}
-		String sql = "delete from " + className + condition;
+		String sql = "delete from " + nameConversion.getTableName(cls) + condition;
 		tempSource = new SQLSource(sql);
 		this.sqlSourceMap.put(className + ".deleteByid", tempSource);
 		return tempSource;
@@ -197,11 +216,12 @@ public class ClasspathLoader implements SQLLoader {
 		if (tempSource != null) {
 			return tempSource;
 		}
-		String sql = "select * from " + className;
+		String sql = "select * from " + nameConversion.getTableName(cls);
 		tempSource = new SQLSource(sql);
 		this.sqlSourceMap.put(className + ".selectAll", tempSource);
 		return tempSource;
 	}
+
 	/****
 	 * 自动生成update语句
 	 */
@@ -212,21 +232,34 @@ public class ClasspathLoader implements SQLLoader {
 		if (tempSource != null) {
 			return tempSource;
 		}
-		String sql = "update " + className + " set "+lineSeparator;
+		String sql = "update " + nameConversion.getTableName(cls) + " set " + lineSeparator;
 		String fieldName = null;
 		String condition = null;
-		Field[] fields = cls.getDeclaredFields();
-		for (Field field : fields) {
-			fieldName = field.getName();
-			sql = sql + appendColumn(fieldName,",");
-			if (field.isAnnotationPresent(ID.class)) {
-				condition = " where " + fieldName + "=${" + fieldName + "}";
+		
+		Method[] methods = cls.getDeclaredMethods();
+		for (Method method : methods) {
+			if(method.getName().startsWith("get")){
+				fieldName = method.getName().substring(3);
+				sql = sql + appendColumn(cls,fieldName, "and");
+			}
+		}
+		List<String> ids = nameConversion.getId(cls);
+		if (ids.size() > 0) {
+			String attrName = null;
+			condition = " where 1=1";
+			for (int i = 0; i < ids.size(); i++) {
+				attrName = nameConversion.getPropertyName(cls, ids.get(0));
+				if (attrName != null) {
+					condition = condition + " and " + ids.get(i) + "= ${"
+							+ nameConversion.getPropertyName(cls, ids.get(i))
+							+ "}";
+				}
 			}
 		}
 		if (condition == null) {
 			condition = " where id=${id}";
 		}
-		sql = removeComma(sql,condition);
+		sql = removeComma(sql, condition);
 		tempSource = new SQLSource(sql);
 		this.sqlSourceMap.put(className + ".updateByid", tempSource);
 		return tempSource;
@@ -239,69 +272,92 @@ public class ClasspathLoader implements SQLLoader {
 		if (tempSource != null) {
 			return tempSource;
 		}
-		String sql = "update " + className + " set "+lineSeparator;
+		String sql = "update " + nameConversion.getTableName(cls) + " set " + lineSeparator;
 		String fieldName = null;
-		Field[] fields = cls.getDeclaredFields();
-		for (Field field : fields) {
-			fieldName = field.getName();
-			sql = sql + appendColumn(fieldName,",");
+		Method[] methods = cls.getDeclaredMethods();
+		for (Method method : methods) {
+			if(method.getName().startsWith("get")){
+				fieldName = method.getName().substring(3);
+				sql = sql + appendColumn(cls,fieldName, ",");
+			}
 		}
-		sql = removeComma(sql,null);
+		sql = removeComma(sql, null);
 		tempSource = new SQLSource(sql);
 		this.sqlSourceMap.put(className + ".updateAll", tempSource);
 		return tempSource;
 	}
+
 	@Override
 	public SQLSource generationUpdataByTemplate(Class cls) {
-		//等待思考
+		// 等待思考
 		String className = cls.getSimpleName().toLowerCase();
-		SQLSource tempSource = this.sqlSourceMap.get(className + ".updateBytemplate");
-//		if (tempSource != null) {
-//			return tempSource;
-//		}
-//		String sql = "update " + className + " set "+lineSeparator;
-//		String fieldName = null;
-//		String condition = " where 1=1 ";
-//		Field[] fields = cls.getFields();
-//		for (Field field : fields) {
-//			fieldName = field.getName();
-//			sql = appendColumn(sql, fieldName);
-//			condition = condition +STATEMENTSTART + "if(!isEmpty(" + fieldName + ")){"
-//					+ STATEMENTEND + " and "+fieldName + "=${" + fieldName + "}"+lineSeparator
-//					+ STATEMENTSTART + "}" + STATEMENTEND;
-//		}
-//		sql = removeComma(sql,condition);
-//		tempSource = new SQLSource(sql);
-//		this.sqlSourceMap.put(className + ".updateBytemplate", tempSource);
+		SQLSource tempSource = this.sqlSourceMap.get(className
+				+ ".updateBytemplate");
+		// if (tempSource != null) {
+		// return tempSource;
+		// }
+		// String sql = "update " + className + " set "+lineSeparator;
+		// String fieldName = null;
+		// String condition = " where 1=1 ";
+		// Field[] fields = cls.getFields();
+		// for (Field field : fields) {
+		// fieldName = field.getName();
+		// sql = appendColumn(sql, fieldName);
+		// condition = condition +STATEMENTSTART + "if(!isEmpty(" + fieldName +
+		// ")){"
+		// + STATEMENTEND + " and "+fieldName + "=${" + fieldName +
+		// "}"+lineSeparator
+		// + STATEMENTSTART + "}" + STATEMENTEND;
+		// }
+		// sql = removeComma(sql,condition);
+		// tempSource = new SQLSource(sql);
+		// this.sqlSourceMap.put(className + ".updateBytemplate", tempSource);
 		return tempSource;
 	}
+
 	/****
-	 *去掉逗号加上条件并换行
+	 * 去掉逗号加上条件并换行
+	 * 
 	 * @param sql
 	 * @return
 	 */
-	private String removeComma(String sql,String condition) {
-		return sql.subSequence(0, sql.lastIndexOf(",")) + lineSeparator + STATEMENTSTART
-				+ "} "+STATEMENTEND+lineSeparator+(condition==null?"":condition);
+	private String removeComma(String sql, String condition) {
+		return sql.subSequence(0, sql.lastIndexOf(",")) + lineSeparator
+				+ STATEMENTSTART + "} " + STATEMENTEND + lineSeparator
+				+ (condition == null ? "" : condition);
 	}
+
 	/***
 	 * 生成一个追加在sql后面的判断字段语句
+	 * 
 	 * @param sql
 	 * @param fieldName
-	 * @param connector  连接字段间的符号，如果是逗号则放在字段后面，否则放在字段前面（如 and，or）
+	 * @param connector
+	 *            连接字段间的符号，如果是逗号则放在字段后面，否则放在字段前面（如 and，or）
 	 * @return
 	 */
-	private String appendColumn(String fieldName,String connector) {
-		if(connector.equals(",")){
+	private String appendColumn(Class<?> cls, String fieldName, String connector) {
+		String colName = nameConversion.getColName(cls, fieldName);
+		if (colName != null) {
+			if (connector.equals(",")) {
+				return STATEMENTSTART + "if(!isEmpty(" + fieldName + ")){"
+						+ STATEMENTEND + colName + "=${" + fieldName + "},"
+						+ lineSeparator + STATEMENTSTART + "}" + STATEMENTEND;
+			}
+			connector = " " + connector + " ";
 			return STATEMENTSTART + "if(!isEmpty(" + fieldName + ")){"
-					+ STATEMENTEND + fieldName + "=${" + fieldName + "},"+lineSeparator
-					+ STATEMENTSTART + "}" + STATEMENTEND;
+					+ STATEMENTEND + connector + colName + "=${" + fieldName
+					+ "}" + lineSeparator + STATEMENTSTART + "}" + STATEMENTEND;
 		}
-		connector = " "+connector+" ";
-		return STATEMENTSTART + "if(!isEmpty(" + fieldName + ")){"
-				+ STATEMENTEND +connector+ fieldName + "=${" + fieldName + "}"+lineSeparator
-				+ STATEMENTSTART + "}" + STATEMENTEND;
+		return "";
 	}
+	/****
+	 * insert等待实现
+	 * @return
+	 */
+	
+	
+	
 	public Map<String, SQLSource> getSqlSourceMap() {
 		return sqlSourceMap;
 	}
@@ -313,5 +369,13 @@ public class ClasspathLoader implements SQLLoader {
 	public String getSTATEMENTEND() {
 		return STATEMENTEND;
 	}
-	
+
+	public NameConversion getNameConversion() {
+		return nameConversion;
+	}
+
+	public void setNameConversion(NameConversion nameConversion) {
+		this.nameConversion = nameConversion;
+	}
+
 }
