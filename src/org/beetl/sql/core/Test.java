@@ -14,25 +14,25 @@ public class Test {
 //    	testSimple();
 //		testIf();
 //    		testManager();
-//    	testManagergenera();
+    	testManagergenera();
     	//testUse();
-    	testNameConve();
+//    	testNameConve();
 	}
     public static void testNameConve(){
-    	NameConversion hnc = new HumpNameConversion(ds);
-    	NameConversion unc = new UnderlinedNameConversion(ds);
+    	NameConversion hnc = new HumpNameConversion();
+    	NameConversion unc = new UnderlinedNameConversion();
     	System.out.println("========HumpNameConversion======");
     	System.out.println("tableName--->className==="+hnc.getClassName("user"));
-    	System.out.println("className--->tableName==="+hnc.getTableName(User.class));
-    	System.out.println("attrName--->ColName==="+hnc.getColName(User.class, "name"));
-    	System.out.println("ColName--->attrName==="+hnc.getPropertyName(User.class, "name"));
-    	System.out.println("idlist==="+hnc.getId(User.class).toString());
+    	System.out.println("className--->tableName==="+hnc.getTableName(User.class.getSimpleName()));
+    	System.out.println("attrName--->ColName==="+hnc.getColName("name"));
+    	System.out.println("ColName--->attrName==="+hnc.getPropertyName("name"));
+    	System.out.println("idlist==="+hnc.getId().toString());
     	System.out.println("========UnderlinedNameConversion======");
     	System.out.println("tableName--->className==="+unc.getClassName("user"));
-    	System.out.println("className--->tableName==="+unc.getTableName(User.class));
-    	System.out.println("attrName--->ColName==="+unc.getColName(User.class, "userName"));
-    	System.out.println("ColName--->attrName==="+unc.getPropertyName(User.class, "user_name"));
-    	System.out.println("idlist==="+unc.getId(User.class).toString());
+    	System.out.println("className--->tableName==="+unc.getTableName(User.class.getSimpleName()));
+    	System.out.println("attrName--->ColName==="+unc.getColName("userName"));
+    	System.out.println("ColName--->attrName==="+unc.getPropertyName("user_name"));
+    	System.out.println("idlist==="+unc.getId().toString());
     	
     }
     public static void testManagergenera(){
@@ -50,6 +50,8 @@ public class Test {
     	System.out.println("UPDATE_ALL==="+script.sql);
     	script = manager.getScript(User.class,SQLManager.UPDATE_BY_ID);
     	System.out.println("UPDATE_BY_ID==="+script.sql);
+    	script = manager.getScript(User.class,SQLManager.INSERT);
+    	System.out.println("INSERT==="+script.sql);
     }
     public static void testManager(){
     	SQLLoader loader = ClasspathLoader.instance("/sql/mysql");
