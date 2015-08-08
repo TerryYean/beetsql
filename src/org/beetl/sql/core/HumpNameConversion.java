@@ -16,7 +16,7 @@ public class HumpNameConversion extends NameConversion {
 	
 	public String getColName(String attrName) {
 		return StringKit.toLowerCaseFirstOne(attrName);
-			}
+	}
 
 	@Override
 	public String getClassName(String tableName) {
