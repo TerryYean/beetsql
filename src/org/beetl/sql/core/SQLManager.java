@@ -6,7 +6,7 @@ public class SQLManager {
     private SQLLoader sqlLoader;
     ConnectionSource ds = null;
     NameConversion nc = null;
-    Interceptor[] inters = null;
+    Interceptor[] inters = {};
     public static final int  SELECT_BY_ID = 0;
     public static final int  SELECT_BY_TEMPLATE = 1;
     public static final int  DELETE_BY_ID = 2;
@@ -18,7 +18,7 @@ public class SQLManager {
 	public SQLManager(SQLLoader loader,ConnectionSource ds){
 		this.sqlLoader = loader;
 		this.ds = ds;
-		this.nc = new HumpNameConversion(ds);
+		this.nc = new HumpNameConversion();
 		this.sqlLoader.setNameConversion(nc);
 	}
 	
