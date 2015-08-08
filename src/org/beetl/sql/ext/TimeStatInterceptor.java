@@ -15,7 +15,7 @@ public class TimeStatInterceptor implements Interceptor {
 	List<String> excludes = null;
 	long max ;
 	public TimeStatInterceptor(long max){
-		this(Collections.emptyList(),max);
+		this(Collections.<String> emptyList(),max);
 	}
 	public TimeStatInterceptor(List<String> excludes,long max){
 		this.excludes = excludes;
