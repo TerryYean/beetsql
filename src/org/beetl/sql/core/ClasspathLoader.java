@@ -133,15 +133,15 @@ public class ClasspathLoader implements SQLLoader {
 			return tempSource;
 		}
 		String condition = null;
-		List<String> ids = nameConversion.getId(cls);
+		List<String> ids = nameConversion.getId();
 		if (ids.size() > 0) {
 			String attrName = null;
 			condition = " where 1=1";
 			for (int i = 0; i < ids.size(); i++) {
-				attrName = nameConversion.getPropertyName(cls, ids.get(0));
+				attrName = nameConversion.getPropertyName(ids.get(0));
 				if (attrName != null) {
 					condition = condition + " and " + ids.get(i) + "= ${"
-							+ nameConversion.getPropertyName(cls, ids.get(i))
+							+ nameConversion.getPropertyName(ids.get(i))
 							+ "}";
 				}
 			}
@@ -150,7 +150,7 @@ public class ClasspathLoader implements SQLLoader {
 		if (condition == null) {
 			condition = " where id=${id}";
 		}
-		String sql = "select * from " + nameConversion.getTableName(cls) + condition;
+		String sql = "select * from " + nameConversion.getTableName(cls.getSimpleName()) + condition;
 		tempSource = new SQLSource(sql);
 		this.sqlSourceMap.put(className + ".selectByid", tempSource);
 		return tempSource;
@@ -170,10 +170,10 @@ public class ClasspathLoader implements SQLLoader {
 		for (Method method : methods) {
 			if(method.getName().startsWith("get")){
 				fieldName = method.getName().substring(3);
-				condition = condition + appendColumn(cls,fieldName, "and");
+				condition = condition + appendColumn(fieldName, "and");
 			}
 		}
-		String sql = "select * from " + nameConversion.getTableName(cls) + condition;
+		String sql = "select * from " + nameConversion.getTableName(cls.getSimpleName()) + condition;
 		tempSource = new SQLSource(sql);
 		this.sqlSourceMap.put(className + ".getByTemplate", tempSource);
 		return tempSource;
@@ -187,15 +187,15 @@ public class ClasspathLoader implements SQLLoader {
 			return tempSource;
 		}
 		String condition = null;
-		List<String> ids = nameConversion.getId(cls);
+		List<String> ids = nameConversion.getId();
 		if (ids.size() > 0) {
 			String attrName = null;
 			condition = " where 1=1";
 			for (int i = 0; i < ids.size(); i++) {
-				attrName = nameConversion.getPropertyName(cls, ids.get(0));
+				attrName = nameConversion.getPropertyName(ids.get(0));
 				if (attrName != null) {
 					condition = condition + " and " + ids.get(i) + "= ${"
-							+ nameConversion.getPropertyName(cls, ids.get(i))
+							+ nameConversion.getPropertyName(ids.get(i))
 							+ "}";
 				}
 			}
@@ -203,7 +203,7 @@ public class ClasspathLoader implements SQLLoader {
 		if (condition == null) {
 			condition = " where id=${id}";
 		}
-		String sql = "delete from " + nameConversion.getTableName(cls) + condition;
+		String sql = "delete from " + nameConversion.getTableName(cls.getSimpleName()) + condition;
 		tempSource = new SQLSource(sql);
 		this.sqlSourceMap.put(className + ".deleteByid", tempSource);
 		return tempSource;
@@ -216,7 +216,7 @@ public class ClasspathLoader implements SQLLoader {
 		if (tempSource != null) {
 			return tempSource;
 		}
-		String sql = "select * from " + nameConversion.getTableName(cls);
+		String sql = "select * from " + nameConversion.getTableName(cls.getSimpleName());
 		tempSource = new SQLSource(sql);
 		this.sqlSourceMap.put(className + ".selectAll", tempSource);
 		return tempSource;
@@ -232,7 +232,7 @@ public class ClasspathLoader implements SQLLoader {
 		if (tempSource != null) {
 			return tempSource;
 		}
-		String sql = "update " + nameConversion.getTableName(cls) + " set " + lineSeparator;
+		String sql = "update " + nameConversion.getTableName(cls.getSimpleName()) + " set " + lineSeparator;
 		String fieldName = null;
 		String condition = null;
 		
@@ -240,18 +240,18 @@ public class ClasspathLoader implements SQLLoader {
 		for (Method method : methods) {
 			if(method.getName().startsWith("get")){
 				fieldName = method.getName().substring(3);
-				sql = sql + appendColumn(cls,fieldName, "and");
+				sql = sql + appendColumn(fieldName, "and");
 			}
 		}
-		List<String> ids = nameConversion.getId(cls);
+		List<String> ids = nameConversion.getId();
 		if (ids.size() > 0) {
 			String attrName = null;
 			condition = " where 1=1";
 			for (int i = 0; i < ids.size(); i++) {
-				attrName = nameConversion.getPropertyName(cls, ids.get(0));
+				attrName = nameConversion.getPropertyName(ids.get(0));
 				if (attrName != null) {
 					condition = condition + " and " + ids.get(i) + "= ${"
-							+ nameConversion.getPropertyName(cls, ids.get(i))
+							+ nameConversion.getPropertyName(ids.get(i))
 							+ "}";
 				}
 			}
@@ -272,13 +272,13 @@ public class ClasspathLoader implements SQLLoader {
 		if (tempSource != null) {
 			return tempSource;
 		}
-		String sql = "update " + nameConversion.getTableName(cls) + " set " + lineSeparator;
+		String sql = "update " + nameConversion.getTableName(cls.getSimpleName()) + " set " + lineSeparator;
 		String fieldName = null;
 		Method[] methods = cls.getDeclaredMethods();
 		for (Method method : methods) {
 			if(method.getName().startsWith("get")){
 				fieldName = method.getName().substring(3);
-				sql = sql + appendColumn(cls,fieldName, ",");
+				sql = sql + appendColumn(fieldName, ",");
 			}
 		}
 		sql = removeComma(sql, null);
@@ -336,8 +336,8 @@ public class ClasspathLoader implements SQLLoader {
 	 *            连接字段间的符号，如果是逗号则放在字段后面，否则放在字段前面（如 and，or）
 	 * @return
 	 */
-	private String appendColumn(Class<?> cls, String fieldName, String connector) {
-		String colName = nameConversion.getColName(cls, fieldName);
+	private String appendColumn(String fieldName, String connector) {
+		String colName = nameConversion.getColName(fieldName);
 		if (colName != null) {
 			if (connector.equals(",")) {
 				return STATEMENTSTART + "if(!isEmpty(" + fieldName + ")){"
