@@ -38,7 +38,7 @@ public class Beetl {
 	 */
 	public Configuration loadConfig(Configuration cfg) {
 		InputStream ins = this.getClass().getResourceAsStream(
-				"/beetl.properties");
+				"/btsql.properties");
 		Properties ps = new Properties();
 		String statementStart = "@";
 		String statementEnd = null;
@@ -51,6 +51,9 @@ public class Beetl {
 			}
 			statementStart = ps.getProperty("beetl.SYMBOL_BEGIN");
 			statementEnd = ps.getProperty("beetl.SYMBOL_END");
+			if(statementEnd != null && statementEnd.toLowerCase().equals("null")){
+				statementEnd = null;
+			}
 		}
 		cfg.setStatementStart(statementStart);
 		cfg.setStatementEnd(statementEnd);
