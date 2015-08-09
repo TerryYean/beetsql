@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.beetl.sql.annotation.ID;
 
 public class Test {
 	static MySqlConnectoinSource ds = new MySqlConnectoinSource();
@@ -171,7 +170,6 @@ public class Test {
 		String name;
 		int age;
 		String userName;
-		@ID
 		public int getId() {
 			return id;
 		}
