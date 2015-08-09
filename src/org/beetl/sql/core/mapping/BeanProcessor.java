@@ -29,6 +29,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.beetl.sql.core.HumpNameConversion;
+import org.beetl.sql.core.NameConversion;
+
 /**
  * @ClassName: BeanProcessor
  * @Description: Pojo处理器，负责转换
@@ -40,6 +43,7 @@ public class BeanProcessor {
 	private static final Map<Class<?>, Object> primitiveDefaults = new HashMap<Class<?>, Object>();
 	private final Map<String, String> columnToPropertyOverrides;
 	protected static final int PROPERTY_NOT_FOUND = -1;
+	private NameConversion nc = new HumpNameConversion();
 
 	//基本类型
 	static {
@@ -55,6 +59,11 @@ public class BeanProcessor {
 
 	public BeanProcessor() {
 		this(new HashMap<String, String>());//为{} 非null
+	}
+	
+	public BeanProcessor(NameConversion nc) {
+		this();
+		this.nc = nc;
 	}
 
 	public BeanProcessor(Map<String, String> columnToPropertyOverrides) {
@@ -315,7 +324,8 @@ public class BeanProcessor {
 			}
 			for (int i = 0; i < props.length; i++) {
 
-				if (propertyName.equalsIgnoreCase(props[i].getName())) {//这里是一个扩展点，用来扩展pojo属性到数据库字段的映射
+//				if (propertyName.equalsIgnoreCase(props[i].getName())) {//这里是一个扩展点，用来扩展pojo属性到数据库字段的映射
+				if(propertyName.equalsIgnoreCase(this.nc.getColName(props[i].getName()))) {
 					columnToProperty[col] = i;
 					break;
 				}
