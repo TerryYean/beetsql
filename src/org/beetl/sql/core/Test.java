@@ -6,6 +6,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.beetl.sql.core.db.DBStyle;
+import org.beetl.sql.core.db.MySqlStyle;
+
 
 public class Test {
 	static MySqlConnectoinSource ds = new MySqlConnectoinSource();
@@ -36,7 +39,7 @@ public class Test {
     }
     public static void testManagergenera(){
     	SQLLoader loader = ClasspathLoader.instance("/sql/mysql");
-		SQLManager manager = new SQLManager(loader,ds);
+		SQLManager manager = new SQLManager(getStyle(),loader,ds);
     	SQLScript script = manager.getScript(User.class,SQLManager.SELECT_BY_ID);
     	System.out.println("SELECT_BY_ID==="+script.sql);
     	script = manager.getScript(User.class,SQLManager.DELETE_BY_ID);
@@ -54,7 +57,7 @@ public class Test {
     }
     public static void testManager(){
     	SQLLoader loader = ClasspathLoader.instance("/sql/mysql");
-		SQLManager manager = new SQLManager(loader,ds);
+		SQLManager manager = new SQLManager(getStyle(),loader,ds);
 		
 		SQLScript script = manager.getScript("user.selectUser");
 		Map paras = getUserParas();
@@ -78,7 +81,7 @@ public class Test {
 	
 	public static void testUse(){
 		SQLLoader loader = ClasspathLoader.instance("/sql/mysql");
-		SQLManager manager = new SQLManager(loader,ds);
+		SQLManager manager = new SQLManager(getStyle(),loader,ds);
 		SQLScript script = manager.getScript("user.selectByExample");
 		User user = (User)script.singleSelect(new User(), User.class);
 		// 
@@ -87,7 +90,7 @@ public class Test {
 	
 	public static void testSimple(){
 		SQLLoader loader = ClasspathLoader.instance("/sql/mysql");
-		SQLManager manager = new SQLManager(loader,ds);
+		SQLManager manager = new SQLManager(getStyle(),loader,ds);
 		String sql =" select * from user where id = ${id}";
 		
 		SQLScript script = new SQLScript(sql,manager);
@@ -164,6 +167,11 @@ public class Test {
 //		System.out.println(jdbcSQL);
 //		System.out.println(jdbcParas);
 //	}
+	
+	
+	public static DBStyle getStyle(){
+		return new MySqlStyle();
+	}
 	
 	static class User{
 		int id;

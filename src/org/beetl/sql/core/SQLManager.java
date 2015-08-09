@@ -2,7 +2,10 @@ package org.beetl.sql.core;
 
 import java.util.Map;
 
+import org.beetl.sql.core.db.DBStyle;
+
 public class SQLManager {
+	private DBStyle dbStyle ;
     private SQLLoader sqlLoader;
     ConnectionSource ds = null;
     NameConversion nc = null;
@@ -15,7 +18,11 @@ public class SQLManager {
     public static final int  UPDATE_BY_ID = 5;
     public static final int  INSERT = 6;
     
-	public SQLManager(SQLLoader loader,ConnectionSource ds){
+    public SQLManager(){
+    	//for framework ,sprint .etc
+    }
+	public SQLManager(DBStyle dbStyle,SQLLoader loader,ConnectionSource ds){
+		this.dbStyle = dbStyle;
 		this.sqlLoader = loader;
 		this.ds = ds;
 		this.nc = new HumpNameConversion();
@@ -23,8 +30,9 @@ public class SQLManager {
 		this.sqlLoader.setMetadataManager(new MetadataManager(ds));
 	}
 	
-	public SQLManager(SQLLoader sqlLoader, ConnectionSource ds,
+	public SQLManager(DBStyle dbStyle,SQLLoader sqlLoader, ConnectionSource ds,
 			NameConversion nc,MetadataManager metadataManager) {
+		this.dbStyle = dbStyle;
 		this.sqlLoader = sqlLoader;
 		this.ds = ds;
 		this.nc = nc;
@@ -32,8 +40,10 @@ public class SQLManager {
 		this.sqlLoader.setMetadataManager(metadataManager);
 	}
 	
-	public SQLManager(SQLLoader sqlLoader, ConnectionSource ds,
+	public SQLManager(	DBStyle dbStyle,SQLLoader sqlLoader, ConnectionSource ds,
 			NameConversion nc,Interceptor[] inters) {
+		this.dbStyle = dbStyle;
+		this.dbStyle = dbStyle;
 		this.sqlLoader = sqlLoader;
 		this.ds = ds;
 		this.nc = nc;

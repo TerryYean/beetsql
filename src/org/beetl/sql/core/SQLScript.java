@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
+import org.beetl.sql.core.db.KeyHolder;
 import org.beetl.sql.core.kit.StringKit;
 
 public class SQLScript {
@@ -48,6 +49,14 @@ public class SQLScript {
 		return result;
 	}
 	
+	public void insert(Object paras){
+		
+	}
+	
+	public void insert(Object paras,KeyHolder holder){
+		
+	}
+	
 	public Object singleSelect(Object paras,
 			Class target) {
 		Map map = new HashMap();
@@ -56,6 +65,8 @@ public class SQLScript {
 		
 		return o;
 	}
+	
+	
 
 	/**
 	 * 查询，返回一个mapping类实例
