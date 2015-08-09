@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.beetl.sql.core.NameConversion;
+
 /**  
  * @ClassName: BasicRowProcessor   
  * @Description: 基础rs处理器  
@@ -29,13 +31,15 @@ import java.util.Map;
  */
 public class BasicRowProcessor implements RowProcessor {
 	
-	@SuppressWarnings("unused")
-	private static final BasicRowProcessor instance = new BasicRowProcessor();
 	private static final BeanProcessor defaultConvert = new BeanProcessor();
 	private final BeanProcessor convert;
 	
 	public BasicRowProcessor(){
 		this(defaultConvert);
+	}
+	
+	public BasicRowProcessor(NameConversion nc){
+		this(new BeanProcessor(nc));
 	}
 	
 	public BasicRowProcessor(BeanProcessor convert){
