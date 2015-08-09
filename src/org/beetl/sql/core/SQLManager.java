@@ -6,28 +6,30 @@ public class SQLManager {
     private SQLLoader sqlLoader;
     ConnectionSource ds = null;
     NameConversion nc = null;
-    Interceptor[] inters = null;
+    Interceptor[] inters = {};
     public static final int  SELECT_BY_ID = 0;
     public static final int  SELECT_BY_TEMPLATE = 1;
     public static final int  DELETE_BY_ID = 2;
     public static final int  SELECT_ALL = 3;
     public static final int  UPDATE_ALL = 4;
     public static final int  UPDATE_BY_ID = 5;
-    public static final int  UPDATE_BY_TEMPLATE = 6;
+    public static final int  INSERT = 6;
     
 	public SQLManager(SQLLoader loader,ConnectionSource ds){
 		this.sqlLoader = loader;
 		this.ds = ds;
-		this.nc = new HumpNameConversion(ds);
+		this.nc = new HumpNameConversion();
 		this.sqlLoader.setNameConversion(nc);
+		this.sqlLoader.setMetadataManager(new MetadataManager(ds));
 	}
 	
 	public SQLManager(SQLLoader sqlLoader, ConnectionSource ds,
-			NameConversion nc) {
+			NameConversion nc,MetadataManager metadataManager) {
 		this.sqlLoader = sqlLoader;
 		this.ds = ds;
 		this.nc = nc;
 		this.sqlLoader.setNameConversion(nc);
+		this.sqlLoader.setMetadataManager(metadataManager);
 	}
 	
 	public SQLManager(SQLLoader sqlLoader, ConnectionSource ds,
@@ -91,8 +93,8 @@ public class SQLManager {
 			SQLScript script = new SQLScript(template,this);
 			return script;
 		}
-		case UPDATE_BY_TEMPLATE:{
-			String template = sqlLoader.generationUpdataByTemplate(cls).getTemplate();
+		case INSERT:{
+			String template = sqlLoader.generationInsert(cls).getTemplate();
 			SQLScript script = new SQLScript(template,this);
 			return script;
 		}

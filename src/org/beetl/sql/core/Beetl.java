@@ -20,11 +20,11 @@ public class Beetl {
 			cfg.setStatementStart("@");
 			cfg.setStatementEnd(null);
 			cfg = loadConfig(cfg);
-			
+
 			gt = new GroupTemplate(resourceLoader, cfg);
 			gt.registerFunction("use", new UseFunction());
-			
-		}catch(Exception ex){
+
+		} catch (Exception ex) {
 			throw new RuntimeException(ex.getMessage());
 		}
 
@@ -38,7 +38,7 @@ public class Beetl {
 	 */
 	public Configuration loadConfig(Configuration cfg) {
 		InputStream ins = this.getClass().getResourceAsStream(
-				"/beetl.properties");
+				"/btsql.properties");
 		Properties ps = new Properties();
 		String statementStart = "@";
 		String statementEnd = null;
@@ -51,6 +51,11 @@ public class Beetl {
 			}
 			statementStart = ps.getProperty("beetl.SYMBOL_BEGIN");
 			statementEnd = ps.getProperty("beetl.SYMBOL_END");
+			if (statementEnd != null)
+				if (statementEnd.toLowerCase().equals("null")
+						|| statementEnd.toLowerCase().equals("\n")
+						|| statementEnd.toLowerCase().equals("\r\n"))
+					statementEnd = null;
 		}
 		cfg.setStatementStart(statementStart);
 		cfg.setStatementEnd(statementEnd);

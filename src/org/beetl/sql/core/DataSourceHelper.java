@@ -21,7 +21,7 @@ class DefaultConnectionSource implements ConnectionSource{
 
 	public DefaultConnectionSource(DataSource master,DataSource[] slaves){
 		this.master = master;
-		this.slaves = null;
+		this.slaves = slaves;
 		
 	}
 	@Override

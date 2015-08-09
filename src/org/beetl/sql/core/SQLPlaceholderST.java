@@ -12,8 +12,7 @@ import org.beetl.core.statement.PlaceholderST;
 import org.beetl.core.statement.Statement;
 import org.beetl.core.statement.Type;
 
-public  
-class SQLPlaceholderST extends Statement
+public class SQLPlaceholderST extends Statement
 {
 	public Expression expression;
 	public Type type = null;
