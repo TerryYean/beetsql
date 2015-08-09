@@ -325,7 +325,7 @@ public class BeanProcessor {
 			for (int i = 0; i < props.length; i++) {
 
 //				if (propertyName.equalsIgnoreCase(props[i].getName())) {//这里是一个扩展点，用来扩展pojo属性到数据库字段的映射
-				if(propertyName.equalsIgnoreCase(this.nc.getColName(props[i].getName()))) {
+				if(props[i].getName().equalsIgnoreCase(this.nc.getPropertyName(propertyName))) {
 					columnToProperty[col] = i;
 					break;
 				}

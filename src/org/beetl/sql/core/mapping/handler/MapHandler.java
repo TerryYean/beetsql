@@ -15,6 +15,8 @@ package org.beetl.sql.core.mapping.handler;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.beetl.sql.core.NameConversion;
+import org.beetl.sql.core.mapping.BasicRowProcessor;
 import org.beetl.sql.core.mapping.ResultSetHandler;
 import org.beetl.sql.core.mapping.RowProcessor;
 
@@ -31,6 +33,10 @@ public class MapHandler implements ResultSetHandler<java.util.Map<String ,Object
 	
 	public MapHandler(){
 		this(BeanHandler.BASIC_ROW_PROCESSOR);
+	}
+	
+	public MapHandler(NameConversion nc){
+		this(new BasicRowProcessor(nc));
 	}
 	
 	public MapHandler(RowProcessor convert){
