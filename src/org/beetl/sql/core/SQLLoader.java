@@ -9,4 +9,6 @@ public interface SQLLoader {
 	public SQLSource generationUpdataAll(Class cls);
 	public SQLSource generationUpdataByid(Class cls);
 	public SQLSource generationUpdataByTemplate(Class cls);
+	public void setNameConversion(NameConversion nc);
+	public NameConversion getNameConversion();
 }

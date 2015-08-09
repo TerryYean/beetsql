@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
+import org.beetl.sql.core.kit.StringKit;
 
 public class SQLScript {
 	SQLManager sm;
@@ -48,14 +49,12 @@ public class SQLScript {
 	}
 	
 	public Object singleSelect(Object paras,
-			Class mapping) {
+			Class target) {
 		Map map = new HashMap();
 		map.put("_root", paras);
-		SQLResult result = run(map);
-		String sql = result.jdbcSql;
-		List<Object> objs = result.jdbcPara;
-		//todo:
-		return null;
+		Object o = singleSelect(map,target);
+		
+		return o;
 	}
 
 	/**
@@ -74,13 +73,17 @@ public class SQLScript {
 		ResultSet rs = null;
 		PreparedStatement ps = null;
 		Object model = null;
+		InterceptorContext ctx = this.callInterceptorAsBefore(this.id,sql, objs);
+		sql = ctx.getSql();
+		objs = ctx.getParas();
 		// 执行jdbc
 		try {
-			ps = sm.ds.getConn().prepareStatement(sql);
+			ps = sm.ds.getReadConn(ctx).prepareStatement(sql);
 			for (int i = 0; i < objs.size(); i++)
 				ps.setObject(i + 1, objs.get(i));
 			rs = ps.executeQuery();
 			model = getModel(rs, mapping);
+			this.callInterceptorAsAfter(ctx);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -128,7 +131,7 @@ public class SQLScript {
 					for (Method method : methods) {
 						String methodName = method.getName();
 						if (methodName.startsWith("set")) {
-							String attrName = toLowerCaseFirstOne(methodName
+							String attrName = StringKit.toLowerCaseFirstOne(methodName
 									.substring(3));
 							method.invoke(model, rs.getObject(attrName));
 						}
@@ -166,14 +169,19 @@ public class SQLScript {
 		SQLResult result = run(paras);
 		String sql = result.jdbcSql;
 		List<Object> objs = result.jdbcPara;
+		
+		InterceptorContext ctx = this.callInterceptorAsBefore(this.id,sql, objs);
+		sql = ctx.getSql();
+		objs = ctx.getParas();
 		int rs = 0;
 		PreparedStatement ps = null;
 		// 执行jdbc
 		try {
-			ps = sm.ds.getConn().prepareStatement(sql);
+			ps = sm.ds.getWriteConn(ctx).prepareStatement(sql);
 			for (int i = 0; i < objs.size(); i++)
 				ps.setObject(i + 1, objs.get(i));
 			rs = ps.executeUpdate();
+			this.callInterceptorAsAfter(ctx);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -206,26 +214,6 @@ public class SQLScript {
 		return field.get(obj).toString();
 	}
 
-	// 首字母转小写
-	public String toLowerCaseFirstOne(String s) {
-		if (Character.isLowerCase(s.charAt(0)))
-			return s;
-		else
-			return (new StringBuilder())
-					.append(Character.toLowerCase(s.charAt(0)))
-					.append(s.substring(1)).toString();
-	}
-
-	// 首字母转大写
-	public String toUpperCaseFirstOne(String s) {
-		if (Character.isUpperCase(s.charAt(0)))
-			return s;
-		else
-			return (new StringBuilder())
-					.append(Character.toUpperCase(s.charAt(0)))
-					.append(s.substring(1)).toString();
-	}
-
 	public String getId() {
 		return id;
 	}
@@ -234,5 +222,24 @@ public class SQLScript {
 		this.id = id;
 	}
 	
+	
+	private InterceptorContext callInterceptorAsBefore(String sqlId,String sql,List<Object> paras){
+		
+		InterceptorContext ctx = new InterceptorContext(sqlId,sql,paras);
+		for(Interceptor in:sm.inters){
+			in.befor(ctx);
+		}
+		return ctx;
+	}
+	
+	
+	private void callInterceptorAsAfter(InterceptorContext ctx ){
+		if(sm.inters==null) return  ;
+		
+		for(Interceptor in:sm.inters){
+			in.befor(ctx);
+		}
+		return ;
+	}
 	
 }

@@ -17,7 +17,6 @@ public class Beetl {
 			StringTemplateResourceLoader resourceLoader = new StringTemplateResourceLoader();
 			Configuration cfg = Configuration.defaultConfiguration();
 			cfg.setEngine("org.beetl.sql.core.SQLTemplateEngine");
-			System.out.println("实例化。。。");
 			cfg.setStatementStart("@");
 			cfg.setStatementEnd(null);
 			cfg = loadConfig(cfg);
@@ -41,8 +40,8 @@ public class Beetl {
 		InputStream ins = this.getClass().getResourceAsStream(
 				"/beetl.properties");
 		Properties ps = new Properties();
-		ClasspathLoader.SYMBOL_BEGIN = "@";
-		ClasspathLoader.SYMBOL_END = null;
+		String statementStart = "@";
+		String statementEnd = null;
 		if (ins != null) {
 			try {
 				ps.load(ins);
@@ -50,17 +49,11 @@ public class Beetl {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			ClasspathLoader.SYMBOL_BEGIN = ps.getProperty("beetl.SYMBOL_BEGIN");
-			ClasspathLoader.SYMBOL_END = ps.getProperty("beetl.SYMBOL_END");
-		} else {
-			ClasspathLoader.SYMBOL_BEGIN = "@";
-			ClasspathLoader.SYMBOL_END = null;
+			statementStart = ps.getProperty("beetl.SYMBOL_BEGIN");
+			statementEnd = ps.getProperty("beetl.SYMBOL_END");
 		}
-		cfg.setStatementStart(ClasspathLoader.SYMBOL_BEGIN);
-		cfg.setStatementEnd(ClasspathLoader.SYMBOL_END);
-		if (ClasspathLoader.SYMBOL_END == null) {
-			ClasspathLoader.SYMBOL_END = System.getProperty("line.separator","\n");
-		}
+		cfg.setStatementStart(statementStart);
+		cfg.setStatementEnd(statementEnd);
 		return cfg;
 	}
 

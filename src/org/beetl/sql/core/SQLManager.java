@@ -5,6 +5,8 @@ import java.util.Map;
 public class SQLManager {
     private SQLLoader sqlLoader;
     ConnectionSource ds = null;
+    NameConversion nc = null;
+    Interceptor[] inters = null;
     public static final int  SELECT_BY_ID = 0;
     public static final int  SELECT_BY_TEMPLATE = 1;
     public static final int  DELETE_BY_ID = 2;
@@ -16,8 +18,35 @@ public class SQLManager {
 	public SQLManager(SQLLoader loader,ConnectionSource ds){
 		this.sqlLoader = loader;
 		this.ds = ds;
+		this.nc = new HumpNameConversion(ds);
+		this.sqlLoader.setNameConversion(nc);
 	}
 	
+	public SQLManager(SQLLoader sqlLoader, ConnectionSource ds,
+			NameConversion nc) {
+		this.sqlLoader = sqlLoader;
+		this.ds = ds;
+		this.nc = nc;
+		this.sqlLoader.setNameConversion(nc);
+	}
+	
+	public SQLManager(SQLLoader sqlLoader, ConnectionSource ds,
+			NameConversion nc,Interceptor[] inters) {
+		this.sqlLoader = sqlLoader;
+		this.ds = ds;
+		this.nc = nc;
+		this.inters = inters;
+	}
+
+	public NameConversion getNc() {
+		return nc;
+	}
+
+	public void setNc(NameConversion nc) {
+		this.nc = nc;
+		this.sqlLoader.setNameConversion(nc);
+	}
+
 	protected SQLResult getSQLResult(String id,Map paras){
 		SQLScript script = getScript(id);
 		return  script.run(paras);

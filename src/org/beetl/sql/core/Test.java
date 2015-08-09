@@ -14,16 +14,45 @@ public class Test {
 //    	testSimple();
 //		testIf();
 //    		testManager();
-    	testManagergenera();
+//    	testManagergenera();
     	//testUse();
+    	testNameConve();
 	}
+    public static void testNameConve(){
+    	NameConversion hnc = new HumpNameConversion(ds);
+    	NameConversion unc = new UnderlinedNameConversion(ds);
+    	System.out.println("========HumpNameConversion======");
+    	System.out.println("tableName--->className==="+hnc.getClassName("user"));
+    	System.out.println("className--->tableName==="+hnc.getTableName(User.class));
+    	System.out.println("attrName--->ColName==="+hnc.getColName(User.class, "name"));
+    	System.out.println("ColName--->attrName==="+hnc.getPropertyName(User.class, "name"));
+    	System.out.println("idlist==="+hnc.getId(User.class).toString());
+    	System.out.println("========UnderlinedNameConversion======");
+    	System.out.println("tableName--->className==="+unc.getClassName("user"));
+    	System.out.println("className--->tableName==="+unc.getTableName(User.class));
+    	System.out.println("attrName--->ColName==="+unc.getColName(User.class, "userName"));
+    	System.out.println("ColName--->attrName==="+unc.getPropertyName(User.class, "user_name"));
+    	System.out.println("idlist==="+unc.getId(User.class).toString());
+    	
+    }
     public static void testManagergenera(){
-    	SQLLoader loader = new ClasspathLoader("/sql/mysql");
+    	SQLLoader loader = ClasspathLoader.instance("/sql/mysql");
 		SQLManager manager = new SQLManager(loader,ds);
-    	SQLScript script3 = manager.getScript(User.class,SQLManager.UPDATE_BY_TEMPLATE);
+    	SQLScript script = manager.getScript(User.class,SQLManager.SELECT_BY_ID);
+    	System.out.println("SELECT_BY_ID==="+script.sql);
+    	script = manager.getScript(User.class,SQLManager.DELETE_BY_ID);
+    	System.out.println("DELETE_BY_ID==="+script.sql);
+    	script = manager.getScript(User.class,SQLManager.SELECT_ALL);
+    	System.out.println("SELECT_ALL==="+script.sql);
+    	script = manager.getScript(User.class,SQLManager.SELECT_BY_TEMPLATE);
+    	System.out.println("SELECT_BY_TEMPLATE==="+script.sql);
+    	script = manager.getScript(User.class,SQLManager.UPDATE_ALL);
+    	System.out.println("UPDATE_ALL==="+script.sql);
+    	script = manager.getScript(User.class,SQLManager.UPDATE_BY_ID);
+    	System.out.println("UPDATE_BY_ID==="+script.sql);
     }
     public static void testManager(){
-    	SQLLoader loader = new ClasspathLoader("/sql/mysql");
+    	SQLLoader loader = ClasspathLoader.instance("/sql/mysql");
 		SQLManager manager = new SQLManager(loader,ds);
 		
 		SQLScript script = manager.getScript("user.selectUser");
@@ -47,7 +76,7 @@ public class Test {
 	}
 	
 	public static void testUse(){
-		SQLLoader loader = new ClasspathLoader("/sql/mysql");
+		SQLLoader loader = ClasspathLoader.instance("/sql/mysql");
 		SQLManager manager = new SQLManager(loader,ds);
 		SQLScript script = manager.getScript("user.selectByExample");
 		User user = (User)script.singleSelect(new User(), User.class);
@@ -56,7 +85,7 @@ public class Test {
 	}
 	
 	public static void testSimple(){
-		SQLLoader loader = new ClasspathLoader("/sql/mysql");
+		SQLLoader loader = ClasspathLoader.instance("/sql/mysql");
 		SQLManager manager = new SQLManager(loader,ds);
 		String sql =" select * from user where id = ${id}";
 		
@@ -71,8 +100,8 @@ public class Test {
 	
 	static class MySqlConnectoinSource implements ConnectionSource{
 
-		@Override
-		public Connection getConn() {
+//		@Override
+		private  Connection getConn() {
 			String driver = "com.mysql.jdbc.Driver";
 	        String dbName = "test";
 	        String passwrod = "root";
@@ -92,6 +121,16 @@ public class Test {
 				e.printStackTrace();
 			}
 			return conn;
+		}
+
+		@Override
+		public Connection getReadConn(InterceptorContext ctx) {
+			return this.getConn();
+		}
+
+		@Override
+		public Connection getWriteConn(InterceptorContext ctx) {
+			return this.getConn();
 		}
 		
 	}
@@ -129,6 +168,7 @@ public class Test {
 		int id;
 		String name;
 		int age;
+		String userName;
 		@ID
 		public int getId() {
 			return id;
@@ -148,6 +188,12 @@ public class Test {
 		}
 		public void setAge(int age) {
 			this.age = age;
+		}
+		public String getUserName() {
+			return userName;
+		}
+		public void setUserName(String userName) {
+			this.userName = userName;
 		}
 		
 	}
