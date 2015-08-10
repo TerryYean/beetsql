@@ -1,29 +1,40 @@
 #beetlsql
 
-演示如何定制模版引擎，替换beetl核心节点，占位符并不直接输出，而是输出？，并纪录占位符的值
-这样，就可以拼凑sql了，能轻易实现mybatis功能
+同时具有Hibernate有点 & Mybatis有点功能，承认以SQL为中心，同时能生成大量常用的SQL
 
-	String sql =" select * from user where id = ${user.id}";
-	
-	User user = new User();
-	user.setId(12);
-	Map paras = new HashMap();
-	paras.put("user", user);
-	
-	SQLScript script = new SQLScript("selectUser",sql,paras);
-	script.run();
-	String jdbcSQL = script.getJdbcSQL();
-	List jdbcParas = script.getJDBCParas();
-	
-	System.out.println(jdbcSQL);
-	System.out.println(jdbcParas);
-	
-结果输出是：
+* SQL 以更简洁的方式，Markdown方式集中管理，同时方便程序开发和数据库SQL调试
+* SQL 模板基于Beetl实现，更容易写和调试
+* 无需注解，自动生成大量内置SQL，轻易完成增删改查功能
+* 支持跨数据库平台，开发者所需工作减少到最小
+* 具备Interceptor功能，可以调试，性能诊断SQL，以及扩展其他功能
 
-	select * from user where id = ?
-	[12]
 
-这样，JDBC工具可以轻易完成MyBatis功能了，具体请参考Test类
+
+代码例子
+===
+
+	List<User>  list = SQLManager.getSQLScript("selectUser").select(paras,User.class);
+	User user = SQLManager.getSQLScript(User.class,SELECT_BY_ID).unque(id);
+
+SQL例子
+===
+
+	selectUser
+	===
+		    select * from user where 1=1
+		    @if(user.age==1){
+		    and age = ${user.age}
+		    @}
+		    
+	selectAll
+	===
+		    select * from user  
+		    @use("selectWhere");
+		    
+	selectWhere
+	===
+		    where  age = ${age}
+	
 
 
 
