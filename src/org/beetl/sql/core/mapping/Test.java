@@ -24,12 +24,12 @@ public class Test {
 //		List<Map<String ,Object>> query(rs ,MappingListHandler());
 		
 		
-		//mappingObject(getConn());	 
+		mappingObject(getConn());	 
 		//mappingObjectList(getConn());
 		//mappingScalar(getConn());
 		//mappingMap(getConn());
 		//mappingMapList(getConn());
-		mappingMatchObject(getConn());
+		//mappingMatchObject(getConn());
 		
 	}
 	
@@ -124,7 +124,7 @@ public class Test {
 	        ResultSet rs = pstmt.executeQuery();
 	        
 	        QueryMapping query = new QueryMapping();
-	        User user = query.query(rs, new BeanHandler<User>(User.class));  
+	        User user = query.query(rs, new BeanHandler<User>(User.class));
 	        
         	System.out.println("===================");
         	System.out.println("id="+user.getId()+",name="+user.getName()+",age="+user.getAge());
