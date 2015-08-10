@@ -1,6 +1,6 @@
 #beetlsql
 
-同时具有Hibernate有点 & Mybatis有点功能，承认以SQL为中心，同时能生成大量常用的SQL
+同时具有Hibernate 优点 & Mybatis优点功能，适用于承认以SQL为中心，同时自动能生成大量常用的SQL的应用
 
 * SQL 以更简洁的方式，Markdown方式集中管理，同时方便程序开发和数据库SQL调试
 * SQL 模板基于Beetl实现，更容易写和调试
