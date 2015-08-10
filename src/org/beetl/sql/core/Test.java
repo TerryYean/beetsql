@@ -40,8 +40,8 @@ public class Test {
     public static void testManagergenera(){
     	SQLLoader loader = ClasspathLoader.instance("/sql/mysql");
 		SQLManager manager = new SQLManager(getStyle(),loader,ds);
-    	SQLScript script = manager.getScript(User.class,SQLManager.SELECT_BY_ID);
-    	System.out.println("SELECT_BY_ID==="+script.sql);
+		SQLScript script = manager.getScript(User.class,SQLManager.SELECT_BY_ID);
+		/*System.out.println("SELECT_BY_ID==="+script.sql);
     	script = manager.getScript(User.class,SQLManager.DELETE_BY_ID);
     	System.out.println("DELETE_BY_ID==="+script.sql);
     	script = manager.getScript(User.class,SQLManager.SELECT_ALL);
@@ -53,7 +53,11 @@ public class Test {
     	script = manager.getScript(User.class,SQLManager.UPDATE_BY_ID);
     	System.out.println("UPDATE_BY_ID==="+script.sql);
     	script = manager.getScript(User.class,SQLManager.INSERT);
-    	System.out.println("INSERT==="+script.sql);
+    	System.out.println("INSERT==="+script.sql);*/
+    	script = manager.getPageSqlScript(manager.getScript(User.class,SQLManager.SELECT_BY_TEMPLATE).sql);
+    	System.out.println("=====page=====\n"+script.sql);
+    	script = manager.getCountSqlScript(manager.getScript(User.class,SQLManager.SELECT_BY_TEMPLATE).sql);
+    	System.out.println("=====count=====\n"+script.sql);
     }
     public static void testManager(){
     	SQLLoader loader = ClasspathLoader.instance("/sql/mysql");

@@ -5,23 +5,24 @@ import java.util.Map;
 import org.beetl.sql.core.db.DBStyle;
 
 public class SQLManager {
-	private DBStyle dbStyle ;
-    private SQLLoader sqlLoader;
-    ConnectionSource ds = null;
-    NameConversion nc = null;
-    Interceptor[] inters = {};
-    public static final int  SELECT_BY_ID = 0;
-    public static final int  SELECT_BY_TEMPLATE = 1;
-    public static final int  DELETE_BY_ID = 2;
-    public static final int  SELECT_ALL = 3;
-    public static final int  UPDATE_ALL = 4;
-    public static final int  UPDATE_BY_ID = 5;
-    public static final int  INSERT = 6;
-    
-    public SQLManager(){
-    	//for framework ,sprint .etc
-    }
-	public SQLManager(DBStyle dbStyle,SQLLoader loader,ConnectionSource ds){
+	private DBStyle dbStyle;
+	private SQLLoader sqlLoader;
+	ConnectionSource ds = null;
+	NameConversion nc = null;
+	Interceptor[] inters = {};
+	public static final int SELECT_BY_ID = 0;
+	public static final int SELECT_BY_TEMPLATE = 1;
+	public static final int DELETE_BY_ID = 2;
+	public static final int SELECT_ALL = 3;
+	public static final int UPDATE_ALL = 4;
+	public static final int UPDATE_BY_ID = 5;
+	public static final int INSERT = 6;
+
+	public SQLManager() {
+		// for framework ,sprint .etc
+	}
+
+	public SQLManager(DBStyle dbStyle, SQLLoader loader, ConnectionSource ds) {
 		this.dbStyle = dbStyle;
 		this.sqlLoader = loader;
 		this.ds = ds;
@@ -29,9 +30,10 @@ public class SQLManager {
 		this.sqlLoader.setNameConversion(nc);
 		this.sqlLoader.setMetadataManager(new MetadataManager(ds));
 	}
-	
-	public SQLManager(DBStyle dbStyle,SQLLoader sqlLoader, ConnectionSource ds,
-			NameConversion nc,MetadataManager metadataManager) {
+
+	public SQLManager(DBStyle dbStyle, SQLLoader sqlLoader,
+			ConnectionSource ds, NameConversion nc,
+			MetadataManager metadataManager) {
 		this.dbStyle = dbStyle;
 		this.sqlLoader = sqlLoader;
 		this.ds = ds;
@@ -39,9 +41,9 @@ public class SQLManager {
 		this.sqlLoader.setNameConversion(nc);
 		this.sqlLoader.setMetadataManager(metadataManager);
 	}
-	
-	public SQLManager(	DBStyle dbStyle,SQLLoader sqlLoader, ConnectionSource ds,
-			NameConversion nc,Interceptor[] inters) {
+
+	public SQLManager(DBStyle dbStyle, SQLLoader sqlLoader,
+			ConnectionSource ds, NameConversion nc, Interceptor[] inters) {
 		this.dbStyle = dbStyle;
 		this.dbStyle = dbStyle;
 		this.sqlLoader = sqlLoader;
@@ -59,59 +61,84 @@ public class SQLManager {
 		this.sqlLoader.setNameConversion(nc);
 	}
 
-	protected SQLResult getSQLResult(String id,Map paras){
+	protected SQLResult getSQLResult(String id, Map paras) {
 		SQLScript script = getScript(id);
-		return  script.run(paras);
+		return script.run(paras);
 	}
-	
-	public SQLScript getScript(String id){
+
+	public SQLScript getScript(String id) {
 		String template = sqlLoader.getSQL(id).getTemplate();
-		SQLScript script = new SQLScript(template,this);
+		SQLScript script = new SQLScript(template, this);
 		script.setId(id);
 		return script;
 	}
-	
-	public SQLScript getScript(Class cls,int flag){
-		switch(flag){
-		case SELECT_BY_ID:{
+
+	public SQLScript getScript(Class cls, int flag) {
+		switch (flag) {
+		case SELECT_BY_ID: {
 			String template = sqlLoader.generationSelectByid(cls).getTemplate();
-			SQLScript script = new SQLScript(template,this);
+			SQLScript script = new SQLScript(template, this);
 			return script;
 		}
-		case SELECT_BY_TEMPLATE:{
-			String template = sqlLoader.generationSelectByTemplate(cls).getTemplate();
-			SQLScript script = new SQLScript(template,this);
+		case SELECT_BY_TEMPLATE: {
+			String template = sqlLoader.generationSelectByTemplate(cls)
+					.getTemplate();
+			SQLScript script = new SQLScript(template, this);
 			return script;
 		}
-		case DELETE_BY_ID:{
+		case DELETE_BY_ID: {
 			String template = sqlLoader.generationDeleteByid(cls).getTemplate();
-			SQLScript script = new SQLScript(template,this);
+			SQLScript script = new SQLScript(template, this);
 			return script;
 		}
-		case SELECT_ALL:{
+		case SELECT_ALL: {
 			String template = sqlLoader.generationSelectAll(cls).getTemplate();
-			SQLScript script = new SQLScript(template,this);
+			SQLScript script = new SQLScript(template, this);
 			return script;
 		}
-		case UPDATE_ALL:{
+		case UPDATE_ALL: {
 			String template = sqlLoader.generationUpdataAll(cls).getTemplate();
-			SQLScript script = new SQLScript(template,this);
+			SQLScript script = new SQLScript(template, this);
 			return script;
 		}
-		case UPDATE_BY_ID:{
+		case UPDATE_BY_ID: {
 			String template = sqlLoader.generationUpdataByid(cls).getTemplate();
-			SQLScript script = new SQLScript(template,this);
+			SQLScript script = new SQLScript(template, this);
 			return script;
 		}
-		case INSERT:{
+		case INSERT: {
 			String template = sqlLoader.generationInsert(cls).getTemplate();
-			SQLScript script = new SQLScript(template,this);
+			SQLScript script = new SQLScript(template, this);
 			return script;
 		}
-		default:{
+		default: {
 			throw new UnsupportedOperationException();
 		}
 		}
+	}
+
+	/****
+	 * 获取为分页语句
+	 * @param sql
+	 * @return
+	 */
+	public SQLScript getPageSqlScript(String sql) {
+		if(!sql.toLowerCase().startsWith("select")){
+			throw new UnsupportedOperationException();
+		}
+		return new SQLScript(dbStyle.getPageSQL(sql), this);
+	}
+	/****
+	 * 获取总行数语句
+	 * @param sql
+	 * @return
+	 */
+	public SQLScript getCountSqlScript(String sql) {
+		if(!sql.toLowerCase().startsWith("select")){
+			throw new UnsupportedOperationException();
+		}
+		sql = "select count(*) "+sql.toLowerCase().substring(sql.indexOf("from"));
+		return new SQLScript(sql, this);
 	}
 
 	public SQLLoader getSqlLoader() {
@@ -129,8 +156,5 @@ public class SQLManager {
 	public void setDs(ConnectionSource ds) {
 		this.ds = ds;
 	}
-	
-	
-	
-	
+
 }
