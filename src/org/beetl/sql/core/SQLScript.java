@@ -18,12 +18,14 @@ import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
 import org.beetl.sql.core.db.KeyHolder;
 import org.beetl.sql.core.kit.StringKit;
+import org.beetl.sql.core.mapping.QueryMapping;
 
 public class SQLScript {
 	SQLManager sm;
 	String id ;
     String sql;
 	String jdbcSql;
+	QueryMapping mapping = QueryMapping.getInstance();
 
 	public SQLScript(String sql,SQLManager sm) {
 		this.sql = sql;

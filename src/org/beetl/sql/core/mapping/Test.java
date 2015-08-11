@@ -41,7 +41,7 @@ public class Test {
 	        pstmt = (PreparedStatement)conn.prepareStatement(sql);
 	        ResultSet rs = pstmt.executeQuery();
 	        
-	        QueryMapping query = new QueryMapping();
+	        QueryMapping query = QueryMapping.getInstance();
 	        String[][] arr = {{"id","tId"},{"name","tName"},{"age","tAge"}};//数据库字段：pojo字段
 	        MatchUser user = query.query(rs, new BeanHandler<MatchUser>(MatchUser.class ,new BasicRowProcessor(new StrategyBeanProcessor(new ArrayMatcher(arr)))));
 	        
@@ -59,7 +59,7 @@ public class Test {
 	        pstmt = (PreparedStatement)conn.prepareStatement(sql);
 	        ResultSet rs = pstmt.executeQuery();
 	        
-	        QueryMapping query = new QueryMapping();
+	        QueryMapping query = QueryMapping.getInstance();
 	        List<Map<String ,Object>> list = query.query(rs, new MapListHandler()); 
 	        
         	for(Map<String ,Object> map : list){
@@ -80,7 +80,7 @@ public class Test {
 	        pstmt = (PreparedStatement)conn.prepareStatement(sql);
 	        ResultSet rs = pstmt.executeQuery();
 	        
-	        QueryMapping query = new QueryMapping();
+	        QueryMapping query = QueryMapping.getInstance();
 	        Map<String ,Object> map = query.query(rs, new MapHandler()); 
 	        
         	for(Map.Entry<String, Object> entry : map.entrySet()){
@@ -100,7 +100,7 @@ public class Test {
 	        pstmt = (PreparedStatement)conn.prepareStatement(sql);
 	        ResultSet rs = pstmt.executeQuery();
 	        
-	        QueryMapping query = new QueryMapping();
+	        QueryMapping query = QueryMapping.getInstance();
 //	        String name = query.query(rs, new ScalarHandler<String>());  
 //	        Long name = query.query(rs, new ScalarHandler<Long>());
 //	        String name = query.query(rs, new ScalarHandler<String>()); 
@@ -123,7 +123,7 @@ public class Test {
 	        pstmt = (PreparedStatement)conn.prepareStatement(sql);
 	        ResultSet rs = pstmt.executeQuery();
 	        
-	        QueryMapping query = new QueryMapping();
+	        QueryMapping query = QueryMapping.getInstance();
 	        User user = query.query(rs, new BeanHandler<User>(User.class));
 	        
         	System.out.println("===================");
@@ -141,7 +141,7 @@ public class Test {
 	        pstmt = (PreparedStatement)conn.prepareStatement(sql);
 	        ResultSet rs = pstmt.executeQuery();
 	        
-	        QueryMapping query = new QueryMapping();
+	        QueryMapping query = QueryMapping.getInstance();
 	        List<User> list = query.query(rs, new BeanListHandler<User>(User.class));  
 	        
 	        for(User user : list){

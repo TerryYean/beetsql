@@ -37,7 +37,7 @@ public class MappingTest {
 	private static void query(DBBase base) {
 		String sql = "select * from user3";
 		ResultSet rs = base.getRs(base.getConn(), sql);
-		QueryMapping query = new QueryMapping();
+		QueryMapping query = QueryMapping.getInstance();
 //		Map<String ,Object> map = query.query(rs, new MapHandler());//断点查看
 		Map<String ,Object> map = query.query(rs, new MapHandler(new UnderlinedNameConversion()));//断点查看
 		

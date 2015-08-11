@@ -42,7 +42,7 @@ public class ListBeanTest {
 	private static void HumQuery(DBBase base) {
 		String sql = "select * from user1";
 		ResultSet rs = base.getRs(base.getConn(), sql);
-		QueryMapping query = new QueryMapping();
+		QueryMapping query = QueryMapping.getInstance();
 		List<User1> list = query.query(rs, new BeanListHandler<User1>(User1.class));
 		
 		for(User1 user : list){
@@ -58,7 +58,7 @@ public class ListBeanTest {
 //		String sql = "select * from user2";
 		String sql = "select id ,t_age from user2";//查询部分字段，其余为java类型默认值
 		ResultSet rs = base.getRs(base.getConn(), sql);
-		QueryMapping query = new QueryMapping();
+		QueryMapping query = QueryMapping.getInstance();
 		List<User2> list = query.query(rs, new BeanListHandler<User2>(User2.class ,new UnderlinedNameConversion()));
 		for(User2 user : list){
 			System.out.println(user);

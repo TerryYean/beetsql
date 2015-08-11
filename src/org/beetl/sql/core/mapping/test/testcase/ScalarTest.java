@@ -44,7 +44,7 @@ public class ScalarTest {
 		String sql = "select age ,id ,name from user1 where id=1";//11 默认取第一条记录的第一个字段（age）
 //		String sql = "select count(*) from user1";//count（*） 是long类型
 		ResultSet rs = base.getRs(base.getConn(), sql);
-		QueryMapping query = new QueryMapping();
+		QueryMapping query = QueryMapping.getInstance();
 //		Long id = query.query(rs, new ScalarHandler<Long>());
 //		Integer id = query.query(rs, new ScalarHandler<Integer>());//默认就去第一个字段
 //		Integer id = query.query(rs, new ScalarHandler<Integer>(1));//如果有多个字段可以自定义取第几个
@@ -79,7 +79,7 @@ public class ScalarTest {
 				+ "t_year "					//java.sql.Date
 				+ "from user3";
 		ResultSet rs = base.getRs(base.getConn(), sql);
-		QueryMapping query = new QueryMapping();
+		QueryMapping query = QueryMapping.getInstance();
 //		String result = query.query(rs, new ScalarHandler<String>("t_varchar"));
 //		String result = query.query(rs, new ScalarHandler<String>("t_char"));
 //		String result = query.query(rs, new ScalarHandler<String>("t_text"));

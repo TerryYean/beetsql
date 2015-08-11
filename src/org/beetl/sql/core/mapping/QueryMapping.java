@@ -21,6 +21,12 @@ import java.sql.SQLException;
  * @date:2015年8月2日 上午12:19:23     
  */
 public class QueryMapping {
+	
+	private QueryMapping(){}
+	private static QueryMapping mapping = new QueryMapping();
+	public static QueryMapping getInstance(){
+		return mapping;
+	}
 
 	/**
 	 * 

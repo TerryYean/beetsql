@@ -39,7 +39,7 @@ public class ListMapTest {
 //		String sql = "select * from user1";
 		String sql = "select * from user2";
 		ResultSet rs = base.getRs(base.getConn(), sql);
-		QueryMapping query = new QueryMapping();
+		QueryMapping query = QueryMapping.getInstance();
 //		List<Map<String ,Object>> list = query.query(rs, new MapListHandler());//断点查看
 		List<Map<String ,Object>> list = query.query(rs, new MapListHandler(new UnderlinedNameConversion()));//断点查看
 		
