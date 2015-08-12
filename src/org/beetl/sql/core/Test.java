@@ -15,8 +15,8 @@ public class Test {
     public static void main(String[] args) {
 //    	testSimple();
 //		testIf();
-//    		testManager();
-    	testManagergenera();
+    		testManager();
+//    	testManagergenera();
     	//testUse();
 //    	testNameConve();
 	}
@@ -64,12 +64,12 @@ public class Test {
 		SQLManager manager = new SQLManager(getStyle(),loader,ds);
 		
 		SQLScript script = manager.getScript("user.selectUser");
-		Map paras = getUserParas();
-		User result = (User)script.singleSelect( paras, User.class);
+		Map<String, Object> paras = getUserParas();
+		org.beetl.sql.core.mapping.test.pojo.User result = script.singleSelect( paras, org.beetl.sql.core.mapping.test.pojo.User.class);
 		
 		SQLScript script2 = manager.getScript(User.class,SQLManager.SELECT_BY_ID);
 		System.out.println("====sql==== \n"+script2.sql);
-		User u = (User) script2.getById(result);//默认返回的是user.getById
+		org.beetl.sql.core.mapping.test.pojo.User u = (org.beetl.sql.core.mapping.test.pojo.User) script2.getById(result);//默认返回的是user.getById
 		printUser(u);
 		
 		SQLScript script3 = manager.getScript(User.class,SQLManager.UPDATE_BY_ID);//已经在30行生成了update语句
@@ -79,7 +79,7 @@ public class Test {
 		
     }
     //便于测试
-	public static void printUser(User user){
+	public static void printUser(org.beetl.sql.core.mapping.test.pojo.User user){
 		System.out.println("user:{id:"+user.getId()+",name:"+user.getName()+"}");
 	}
 	
@@ -145,10 +145,10 @@ public class Test {
 	
 	
 	
-	private static Map getUserParas(){
-		User user = new User();
+	private static Map<String, Object> getUserParas(){
+		org.beetl.sql.core.mapping.test.pojo.User user = new org.beetl.sql.core.mapping.test.pojo.User();
 		user.setId(2);
-		Map paras = new HashMap();
+		Map<String, Object> paras = new HashMap<String, Object>();
 		paras.put("user", user);
 		return paras;
 	}
@@ -177,36 +177,37 @@ public class Test {
 		return new MySqlStyle();
 	}
 	
-	static class User{
-		int id;
-		String name;
-		int age;
-		String userName;
-		public int getId() {
-			return id;
-		}
-		public void setId(int id) {
-			this.id = id;
-		}
-		
-		public String getName() {
-			return name;
-		}
-		public void setName(String name) {
-			this.name = name;
-		}
-		public int getAge() {
-			return age;
-		}
-		public void setAge(int age) {
-			this.age = age;
-		}
-		public String getUserName() {
-			return userName;
-		}
-		public void setUserName(String userName) {
-			this.userName = userName;
-		}
-		
+}
+
+class User{
+	int id;
+	String name;
+	int age;
+	String userName;
+	public int getId() {
+		return id;
 	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public int getAge() {
+		return age;
+	}
+	public void setAge(int age) {
+		this.age = age;
+	}
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+	
 }

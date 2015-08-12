@@ -19,13 +19,14 @@ import org.beetl.core.Template;
 import org.beetl.sql.core.db.KeyHolder;
 import org.beetl.sql.core.kit.StringKit;
 import org.beetl.sql.core.mapping.QueryMapping;
+import org.beetl.sql.core.mapping.handler.BeanHandler;
 
 public class SQLScript {
 	SQLManager sm;
 	String id ;
     String sql;
 	String jdbcSql;
-	QueryMapping mapping = QueryMapping.getInstance();
+	QueryMapping queryMapping = QueryMapping.getInstance();
 
 	public SQLScript(String sql,SQLManager sm) {
 		this.sql = sql;
@@ -59,9 +60,8 @@ public class SQLScript {
 		
 	}
 	
-	public Object singleSelect(Object paras,
-			Class target) {
-		Map map = new HashMap();
+	public Object singleSelect(Object paras, Class<?> target) {
+		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("_root", paras);
 		Object o = singleSelect(map,target);
 		
@@ -78,14 +78,13 @@ public class SQLScript {
 	 * @param mapping
 	 * @return
 	 */
-	public Object singleSelect(Map<String, Object> paras,
-			Class mapping) {
+	public <T> T singleSelect(Map<String, Object> paras, Class<T> clazz) {
 		SQLResult result = run(paras);
 		String sql = result.jdbcSql;
 		List<Object> objs = result.jdbcPara;
 		ResultSet rs = null;
 		PreparedStatement ps = null;
-		Object model = null;
+		T model = null;
 		InterceptorContext ctx = this.callInterceptorAsBefore(this.id,sql, objs);
 		sql = ctx.getSql();
 		objs = ctx.getParas();
@@ -95,7 +94,8 @@ public class SQLScript {
 			for (int i = 0; i < objs.size(); i++)
 				ps.setObject(i + 1, objs.get(i));
 			rs = ps.executeQuery();
-			model = getModel(rs, mapping);
+//			model = getModel(rs, mapping);
+			model = queryMapping.query(rs, new BeanHandler<T>(clazz, this.sm.nc));
 			this.callInterceptorAsAfter(ctx);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -211,10 +211,11 @@ public class SQLScript {
 	}
 
 	public Object getById( Object obj) {
-		Map<String, Object> paras = new HashMap<String, Object>();
-		String tableName = obj.getClass().getSimpleName().toLowerCase();
-		paras.put(tableName, obj);
-		return singleSelect( paras, obj.getClass());
+//		Map<String, Object> paras = new HashMap<String, Object>();
+//		String tableName = obj.getClass().getSimpleName().toLowerCase();
+		String tableName = this.sm.nc.getTableName(obj.getClass().getSimpleName());
+//		paras.put(tableName, obj);
+		return singleSelect( obj, obj.getClass());
 	}
 
 	public String getFieldValue(Field field, Object obj)
