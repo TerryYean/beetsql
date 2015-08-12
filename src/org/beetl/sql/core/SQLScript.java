@@ -22,6 +22,7 @@ import org.beetl.sql.core.mapping.QueryMapping;
 import org.beetl.sql.core.mapping.handler.BeanHandler;
 
 public class SQLScript {
+	
 	SQLManager sm;
 	String id ;
     String sql;
@@ -37,7 +38,7 @@ public class SQLScript {
 	protected SQLResult run(Map<String, Object> paras) {
 		GroupTemplate gt = Beetl.instance().getGroupTemplate();
 		Template t = gt.getTemplate(sql);
-		List jdbcPara = new LinkedList();
+		List<Object> jdbcPara = new LinkedList<Object>();
 		for (Entry<String, Object> entry : paras.entrySet()) {
 			t.binding(entry.getKey(), entry.getValue());
 		}

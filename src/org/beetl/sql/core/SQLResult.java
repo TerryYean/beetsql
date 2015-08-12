@@ -4,5 +4,5 @@ import java.util.List;
 
  public class SQLResult {
 	public String jdbcSql;
-	public List jdbcPara;
+	public List<Object> jdbcPara;
 }
