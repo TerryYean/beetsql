@@ -3,12 +3,13 @@ package org.beetl.sql.core;
 import java.util.Map;
 
 import org.beetl.sql.core.db.DBStyle;
+import org.beetl.sql.core.db.MetadataManager;
 
 public class SQLManager {
 	private DBStyle dbStyle;
 	private SQLLoader sqlLoader;
-	ConnectionSource ds = null;
-	NameConversion nc = null;
+	ConnectionSource ds = null;//数据库连接管理
+	NameConversion nc = null;//名字转换器
 	Interceptor[] inters = {};
 	public static final int SELECT_BY_ID = 0;
 	public static final int SELECT_BY_TEMPLATE = 1;
@@ -27,8 +28,9 @@ public class SQLManager {
 		this.sqlLoader = loader;
 		this.ds = ds;
 		this.nc = new HumpNameConversion();
-		this.sqlLoader.setNameConversion(nc);
-		this.sqlLoader.setMetadataManager(new MetadataManager(ds));
+		this.dbStyle.setNameConversion(nc);
+		this.dbStyle.setMetadataManager(new MetadataManager(ds));
+		this.sqlLoader.setDbs(dbStyle);
 	}
 
 	public SQLManager(DBStyle dbStyle, SQLLoader sqlLoader,
@@ -38,13 +40,13 @@ public class SQLManager {
 		this.sqlLoader = sqlLoader;
 		this.ds = ds;
 		this.nc = nc;
-		this.sqlLoader.setNameConversion(nc);
-		this.sqlLoader.setMetadataManager(metadataManager);
+		this.dbStyle.setNameConversion(nc);
+		this.dbStyle.setMetadataManager(metadataManager);
+		this.sqlLoader.setDbs(dbStyle);
 	}
 
 	public SQLManager(DBStyle dbStyle, SQLLoader sqlLoader,
 			ConnectionSource ds, NameConversion nc, Interceptor[] inters) {
-		this.dbStyle = dbStyle;
 		this.dbStyle = dbStyle;
 		this.sqlLoader = sqlLoader;
 		this.ds = ds;
@@ -58,10 +60,10 @@ public class SQLManager {
 
 	public void setNc(NameConversion nc) {
 		this.nc = nc;
-		this.sqlLoader.setNameConversion(nc);
+		this.dbStyle.setNameConversion(nc);
 	}
 
-	protected SQLResult getSQLResult(String id, Map paras) {
+	protected SQLResult getSQLResult(String id, Map<String, Object> paras) {
 		SQLScript script = getScript(id);
 		return script.run(paras);
 	}
@@ -73,41 +75,41 @@ public class SQLManager {
 		return script;
 	}
 
-	public SQLScript getScript(Class cls, int flag) {
+	public SQLScript getScript(Class<?> cls, int flag) {
 		switch (flag) {
 		case SELECT_BY_ID: {
-			String template = sqlLoader.generationSelectByid(cls).getTemplate();
+			String template = sqlLoader.getSelectByid(cls).getTemplate();
 			SQLScript script = new SQLScript(template, this);
 			return script;
 		}
 		case SELECT_BY_TEMPLATE: {
-			String template = sqlLoader.generationSelectByTemplate(cls)
+			String template = sqlLoader.getSelectByTemplate(cls)
 					.getTemplate();
 			SQLScript script = new SQLScript(template, this);
 			return script;
 		}
 		case DELETE_BY_ID: {
-			String template = sqlLoader.generationDeleteByid(cls).getTemplate();
+			String template = sqlLoader.getDeleteByid(cls).getTemplate();
 			SQLScript script = new SQLScript(template, this);
 			return script;
 		}
 		case SELECT_ALL: {
-			String template = sqlLoader.generationSelectAll(cls).getTemplate();
+			String template = sqlLoader.getSelectAll(cls).getTemplate();
 			SQLScript script = new SQLScript(template, this);
 			return script;
 		}
 		case UPDATE_ALL: {
-			String template = sqlLoader.generationUpdataAll(cls).getTemplate();
+			String template = sqlLoader.getUpdataAll(cls).getTemplate();
 			SQLScript script = new SQLScript(template, this);
 			return script;
 		}
 		case UPDATE_BY_ID: {
-			String template = sqlLoader.generationUpdataByid(cls).getTemplate();
+			String template = sqlLoader.getUpdataByid(cls).getTemplate();
 			SQLScript script = new SQLScript(template, this);
 			return script;
 		}
 		case INSERT: {
-			String template = sqlLoader.generationInsert(cls).getTemplate();
+			String template = sqlLoader.getInsert(cls).getTemplate();
 			SQLScript script = new SQLScript(template, this);
 			return script;
 		}

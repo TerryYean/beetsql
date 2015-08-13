@@ -17,11 +17,13 @@ import java.util.Map.Entry;
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
 import org.beetl.sql.core.db.KeyHolder;
+import org.beetl.sql.core.kit.PojoKit;
 import org.beetl.sql.core.kit.StringKit;
 import org.beetl.sql.core.mapping.QueryMapping;
 import org.beetl.sql.core.mapping.handler.BeanHandler;
 
 public class SQLScript {
+	
 	SQLManager sm;
 	String id ;
     String sql;
@@ -37,7 +39,7 @@ public class SQLScript {
 	protected SQLResult run(Map<String, Object> paras) {
 		GroupTemplate gt = Beetl.instance().getGroupTemplate();
 		Template t = gt.getTemplate(sql);
-		List jdbcPara = new LinkedList();
+		List<Object> jdbcPara = new LinkedList<Object>();
 		for (Entry<String, Object> entry : paras.entrySet()) {
 			t.binding(entry.getKey(), entry.getValue());
 		}
@@ -116,12 +118,12 @@ public class SQLScript {
 	}
 
 	public List<Object> select(Connection conn, Map<String, Object> paras,
-			Class mapping) {
+			Class<?> mapping) {
 		throw new UnsupportedOperationException();
 	}
 
 	public List<Object> select(Connection conn, Map<String, Object> paras,
-			Class mapping, long start, long end) {
+			Class<?> mapping, long start, long end) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -134,7 +136,7 @@ public class SQLScript {
 	 * @param mapping
 	 * @return
 	 */
-	public Object getModel(ResultSet rs, Class mapping) {
+	public Object getModel(ResultSet rs, Class<?> mapping) {
 		Object model = null;
 		try {
 			model = mapping.newInstance();
@@ -177,8 +179,9 @@ public class SQLScript {
 
 	public int update(Object obj) {
 		Map<String, Object> paras = new HashMap<String, Object>();
-		String tableName = obj.getClass().getSimpleName().toLowerCase();
-		paras.put(tableName, obj);
+//		String tableName = obj.getClass().getSimpleName().toLowerCase();
+//		paras.put(tableName, obj);
+		paras.put("_root", obj);
 		SQLResult result = run(paras);
 		String sql = result.jdbcSql;
 		List<Object> objs = result.jdbcPara;

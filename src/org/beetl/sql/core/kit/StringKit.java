@@ -1,6 +1,7 @@
 package org.beetl.sql.core.kit;
 
 public class StringKit {
+	
 	// 首字母转小写
 	public static String toLowerCaseFirstOne(String s) {
 		if (Character.isLowerCase(s.charAt(0)))
@@ -33,8 +34,9 @@ public class StringKit {
 		}
 		return temp.toString();
 	}
+	
 	// 删除下划线并转把后一个字母转成大写
-		public static String deCodeUnderlined(String s) {
+	public static String deCodeUnderlined(String s) {
 			char[] chars = s.toCharArray();
 			StringBuilder temp = new StringBuilder();
 			for (int i = 0; i < chars.length; i++) {

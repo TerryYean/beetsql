@@ -2,8 +2,6 @@ package org.beetl.sql.core.db;
 
 import java.util.List;
 
-import org.beetl.sql.core.SQLResult;
-
 /**
  * 没有什么
  * @author xiandafu
@@ -11,13 +9,7 @@ import org.beetl.sql.core.SQLResult;
  */
 public class MySqlStyle extends AbstractDBStyle {
 	
-	public KeyHolder getKeyHolder(String name) {
-		return this.getKeyHolder();
-	}
-	
-	public KeyHolder getKeyHolder(){
-		return new AutoIncKeyHolder();
-	}
+
 
 
 	@Override
@@ -33,6 +25,15 @@ public class MySqlStyle extends AbstractDBStyle {
 		return paras;
 	}
 
+	@Override
+	public AbstractDBStyle instance() {
+		if(adbs == null){
+			adbs = new MySqlStyle();
+		}
+		return adbs;
+	}
 
-
+	public MySqlStyle() {
+		super();
+	}
 }
