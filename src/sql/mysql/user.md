@@ -17,7 +17,3 @@ selectByExample
 example
 ===  
    where 1=1 and name = ${name}
-
- 
-  
-    
