@@ -9,6 +9,7 @@ import org.beetl.core.statement.VarRef;
 public class SQLVarRef extends VarRef {
 	public SQLVarRef(VarRef ref) {
 		super(ref.attributes, ref.hasSafe, ref.safe, ref.token, ref.token);
+		this.varIndex = ref.varIndex;
 
 	}
 
