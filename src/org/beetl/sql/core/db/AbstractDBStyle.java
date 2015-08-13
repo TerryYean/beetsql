@@ -132,7 +132,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 	@Override
 	public SQLSource generationUpdataByid(Class cls) {
 		String tableName = nameConversion.getTableName(cls.getSimpleName());
-		StringBuffer sql = new StringBuffer("update ").append(tableName).append(" set ").append(lineSeparator);
+		StringBuilder sql = new StringBuilder("update ").append(tableName).append(" set ").append(lineSeparator);
 		String fieldName = null;
 		
 		Method[] methods = cls.getDeclaredMethods();
@@ -153,7 +153,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 	@Override
 	public SQLSource generationUpdataAll(Class cls) {
 		String tableName = nameConversion.getTableName(cls.getSimpleName());
-		StringBuffer sql = new StringBuffer("update ").append(tableName).append(" set ").append(lineSeparator);
+		StringBuilder sql = new StringBuilder("update ").append(tableName).append(" set ").append(lineSeparator);
 		String fieldName = null;
 		Method[] methods = cls.getDeclaredMethods();
 		for (Method method : methods) {
@@ -169,11 +169,11 @@ public abstract class AbstractDBStyle implements DBStyle {
 	 * 生成insert语句
 	 * @return
 	 */
-	public SQLSource generationInsert(Class cls) {
+	public SQLSource generationInsert(Class<?> cls) {
 		String tableName = nameConversion.getTableName(cls.getSimpleName());
-		StringBuffer sql = new StringBuffer("insert into " + tableName + lineSeparator);
-		StringBuffer colSql = new StringBuffer("(");
-		StringBuffer valSql = new StringBuffer(" VALUES (");
+		StringBuilder sql = new StringBuilder("insert into " + tableName + lineSeparator);
+		StringBuilder colSql = new StringBuilder("(");
+		StringBuilder valSql = new StringBuilder(" VALUES (");
 		String fieldName = null;
 		Method[] methods = cls.getDeclaredMethods();
 		for (Method method : methods) {
@@ -183,7 +183,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 				valSql.append(appendInsertVlaue(tableName, fieldName));
 			}
 		}
-		sql = removeComma(colSql, null).append(")").append(removeComma(valSql, null)).append(")");
+		sql.append(removeComma(colSql, null).append(")").append(removeComma(valSql, null)).append(")").toString());
 		return new SQLSource(sql.toString());
 	}
 	/****
@@ -192,7 +192,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 	 * @param sql
 	 * @return
 	 */
-	private StringBuffer removeComma(StringBuffer sql, String condition) {
+	private StringBuilder removeComma(StringBuilder sql, String condition) {
 		return sql.delete(sql.lastIndexOf(","),sql.length() ).append(lineSeparator
 				+ STATEMENTSTART + "} " + STATEMENTEND + lineSeparator
 				+ (condition == null ? "" : condition));
