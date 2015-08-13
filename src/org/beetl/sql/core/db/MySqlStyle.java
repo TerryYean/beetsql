@@ -1,8 +1,11 @@
 package org.beetl.sql.core.db;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 import org.beetl.sql.core.SQLResult;
+import org.beetl.sql.core.SQLSource;
+import org.beetl.sql.core.kit.StringKit;
 
 /**
  * 没有什么
@@ -33,6 +36,15 @@ public class MySqlStyle extends AbstractDBStyle {
 		return paras;
 	}
 
+	@Override
+	public AbstractDBStyle instance() {
+		if(adbs == null){
+			adbs = new MySqlStyle();
+		}
+		return adbs;
+	}
 
-
+	public MySqlStyle() {
+		super();
+	}
 }

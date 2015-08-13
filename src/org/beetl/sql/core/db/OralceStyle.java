@@ -2,8 +2,10 @@ package org.beetl.sql.core.db;
 
 import java.util.List;
 
+import org.beetl.sql.core.SQLSource;
+
 public class OralceStyle extends AbstractDBStyle {
-	 
+
 		public KeyHolder getKeyHolder(String name) {
 			return new OralceKeyHolder(name);
 		}
@@ -21,6 +23,12 @@ public class OralceStyle extends AbstractDBStyle {
 
 		@Override
 		public List<Object> getPagePara(List<Object> paras, int start, int size) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public AbstractDBStyle instance() {
 			// TODO Auto-generated method stub
 			return null;
 		}

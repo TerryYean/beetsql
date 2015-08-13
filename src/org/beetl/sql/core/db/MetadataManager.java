@@ -1,4 +1,4 @@
-package org.beetl.sql.core;
+package org.beetl.sql.core.db;
 
 import java.lang.reflect.Field;
 import java.sql.DatabaseMetaData;
@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.beetl.sql.core.ConnectionSource;
 
 public class MetadataManager {
 	
