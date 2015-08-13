@@ -51,11 +51,12 @@ public class Beetl {
 			}
 			statementStart = ps.getProperty("beetl.SYMBOL_BEGIN");
 			statementEnd = ps.getProperty("beetl.SYMBOL_END");
-			if (statementEnd != null)
-				if (statementEnd.toLowerCase().equals("null")
-						|| statementEnd.toLowerCase().equals("\n")
-						|| statementEnd.toLowerCase().equals("\r\n"))
-					statementEnd = null;
+			if (statementEnd == null 
+					|| statementEnd.length() == 0
+					|| statementEnd.toLowerCase().equals("null")
+					|| statementEnd.toLowerCase().equals("\n")
+					|| statementEnd.toLowerCase().equals("\r\n"))
+				statementEnd = System.getProperty("line.separator", "\n");
 		}
 		cfg.setStatementStart(statementStart);
 		cfg.setStatementEnd(statementEnd);

@@ -127,7 +127,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 		
 		Method[] methods = cls.getDeclaredMethods();
 		for (Method method : methods) {
-			if(method.getName().startsWith("get")){
+			if(method.getName().startsWith("get") && !method.getName().endsWith("Id")){//TODO 暂时限定排除ID
 				fieldName = StringKit.toLowerCaseFirstOne(method.getName().substring(3));
 				sql.append(appendSetColumn(tableName, fieldName));
 			}
@@ -198,7 +198,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 		String colName = nameConversion.getColName(fieldName);
 		if (metadataManager.existColName(tableName, colName)) {
 			return STATEMENTSTART + "if(!isEmpty(" + fieldName + ")){"
-					+ STATEMENTEND + colName + "=${" + fieldName + "},"
+					+ STATEMENTEND + "\t" + colName + "=${" + fieldName + "},"
 					+ lineSeparator + STATEMENTSTART + "}" + STATEMENTEND;
 		}
 		return "";

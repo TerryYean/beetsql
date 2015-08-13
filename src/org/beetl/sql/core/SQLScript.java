@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
 import org.beetl.sql.core.db.KeyHolder;
+import org.beetl.sql.core.kit.PojoKit;
 import org.beetl.sql.core.kit.StringKit;
 import org.beetl.sql.core.mapping.QueryMapping;
 import org.beetl.sql.core.mapping.handler.BeanHandler;
@@ -178,8 +179,9 @@ public class SQLScript {
 
 	public int update(Object obj) {
 		Map<String, Object> paras = new HashMap<String, Object>();
-		String tableName = obj.getClass().getSimpleName().toLowerCase();
-		paras.put(tableName, obj);
+//		String tableName = obj.getClass().getSimpleName().toLowerCase();
+//		paras.put(tableName, obj);
+		paras.put("_root", obj);
 		SQLResult result = run(paras);
 		String sql = result.jdbcSql;
 		List<Object> objs = result.jdbcPara;
