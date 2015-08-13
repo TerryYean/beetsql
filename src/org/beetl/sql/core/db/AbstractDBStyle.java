@@ -28,6 +28,9 @@ public abstract class AbstractDBStyle implements DBStyle {
 		Configuration cf = Beetl.instance().getGroupTemplate().getConf();
 		STATEMENTSTART = cf.getStatementStart();
 		STATEMENTEND = cf.getStatementEnd();
+		if(STATEMENTEND == null){
+			STATEMENTEND = lineSeparator;
+		}
 	}
 	public abstract AbstractDBStyle instance();
 
