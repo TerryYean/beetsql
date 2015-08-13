@@ -2,8 +2,6 @@ package org.beetl.sql.core.db;
 
 import java.util.List;
 
-import org.beetl.sql.core.SQLSource;
-
 public class OralceStyle extends AbstractDBStyle {
 
 	

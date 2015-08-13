@@ -9,6 +9,7 @@ import org.beetl.core.statement.VarRef;
 
 public class PlaceHolderListener implements Listener {
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Object onEvent(Event e) {
 		Stack stack = (Stack) e.getEventTaget();
