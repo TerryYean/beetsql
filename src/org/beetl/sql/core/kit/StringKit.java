@@ -36,18 +36,26 @@ public class StringKit {
 	}
 	
 	// 删除下划线并转把后一个字母转成大写
-	public static String deCodeUnderlined(String s) {
-			char[] chars = s.toCharArray();
-			StringBuilder temp = new StringBuilder();
-			for (int i = 0; i < chars.length; i++) {
-				if(chars[i] == '_'){
-					i++;
-					temp.append(Character.toUpperCase(chars[i]));
-				}else{
-					temp.append(chars[i]);
-				}
-				
+	public static String deCodeUnderlined(String str) {
+		
+		String[] splitArr = str.split("_");
+		StringBuilder sb = new StringBuilder();
+		
+		for(int i=0 ;i<splitArr.length ;i++){
+			if(i == 0){
+				sb.append(splitArr[0].toLowerCase());
+				continue;
 			}
-			return temp.toString();
+			
+			sb.append(toUpperCaseFirstOne(splitArr[i].toLowerCase()));
 		}
+		
+		return sb.toString();
+	}
+	
+	
+	public static void main(String[] args) {
+		System.out.println(deCodeUnderlined("USER_NAME"));
+	}
+	
 }

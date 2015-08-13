@@ -15,8 +15,8 @@ public class Test {
     public static void main(String[] args) {
 //    	testSimple();
 //		testIf();
-//    		testManager();
-    	testManagergenera();
+    		testManager();
+//    	testManagergenera();
     	//testUse();
 //    	testNameConve();
 	}
@@ -65,11 +65,11 @@ public class Test {
 		
 		SQLScript script = manager.getScript("user.selectUser");
 		Map<String, Object> paras = getUserParas();
-		org.beetl.sql.core.mapping.test.pojo.User result = script.singleSelect( paras, org.beetl.sql.core.mapping.test.pojo.User.class);
+		org.beetl.sql.pojo.User result = script.singleSelect( paras, org.beetl.sql.pojo.User.class);
 		
 		SQLScript script2 = manager.getScript(User.class,SQLManager.SELECT_BY_ID);
 		System.out.println("====sql==== \n"+script2.sql);
-		org.beetl.sql.core.mapping.test.pojo.User u = (org.beetl.sql.core.mapping.test.pojo.User) script2.getById(result);//默认返回的是user.getById
+		org.beetl.sql.pojo.User u = (org.beetl.sql.pojo.User) script2.getById(result);//默认返回的是user.getById
 		printUser(u);
 		
 		SQLScript script3 = manager.getScript(User.class,SQLManager.UPDATE_BY_ID);//已经在30行生成了update语句
@@ -79,7 +79,7 @@ public class Test {
 		
     }
     //便于测试
-	public static void printUser(org.beetl.sql.core.mapping.test.pojo.User user){
+	public static void printUser(org.beetl.sql.pojo.User user){
 		System.out.println("user:{id:"+user.getId()+",name:"+user.getName()+"}");
 	}
 	
@@ -112,7 +112,7 @@ public class Test {
 		private  Connection getConn() {
 			String driver = "com.mysql.jdbc.Driver";
 	        String dbName = "test";
-	        String passwrod = "root";
+	        String passwrod = "123456";
 	        String userName = "root";
 	        String url = "jdbc:mysql://localhost:3306/" + dbName;
 	        String sql = "select * from users";
@@ -146,7 +146,7 @@ public class Test {
 	
 	
 	private static Map<String, Object> getUserParas(){
-		org.beetl.sql.core.mapping.test.pojo.User user = new org.beetl.sql.core.mapping.test.pojo.User();
+		org.beetl.sql.pojo.User user = new org.beetl.sql.pojo.User();
 		user.setId(2);
 		Map<String, Object> paras = new HashMap<String, Object>();
 		paras.put("user", user);

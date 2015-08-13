@@ -10,7 +10,7 @@
  * ------------------------------------------------------------------  
  * 2015年8月12日        suxj     1.0     1.0 Version  
  */
-package org.beetl.sql.core.mapping.test.pojo;
+package org.beetl.sql.pojo;
 
 /**
  * @ClassName: User

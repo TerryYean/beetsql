@@ -1,5 +1,5 @@
 /**  
- * 文件名:    User2.java  
+ * 文件名:    User1.java  
  * 描述:      
  * 作者:      suxj
  * 版本:      1.0  
@@ -10,23 +10,23 @@
  * ------------------------------------------------------------------  
  * 2015年8月9日        suxj     1.0     1.0 Version  
  */
-package org.beetl.sql.core.mapping.test.pojo;
+package org.beetl.sql.pojo;
 
 /**
- * @ClassName: User2
+ * @ClassName: User1
  * @Description: TODO
  * @author: suxj
  * @date:2015年8月9日 下午1:28:12
  */
-public class User2 {
+public class User1 {
 
 	private int id; 		// int
-	private String tName; 	// varchar
-	private int tAge; 		// int
-	private String tSex; 	// char
+	private String name; 	// varchar
+	private int age; 		// int
+	private String sex; 	// char
 	private java.sql.Date createDate;//datatime
-	private java.sql.Timestamp deleteDate;//timestamp
-	
+	private java.sql.Date deleteDate;//timestamp
+
 	public int getId() {
 		return id;
 	}
@@ -35,28 +35,28 @@ public class User2 {
 		this.id = id;
 	}
 
-	public String gettName() {
-		return tName;
+	public String getName() {
+		return name;
 	}
 
-	public void settName(String tName) {
-		this.tName = tName;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public int gettAge() {
-		return tAge;
+	public int getAge() {
+		return age;
 	}
 
-	public void settAge(int tAge) {
-		this.tAge = tAge;
+	public void setAge(int age) {
+		this.age = age;
 	}
 
-	public String gettSex() {
-		return tSex;
+	public String getSex() {
+		return sex;
 	}
 
-	public void settSex(String tSex) {
-		this.tSex = tSex;
+	public void setSex(String sex) {
+		this.sex = sex;
 	}
 	
 	public java.sql.Date getCreateDate() {
@@ -67,16 +67,16 @@ public class User2 {
 		this.createDate = createDate;
 	}
 
-	public java.sql.Timestamp getDeleteDate() {
+	public java.sql.Date getDeleteDate() {
 		return deleteDate;
 	}
 
-	public void setDeleteDate(java.sql.Timestamp deleteDate) {
+	public void setDeleteDate(java.sql.Date deleteDate) {
 		this.deleteDate = deleteDate;
 	}
 
 	public String toString(){
-		return "id="+id+",name="+tName+",age="+tAge+",sex="+tSex+",createDate="+createDate+",deleteDate="+deleteDate;
+		return "id="+id+",name="+name+",age="+age+",sex="+sex+",createDate="+createDate+",deleteDate="+deleteDate;
 	}
 
 }

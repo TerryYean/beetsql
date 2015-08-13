@@ -1,4 +1,4 @@
-package org.beetl.sql.core.mapping.test.base;
+package org.beetl.sql.mapping;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
