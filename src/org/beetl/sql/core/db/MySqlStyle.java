@@ -1,11 +1,6 @@
 package org.beetl.sql.core.db;
 
-import java.lang.reflect.Method;
 import java.util.List;
-
-import org.beetl.sql.core.SQLResult;
-import org.beetl.sql.core.SQLSource;
-import org.beetl.sql.core.kit.StringKit;
 
 /**
  * 没有什么

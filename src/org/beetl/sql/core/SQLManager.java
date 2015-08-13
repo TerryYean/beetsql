@@ -63,7 +63,7 @@ public class SQLManager {
 		this.dbStyle.setNameConversion(nc);
 	}
 
-	protected SQLResult getSQLResult(String id, Map paras) {
+	protected SQLResult getSQLResult(String id, Map<String, Object> paras) {
 		SQLScript script = getScript(id);
 		return script.run(paras);
 	}
@@ -75,7 +75,7 @@ public class SQLManager {
 		return script;
 	}
 
-	public SQLScript getScript(Class cls, int flag) {
+	public SQLScript getScript(Class<?> cls, int flag) {
 		switch (flag) {
 		case SELECT_BY_ID: {
 			String template = sqlLoader.getSelectByid(cls).getTemplate();

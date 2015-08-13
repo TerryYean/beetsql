@@ -1,9 +1,9 @@
 selectUser
 ===
-    select * from user where 1=1
-    @if(user.age==1){
-    and age = ${user.age}
-    @}
+	select * from user where 1=1
+	@if(user.age==12){@@
+		and age = ${user.age}
+	@}@@
     
 selectAll
 ===
@@ -12,7 +12,7 @@ selectAll
 selectByExample
 ===
     select * from user  
-    @use("example");
+    @use("example")@@;
   
 example
 ===  

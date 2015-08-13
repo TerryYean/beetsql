@@ -117,12 +117,12 @@ public class SQLScript {
 	}
 
 	public List<Object> select(Connection conn, Map<String, Object> paras,
-			Class mapping) {
+			Class<?> mapping) {
 		throw new UnsupportedOperationException();
 	}
 
 	public List<Object> select(Connection conn, Map<String, Object> paras,
-			Class mapping, long start, long end) {
+			Class<?> mapping, long start, long end) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -135,7 +135,7 @@ public class SQLScript {
 	 * @param mapping
 	 * @return
 	 */
-	public Object getModel(ResultSet rs, Class mapping) {
+	public Object getModel(ResultSet rs, Class<?> mapping) {
 		Object model = null;
 		try {
 			model = mapping.newInstance();

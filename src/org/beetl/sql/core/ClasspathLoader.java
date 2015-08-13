@@ -48,11 +48,11 @@ public class ClasspathLoader implements SQLLoader {
 	@Override
 	public SQLSource getSQL(String id) {
 		// real path = sqlRoot\xx\yy.sql
-		SQLSource ss = this.sqlSourceMap.get(id);
+		SQLSource ss = sqlSourceMap.get(id);
 		if (ss == null) {
 			loadSql(id);
 		}
-		ss = this.sqlSourceMap.get(id);
+		ss = sqlSourceMap.get(id);
 		return ss;
 	}
 
@@ -82,7 +82,7 @@ public class ClasspathLoader implements SQLLoader {
 						while (!list.isEmpty()) {// 拼装成一句sql
 							sql.append(list.pollFirst() + lineSeparator);
 						}
-						this.sqlSourceMap.put(modelName + key, new SQLSource(
+						sqlSourceMap.put(modelName + key, new SQLSource(
 								sql.toString()));// 放入map
 						list.addLast(tempKey);// 把下一句的key又放进来
 					}
@@ -96,7 +96,7 @@ public class ClasspathLoader implements SQLLoader {
 			while (!list.isEmpty()) {
 				sql.append(list.pollFirst());
 			}
-			this.sqlSourceMap.put(modelName + key,
+			sqlSourceMap.put(modelName + key,
 					new SQLSource(sql.toString()));
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -120,85 +120,85 @@ public class ClasspathLoader implements SQLLoader {
 	@Override
 	public SQLSource getSelectByid(Class<?> cls) {
 		String className = cls.getSimpleName().toLowerCase();
-		SQLSource tempSource = this.sqlSourceMap.get(className + ".selectByid");
+		SQLSource tempSource = sqlSourceMap.get(className + ".selectByid");
 		if (tempSource != null) {
 			return tempSource;
 		}
 		tempSource = dbs.generationSelectByid(cls);
-		this.sqlSourceMap.put(className + ".selectByid", tempSource);
+		sqlSourceMap.put(className + ".selectByid", tempSource);
 		return tempSource;
 	}
 
 	@Override
 	public SQLSource getSelectByTemplate(Class<?> cls) {
 		String className = cls.getSimpleName().toLowerCase();
-		SQLSource tempSource = this.sqlSourceMap.get(className
+		SQLSource tempSource = sqlSourceMap.get(className
 				+ ".getByTemplate");
 		if (tempSource != null) {
 			return tempSource;
 		}
 		tempSource = dbs.generationSelectByTemplate(cls);
-		this.sqlSourceMap.put(className + ".getByTemplate", tempSource);
+		sqlSourceMap.put(className + ".getByTemplate", tempSource);
 		return tempSource;
 	}
 
 	@Override
 	public SQLSource getDeleteByid(Class<?> cls) {
 		String className = cls.getSimpleName().toLowerCase();
-		SQLSource tempSource = this.sqlSourceMap.get(className + ".deleteByid");
+		SQLSource tempSource = sqlSourceMap.get(className + ".deleteByid");
 		if (tempSource != null) {
 			return tempSource;
 		}
 		tempSource = dbs.generationDeleteByid(cls);
-		this.sqlSourceMap.put(className + ".deleteByid", tempSource);
+		sqlSourceMap.put(className + ".deleteByid", tempSource);
 		return tempSource;
 	}
 
 	@Override
 	public SQLSource getSelectAll(Class<?> cls) {
 		String className = cls.getSimpleName().toLowerCase();
-		SQLSource tempSource = this.sqlSourceMap.get(className + ".selectAll");
+		SQLSource tempSource = sqlSourceMap.get(className + ".selectAll");
 		if (tempSource != null) {
 			return tempSource;
 		}
 		tempSource = dbs.generationSelectAll(cls);
-		this.sqlSourceMap.put(className + ".selectAll", tempSource);
+		sqlSourceMap.put(className + ".selectAll", tempSource);
 		return tempSource;
 	}
 
 	@Override
 	public SQLSource getUpdataAll(Class<?> cls) {
 		String className = cls.getSimpleName().toLowerCase();
-		SQLSource tempSource = this.sqlSourceMap.get(className + ".updateAll");
+		SQLSource tempSource = sqlSourceMap.get(className + ".updateAll");
 		if (tempSource != null) {
 			return tempSource;
 		}
 		tempSource = dbs.generationUpdataAll(cls);
-		this.sqlSourceMap.put(className + ".updateAll", tempSource);
+		sqlSourceMap.put(className + ".updateAll", tempSource);
 		return tempSource;
 	}
 
 	@Override
 	public SQLSource getUpdataByid(Class<?> cls) {
 		String className = cls.getSimpleName().toLowerCase();
-		SQLSource tempSource = this.sqlSourceMap.get(className + ".updateByid");
+		SQLSource tempSource = sqlSourceMap.get(className + ".updateByid");
 		if (tempSource != null) {
 			return tempSource;
 		}
 		tempSource = dbs.generationUpdataByid(cls);
-		this.sqlSourceMap.put(className + ".updateByid", tempSource);
+		sqlSourceMap.put(className + ".updateByid", tempSource);
 		return tempSource;
 	}
 
 	@Override
 	public SQLSource getInsert(Class<?> cls) {
 		String className = cls.getSimpleName().toLowerCase();
-		SQLSource tempSource = this.sqlSourceMap.get(className + ".insert");
+		SQLSource tempSource = sqlSourceMap.get(className + ".insert");
 		if (tempSource != null) {
 			return tempSource;
 		}
 		tempSource = dbs.generationInsert(cls);
-		this.sqlSourceMap.put(className + ".insert", tempSource);
+		sqlSourceMap.put(className + ".insert", tempSource);
 		return tempSource;
 	}
 
