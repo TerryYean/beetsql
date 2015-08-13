@@ -6,14 +6,7 @@ import org.beetl.sql.core.SQLSource;
 
 public class OralceStyle extends AbstractDBStyle {
 
-		public KeyHolder getKeyHolder(String name) {
-			return new OralceKeyHolder(name);
-		}
-		
-		public KeyHolder getKeyHolder(){
-			// throw exception or  触发器可以支持？
-			return new AutoIncKeyHolder();
-		}
+	
 
 		@Override
 		public String getPageSQL(String sql) {

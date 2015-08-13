@@ -14,13 +14,7 @@ import org.beetl.sql.core.kit.StringKit;
  */
 public class MySqlStyle extends AbstractDBStyle {
 	
-	public KeyHolder getKeyHolder(String name) {
-		return this.getKeyHolder();
-	}
-	
-	public KeyHolder getKeyHolder(){
-		return new AutoIncKeyHolder();
-	}
+
 
 
 	@Override

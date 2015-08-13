@@ -55,19 +55,9 @@ public abstract class AbstractDBStyle implements DBStyle {
 		this.metadataManager = metadataManager;
 	}
 
-	@Override
-	/**
-	 * 获得一个序列号获取，考虑到跨平台，提供一个name，对于mysql，总是忽略，对于oralce，是其序列号
-	 */
-	public KeyHolder getKeyHolder(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 	
-	public KeyHolder getKeyHolder(){
-		
-		return null;
-	}
+
 	
 
 	@Override
