@@ -60,14 +60,14 @@ BeetlSQL集中管理SQL语句，SQL 可以按照业务逻辑放到一个文件�
 所有SQL文件建议放到一个db目录，db目录有多个子目录，表示数据库类型，比如db下有common，这是公共SQL语句
 还有mysql，oralce。当程序获取SQL语句得时候，先会根据数据库找特定数据库下的sql语句，如果未找到，会寻找common下的。如下代码
 
-			SqlScript sql = SqlManager.getSql("sys.user.update");
+			SqlScript sql = SqlManager.getSql("sys.user.update"); 
 			
 SqlManager 会根据当前使用的数据库，先找db/mysql/sys/user.md 文件，确认是否有update语句，如果没有，则会寻找db/common/sys/user.md 
 
 
 丰富的数据模型支持
 ===
-BeetlSql 适合各种类型的引用，对于大中小型应用，模型通常是Pojo，这样易于维护和与三方系统交互，对于特小型项目，往往不需要严格的模型，表示业务实体通常是Map/List 组合。SQL语句得输入可以是Pojo或者Map，SQL语句执行结果也可以映射到Pojo和Map。
+BeetlSql 适合各种类型的引用，对于大中小型应用，模型通常是Pojo，这样易于维护和与三方系统交互，对于特小型项目，往往不需要严格的模型，表示业务实体通常是Map/List 组合。SQL语句的输入可以是Pojo或者Map，SQL语句执行结果也可以映射到Pojo和Map。
 
 			SqlScript sql = SqlManager.getSql("user.update");
 			int result = sql.update(user);
@@ -89,7 +89,7 @@ SQL语句可以动态生成，基于Beetl语言，这是因为
 
 * beetl执行效率业界出名的高效 ，因此对于基于模板的动态sql语句，采用beetl非常合适
 
-* beetl 语法简单易用，可以通过半猜半式的方式实现，杜绝myBatis这样难懂难记得语法。学习曲线几乎没有
+* beetl 语法简单易用，可以通过半猜半式的方式实现，杜绝myBatis这样难懂难记得语法。BeetlSql学习曲线几乎没有
 
 * 利用beetl可以定制定界符号，完全可以将sql模板定界符好定义为数据库sql注释符号，这样容易在数据库中测试，如下也是sql模板（定义定界符为"--" 和 "null",null是回车意思);
 
@@ -134,7 +134,7 @@ BeetlSql虽然不是一个O/R Mapping 工具，但能根据默认约定，生成
 支持跨数据库平台，开发者所需工作减少到最小
 ===
 如前所述，BeetlSql 可以通过sql文件的管理和搜索来支持跨数据库开发，如前所述，先搜索特定数据库，然后再查找common。另外BeetlSql也提供了一些夸数据库解决方案
-* DbStyle 描述了数据库特性，注入insert语句，翻页语句都通过其子类完成，用户无需操行
+* DbStyle 描述了数据库特性，注入insert语句，翻页语句都通过其子类完成，用户无需操心
 * 提供一些默认的函数扩展，代替各个数据库的函数，如时间和时间操作函数date等
 
 
@@ -144,8 +144,8 @@ BeetlSql虽然不是一个O/R Mapping 工具，但能根据默认约定，生成
 BeetlSql可以在执行sql前后执行一系列的Intercetor，从而有机会执行各种扩展和监控，这比已知的通过数据库连接池做Interceptor更加容易。如下Interceptor都是有可能的
 
 *  监控sql执行较长时间语句，打印并收集（已完成）
-* 对每一条sql语句执行后输出其sql和参数，也可以根据条件只输出特定sql集合的sql。便于用户调试（已完成）
-* 对sql预计解析，汇总sql执行情况（未完成，需要集成第三方sql分析工具）
+*  对每一条sql语句执行后输出其sql和参数，也可以根据条件只输出特定sql集合的sql。便于用户调试（已完成）
+*  对sql预计解析，汇总sql执行情况（未完成，需要集成第三方sql分析工具）
 *  数据库分表分库逻辑
 
 内置支持主从数据库，通过扩展，可以支持更复杂的分库分表逻辑
@@ -170,8 +170,13 @@ log表示按照一定规则分表，table可以根据输入的时间去确定是
 		@ table("log",log.date)
 		where 
 
-同样，根据输入条件决定去哪个表
+同样，根据输入条件决定去哪个表，或者查询所有表
 
-
+		@ var tables = getLogTables();
+		@ for(table in tables){
+		select * from ${table} 
+		@		if(!tableLP.isLast) print("union");
+		@}		
+		where text = ?
 
 
