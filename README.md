@@ -26,7 +26,7 @@ SQL例子
 	===
 		    select * from user where 1=1
 		    @if(user.age==1){
-		    and age = ${user.age}
+		    and age = #user.age#
 		    @}
 		    
 	selectAll
@@ -36,7 +36,7 @@ SQL例子
 		    
 	selectWhere
 	===
-		    where  age = ${age}
+		    where  age = #age#
 	
 
 Markdown方式管理
@@ -97,7 +97,7 @@ SQL语句可以动态生成，基于Beetl语言，这是因为
 			===
 			select * form user where 1=1
 			--if(age!=null)
-			age=${age}
+			age=#age#
 			--}
 			
 
@@ -161,22 +161,26 @@ BeetlSql管理数据源，如果只提供一个数据源，则认为读写均操
 开发者也可以通过在Sql 模板里完成分表逻辑而对使用者透明，如下sql语句
 
 	  insert into 
-		@ table("log",date())；
+		#text("log"+date())#
 		values () ...
+		
+		注：text函数直接输出表达式到sql语句，而不是输出？。
 		
 log表示按照一定规则分表，table可以根据输入的时间去确定是哪个表
 
 		select * from 
-		@ table("log",log.date)
+		#text("log"+log.date)#
 		where 
+		
+		注：text函数直接输出表达式到sql语句，而不是输出？。
 
 同样，根据输入条件决定去哪个表，或者查询所有表
 
 		@ var tables = getLogTables();
 		@ for(table in tables){
-		select * from ${table} 
+		select * from #text(table)# 
 		@		if(!tableLP.isLast) print("union");
 		@}		
-		where text = ?
+		where name = #name#
 
 

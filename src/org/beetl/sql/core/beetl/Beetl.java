@@ -1,4 +1,4 @@
-package org.beetl.sql.core;
+package org.beetl.sql.core.beetl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,6 +7,7 @@ import java.util.Properties;
 import org.beetl.core.Configuration;
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.resource.StringTemplateResourceLoader;
+import org.beetl.sql.core.UseFunction;
 
 public class Beetl {
 	private static Beetl beetl = new Beetl();

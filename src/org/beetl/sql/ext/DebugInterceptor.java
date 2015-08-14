@@ -25,6 +25,7 @@ public class DebugInterceptor implements Interceptor {
 		if(this.isDebugEanble(sqlId)){
 			ctx.put("debug.time", System.currentTimeMillis());
 		}
+		print(sqlId,ctx.getSql(),ctx.getParas());
 		return ;
 		
 
@@ -32,19 +33,12 @@ public class DebugInterceptor implements Interceptor {
 
 	@Override
 	public void after(InterceptorContext ctx) {
-		String sqlId = ctx.getSqlId();
-		if(this.isDebugEanble(sqlId)){
-			long end = System.currentTimeMillis();
-			long start = (Long)ctx.get("debug.time");
-			long total = end-start;
-			print(sqlId,ctx.getSql(),ctx.getParas(),total);
-		}
 		
 
 	}
 	
-	protected void print(String sqlId,String sql,List<Object> paras,long time){
-		System.out.println("sqlId="+sqlId+" time:"+time);
+	protected void print(String sqlId,String sql,List<Object> paras){
+		System.out.println("sqlId="+sqlId);
 		System.out.println("=====================");
 		System.out.println(sql);
 		System.out.println(paras);

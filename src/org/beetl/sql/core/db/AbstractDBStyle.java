@@ -4,9 +4,9 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import org.beetl.core.Configuration;
-import org.beetl.sql.core.Beetl;
 import org.beetl.sql.core.NameConversion;
 import org.beetl.sql.core.SQLSource;
+import org.beetl.sql.core.beetl.Beetl;
 import org.beetl.sql.core.kit.StringKit;
 /**
  * 按照mysql来的，oralce需要重载insert，page方法

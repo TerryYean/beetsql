@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
+import org.beetl.sql.core.beetl.Beetl;
 import org.beetl.sql.core.db.KeyHolder;
 import org.beetl.sql.core.kit.PojoKit;
 import org.beetl.sql.core.kit.StringKit;

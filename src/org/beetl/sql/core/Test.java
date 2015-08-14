@@ -65,11 +65,11 @@ public class Test {
 		
 		SQLScript script = manager.getScript("user.selectUser");
 		Map<String, Object> paras = getUserParas();
-		org.beetl.sql.pojo.User result = script.singleSelect( paras, org.beetl.sql.pojo.User.class);
+		User result = script.singleSelect( paras, User.class);
 		
 		SQLScript script2 = manager.getScript(User.class,SQLManager.SELECT_BY_ID);
 		System.out.println("====sql==== \n"+script2.sql);
-		org.beetl.sql.pojo.User u = (org.beetl.sql.pojo.User) script2.getById(result);//默认返回的是user.getById
+		User u = (User) script2.getById(result);//默认返回的是user.getById
 		printUser(u);
 		
 		SQLScript script3 = manager.getScript(User.class,SQLManager.UPDATE_BY_ID);//已经在30行生成了update语句
@@ -79,7 +79,7 @@ public class Test {
 		
     }
     //便于测试
-	public static void printUser(org.beetl.sql.pojo.User user){
+	public static void printUser(User user){
 		System.out.println("user:{id:"+user.getId()+",name:"+user.getName()+"}");
 	}
 	
@@ -146,7 +146,7 @@ public class Test {
 	
 	
 	private static Map<String, Object> getUserParas(){
-		org.beetl.sql.pojo.User user = new org.beetl.sql.pojo.User();
+		User user = new User();
 		user.setId(2);
 		Map<String, Object> paras = new HashMap<String, Object>();
 		paras.put("user", user);

@@ -1,4 +1,4 @@
-package org.beetl.sql.core;
+package org.beetl.sql.core.beetl;
 
 import java.io.IOException;
 import java.util.List;

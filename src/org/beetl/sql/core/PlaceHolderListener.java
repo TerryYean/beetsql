@@ -6,6 +6,8 @@ import org.beetl.core.Event;
 import org.beetl.core.Listener;
 import org.beetl.core.statement.PlaceholderST;
 import org.beetl.core.statement.VarRef;
+import org.beetl.sql.core.beetl.SQLPlaceholderST;
+import org.beetl.sql.core.beetl.SQLVarRef;
 
 public class PlaceHolderListener implements Listener {
 
