@@ -189,7 +189,6 @@ public abstract class AbstractDBStyle implements DBStyle {
 				+ STATEMENT_START + "} " + STATEMENT_END + lineSeparator
 				+ (condition == null ? "" : condition));
 	}
-
 	/***
 	 * 生成一个追加在set子句的后面sql(示例：name=${name},)
 	 * @param tableName
