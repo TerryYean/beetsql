@@ -6,9 +6,10 @@ import org.beetl.sql.core.db.DBStyle;
 import org.beetl.sql.core.db.MetadataManager;
 
 public class SQLManager {
+	
 	private DBStyle dbStyle;
 	private SQLLoader sqlLoader;
-	ConnectionSource ds = null;//数据库连接管理
+	private ConnectionSource ds = null;//数据库连接管理 TODO 应该指定一个默认数据库连接管理
 	NameConversion nc = null;//名字转换器
 	Interceptor[] inters = {};
 	public static final int SELECT_BY_ID = 0;
@@ -28,8 +29,8 @@ public class SQLManager {
 		this.sqlLoader = loader;
 		this.ds = ds;
 		this.nc = new HumpNameConversion();
-		this.dbStyle.setNameConversion(nc);
-		this.dbStyle.setMetadataManager(new MetadataManager(ds));
+		this.dbStyle.setNameConversion(this.nc);
+		this.dbStyle.setMetadataManager(new MetadataManager(this.ds));
 		this.sqlLoader.setDbs(dbStyle);
 	}
 
@@ -40,7 +41,7 @@ public class SQLManager {
 		this.sqlLoader = sqlLoader;
 		this.ds = ds;
 		this.nc = nc;
-		this.dbStyle.setNameConversion(nc);
+		this.dbStyle.setNameConversion(this.nc);
 		this.dbStyle.setMetadataManager(metadataManager);
 		this.sqlLoader.setDbs(dbStyle);
 	}
@@ -52,15 +53,6 @@ public class SQLManager {
 		this.ds = ds;
 		this.nc = nc;
 		this.inters = inters;
-	}
-
-	public NameConversion getNc() {
-		return nc;
-	}
-
-	public void setNc(NameConversion nc) {
-		this.nc = nc;
-		this.dbStyle.setNameConversion(nc);
 	}
 
 	protected SQLResult getSQLResult(String id, Map<String, Object> paras) {
@@ -77,45 +69,45 @@ public class SQLManager {
 
 	public SQLScript getScript(Class<?> cls, int flag) {
 		switch (flag) {
-		case SELECT_BY_ID: {
-			String template = sqlLoader.getSelectByid(cls).getTemplate();
-			SQLScript script = new SQLScript(template, this);
-			return script;
-		}
-		case SELECT_BY_TEMPLATE: {
-			String template = sqlLoader.getSelectByTemplate(cls)
-					.getTemplate();
-			SQLScript script = new SQLScript(template, this);
-			return script;
-		}
-		case DELETE_BY_ID: {
-			String template = sqlLoader.getDeleteByid(cls).getTemplate();
-			SQLScript script = new SQLScript(template, this);
-			return script;
-		}
-		case SELECT_ALL: {
-			String template = sqlLoader.getSelectAll(cls).getTemplate();
-			SQLScript script = new SQLScript(template, this);
-			return script;
-		}
-		case UPDATE_ALL: {
-			String template = sqlLoader.getUpdataAll(cls).getTemplate();
-			SQLScript script = new SQLScript(template, this);
-			return script;
-		}
-		case UPDATE_BY_ID: {
-			String template = sqlLoader.getUpdataByid(cls).getTemplate();
-			SQLScript script = new SQLScript(template, this);
-			return script;
-		}
-		case INSERT: {
-			String template = sqlLoader.getInsert(cls).getTemplate();
-			SQLScript script = new SQLScript(template, this);
-			return script;
-		}
-		default: {
-			throw new UnsupportedOperationException();
-		}
+			case SELECT_BY_ID: {
+				String template = sqlLoader.getSelectByid(cls).getTemplate();
+				SQLScript script = new SQLScript(template, this);
+				return script;
+			}
+			case SELECT_BY_TEMPLATE: {
+				String template = sqlLoader.getSelectByTemplate(cls)
+						.getTemplate();
+				SQLScript script = new SQLScript(template, this);
+				return script;
+			}
+			case DELETE_BY_ID: {
+				String template = sqlLoader.getDeleteByid(cls).getTemplate();
+				SQLScript script = new SQLScript(template, this);
+				return script;
+			}
+			case SELECT_ALL: {
+				String template = sqlLoader.getSelectAll(cls).getTemplate();
+				SQLScript script = new SQLScript(template, this);
+				return script;
+			}
+			case UPDATE_ALL: {
+				String template = sqlLoader.getUpdataAll(cls).getTemplate();
+				SQLScript script = new SQLScript(template, this);
+				return script;
+			}
+			case UPDATE_BY_ID: {
+				String template = sqlLoader.getUpdataByid(cls).getTemplate();
+				SQLScript script = new SQLScript(template, this);
+				return script;
+			}
+			case INSERT: {
+				String template = sqlLoader.getInsert(cls).getTemplate();
+				SQLScript script = new SQLScript(template, this);
+				return script;
+			}
+			default: {
+				throw new UnsupportedOperationException();
+			}
 		}
 	}
 
@@ -157,6 +149,15 @@ public class SQLManager {
 
 	public void setDs(ConnectionSource ds) {
 		this.ds = ds;
+	}
+	
+	public NameConversion getNc() {
+		return nc;
+	}
+
+	public void setNc(NameConversion nc) {
+		this.nc = nc;
+		this.dbStyle.setNameConversion(nc);
 	}
 
 }
