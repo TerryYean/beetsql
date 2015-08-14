@@ -91,10 +91,6 @@ public abstract class AbstractDBStyle implements DBStyle {
 	public SQLSource generationSelectByid(Class<?> cls) {
 		String tableName = nameConversion.getTableName(cls.getSimpleName());
 		String condition = appendIdCondition(cls);
-		// 这一步还需不需要？
-		if (condition == null) {
-			condition = " where id="+HOLDER_START+"id"+HOLDER_END;
-		}
 		return new SQLSource(new StringBuffer("select * from ").append(tableName).append(condition).toString());
 	}
 
@@ -117,9 +113,6 @@ public abstract class AbstractDBStyle implements DBStyle {
 	public SQLSource generationDeleteByid(Class<?> cls) {
 		String tableName = nameConversion.getTableName(cls.getSimpleName());
 		String condition = appendIdCondition(cls);
-		if (condition == null) {
-			condition = " where id="+HOLDER_START+"id"+HOLDER_END;
-		}
 		return new SQLSource(new StringBuffer("delete from ").append(tableName).append(condition).toString());
 	}
 
@@ -145,9 +138,6 @@ public abstract class AbstractDBStyle implements DBStyle {
 			}
 		}
 		String condition = appendIdCondition(cls);
-		if (condition == null) {
-			condition = " where id="+HOLDER_START+"id"+HOLDER_END;
-		}
 		sql = removeComma(sql, condition);
 		return new SQLSource(sql.toString());
 	}
