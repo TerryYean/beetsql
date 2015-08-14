@@ -32,7 +32,7 @@ public class ManagerGeneraTest {
 	@Before
 	public void before(){
 		loader = ClasspathLoader.instance("/sql/mysql");
-		manager = new SQLManager();
+//		manager = new SQLManager();
 	}
 
 	@Test
