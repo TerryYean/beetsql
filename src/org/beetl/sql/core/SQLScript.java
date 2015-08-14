@@ -93,7 +93,7 @@ public class SQLScript {
 		objs = ctx.getParas();
 		// 执行jdbc
 		try {
-			ps = sm.ds.getReadConn(ctx).prepareStatement(sql);
+			ps = sm.getDs().getReadConn(ctx).prepareStatement(sql);
 			for (int i = 0; i < objs.size(); i++)
 				ps.setObject(i + 1, objs.get(i));
 			rs = ps.executeQuery();
@@ -194,7 +194,7 @@ public class SQLScript {
 		PreparedStatement ps = null;
 		// 执行jdbc
 		try {
-			ps = sm.ds.getWriteConn(ctx).prepareStatement(sql);
+			ps = sm.getDs().getWriteConn(ctx).prepareStatement(sql);
 			for (int i = 0; i < objs.size(); i++)
 				ps.setObject(i + 1, objs.get(i));
 			rs = ps.executeUpdate();
