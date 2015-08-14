@@ -20,13 +20,13 @@ import org.junit.Test;
  */
 public class BeanTest {
 	
-	DBBase base;
-	Connection conn;
+	private DBBase base;
+	private Connection conn;
 
 	@Before
 	public void setUp() throws Exception {
 		
-		DBBase base = DBBase.getInstance();
+		base = DBBase.getInstance();
 		conn = base.getConn();
 	}
 

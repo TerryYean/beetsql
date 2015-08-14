@@ -28,7 +28,7 @@ public class ListBeanTest {
 	@Before
 	public void setUp() throws Exception {
 		
-		DBBase base = DBBase.getInstance();
+		base = DBBase.getInstance();
 		conn = base.getConn();
 	}
 

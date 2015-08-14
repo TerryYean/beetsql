@@ -26,7 +26,7 @@ public class MapTest {
 	@Before
 	public void setUp() throws Exception {
 		
-		DBBase base = DBBase.getInstance();
+		base = DBBase.getInstance();
 		conn = base.getConn();
 	}
 
@@ -36,13 +36,13 @@ public class MapTest {
 		String sql = "select * from user3";
 		ResultSet rs = base.getRs(conn, sql);
 		QueryMapping query = QueryMapping.getInstance();
-		Map<String ,Object> map1 = query.query(rs, new MapHandler());//断点查看
-		Map<String ,Object> map2 = query.query(rs, new MapHandler(new HumpNameConversion()));//断点查看
+//		Map<String ,Object> map1 = query.query(rs, new MapHandler());//断点查看
+//		Map<String ,Object> map2 = query.query(rs, new MapHandler(new HumpNameConversion()));//断点查看
 		Map<String ,Object> map3 = query.query(rs, new MapHandler(new UnderlinedNameConversion()));//断点查看
 		
 		//测试忽略key的大小写
-		System.out.println(map1.get("tvarchar"));
-		System.out.println(map2.get("tvarchar"));
+		System.out.println(map3.get("tvarchar"));
+		System.out.println(map3.get("tvarchar"));
 		System.out.println(map3.get("TVARCHAR"));
 	}
 	

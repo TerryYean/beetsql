@@ -23,7 +23,7 @@ public class ScalarTest {
 	@Before
 	public void setUp() throws Exception {
 		
-		DBBase base = DBBase.getInstance();
+		base = DBBase.getInstance();
 		conn = base.getConn();
 	}
 
@@ -31,9 +31,9 @@ public class ScalarTest {
 	public void query() {
 		
 		String sql = "select id from user1 where id=1";
-		ResultSet rs = base.getRs(base.getConn(), sql);
+		ResultSet rs = base.getRs(conn, sql);
 		QueryMapping query = QueryMapping.getInstance();
-		Long id = query.query(rs, new ScalarHandler<Long>());
+		Integer id = query.query(rs, new ScalarHandler<Integer>());
 		System.out.println(id);
 		
 	}
@@ -61,7 +61,7 @@ public class ScalarTest {
 	@Test
 	public void query4() {
 		
-		String sql = "select count(*) from user1";//count（*） 是long类型
+		String sql = "select age, id from user1";//count（*） 是long类型
 		ResultSet rs = base.getRs(base.getConn(), sql);
 		QueryMapping query = QueryMapping.getInstance();
 		Integer id = query.query(rs, new ScalarHandler<Integer>("id"));//如果有多个字段可以根据字段name取
@@ -70,6 +70,16 @@ public class ScalarTest {
 	
 	@Test
 	public void query5() {
+
+		String sql = "select count(*) from user1";
+		ResultSet rs = base.getRs(base.getConn(), sql);
+		QueryMapping query = QueryMapping.getInstance();
+		Long id = query.query(rs, new ScalarHandler<Long>());
+		System.out.println(id);
+	}
+	
+	@Test
+	public void query6() {
 		String sql = "select t_varchar,"	//java.lang.String
 				+ "t_char,"					//java.lang.String
 				+ "t_blob,"					//java.lang.byte[]
@@ -122,7 +132,7 @@ public class ScalarTest {
 	}
 	
 	@Test
-	public void query6() {
+	public void query7() {
 		
 	}
 	

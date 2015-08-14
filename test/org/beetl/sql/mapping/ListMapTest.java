@@ -26,23 +26,23 @@ public class ListMapTest {
 	@Before
 	public void setUp() throws Exception {
 		
-		DBBase base = DBBase.getInstance();
+		base = DBBase.getInstance();
 		conn = base.getConn();
 	}
 
 	@Test
 	public void query() {
 		
-		String sql = "select * from user1";
-//		String sql = "select * from user2";
+//		String sql = "select * from user1";
+		String sql = "select * from user2";
 		ResultSet rs = base.getRs(conn, sql);
 		QueryMapping query = QueryMapping.getInstance();
 		
-		List<Map<String ,Object>> list1 = query.query(rs, new MapListHandler());//断点查看
+//		List<Map<String ,Object>> list1 = query.query(rs, new MapListHandler());//断点查看
 		List<Map<String ,Object>> list2 = query.query(rs, new MapListHandler(new UnderlinedNameConversion()));//断点查看
 		
 		//测试忽略key的大小写
-		System.out.println(list1.get(0).get("tname"));
+		System.out.println(list2.get(0).get("tname"));
 		System.out.println(list2.get(0).get("tNAME"));
 	}
 	
