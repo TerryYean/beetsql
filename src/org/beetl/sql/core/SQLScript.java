@@ -16,8 +16,8 @@ import java.util.Map.Entry;
 
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
-import org.beetl.sql.core.beetl.Beetl;
 import org.beetl.sql.core.db.KeyHolder;
+import org.beetl.sql.core.engine.Beetl;
 import org.beetl.sql.core.kit.PojoKit;
 import org.beetl.sql.core.kit.StringKit;
 import org.beetl.sql.core.mapping.QueryMapping;
@@ -258,6 +258,14 @@ public class SQLScript {
 			in.befor(ctx);
 		}
 		return ;
+	}
+
+	public String getSql() {
+		return sql;
+	}
+
+	public void setSql(String sql) {
+		this.sql = sql;
 	}
 	
 }

@@ -1,4 +1,4 @@
-package org.beetl.sql.core;
+package org.beetl.sql;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -6,11 +6,24 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.beetl.sql.core.ClasspathLoader;
+import org.beetl.sql.core.ConnectionSource;
+import org.beetl.sql.core.HumpNameConversion;
+import org.beetl.sql.core.InterceptorContext;
+import org.beetl.sql.core.NameConversion;
+import org.beetl.sql.core.SQLLoader;
+import org.beetl.sql.core.SQLManager;
+import org.beetl.sql.core.SQLScript;
+import org.beetl.sql.core.UnderlinedNameConversion;
 import org.beetl.sql.core.db.DBStyle;
 import org.beetl.sql.core.db.MySqlStyle;
 import org.beetl.sql.pojo.User;
 
 
+/** 简单快速的功能测试类
+ * @author xiandafu
+ *
+ */
 public class Test {
 	static MySqlConnectoinSource ds = new MySqlConnectoinSource();
     public static void main(String[] args) {
@@ -42,23 +55,23 @@ public class Test {
     	SQLLoader loader = ClasspathLoader.instance("/sql/mysql");
 		SQLManager manager = new SQLManager(getStyle(),loader,ds);
 		SQLScript script = manager.getScript(User.class,SQLManager.SELECT_BY_ID);
-		System.out.println("SELECT_BY_ID==="+script.sql);
+		System.out.println("SELECT_BY_ID==="+script.getSql());
     	script = manager.getScript(User.class,SQLManager.DELETE_BY_ID);
-    	System.out.println("DELETE_BY_ID==="+script.sql);
+    	System.out.println("DELETE_BY_ID==="+script.getSql());
     	script = manager.getScript(User.class,SQLManager.SELECT_ALL);
-    	System.out.println("SELECT_ALL==="+script.sql);
+    	System.out.println("SELECT_ALL==="+script.getSql());
     	script = manager.getScript(User.class,SQLManager.SELECT_BY_TEMPLATE);
-    	System.out.println("SELECT_BY_TEMPLATE==="+script.sql);
+    	System.out.println("SELECT_BY_TEMPLATE==="+script.getSql());
     	script = manager.getScript(User.class,SQLManager.UPDATE_ALL);
-    	System.out.println("UPDATE_ALL==="+script.sql);
+    	System.out.println("UPDATE_ALL==="+script.getSql());
     	script = manager.getScript(User.class,SQLManager.UPDATE_BY_ID);
-    	System.out.println("UPDATE_BY_ID==="+script.sql);
+    	System.out.println("UPDATE_BY_ID==="+script.getSql());
     	script = manager.getScript(User.class,SQLManager.INSERT);
-    	System.out.println("INSERT==="+script.sql);
-    	script = manager.getPageSqlScript(manager.getScript(User.class,SQLManager.SELECT_BY_TEMPLATE).sql);
-    	System.out.println("=====page=====\n"+script.sql);
-    	script = manager.getCountSqlScript(manager.getScript(User.class,SQLManager.SELECT_BY_TEMPLATE).sql);
-    	System.out.println("=====count=====\n"+script.sql);
+    	System.out.println("INSERT==="+script.getSql());
+    	script = manager.getPageSqlScript(manager.getScript(User.class,SQLManager.SELECT_BY_TEMPLATE).getSql());
+    	System.out.println("=====page=====\n"+script.getSql());
+    	script = manager.getCountSqlScript(manager.getScript(User.class,SQLManager.SELECT_BY_TEMPLATE).getSql());
+    	System.out.println("=====count=====\n"+script.getSql());
     }
     public static void testManager(){
     	SQLLoader loader = ClasspathLoader.instance("/sql/mysql");
@@ -68,15 +81,15 @@ public class Test {
 		Map<String, Object> paras = getUserParas();
 		User result = script.singleSelect( paras, User.class);
 		
-//		SQLScript script2 = manager.getScript(User.class,SQLManager.SELECT_BY_ID);
-//		System.out.println("====sql==== \n"+script2.sql);
-//		User u = (User) script2.getById(result);//默认返回的是user.getById
-//		printUser(u);
-//		
-//		SQLScript script3 = manager.getScript(User.class,SQLManager.UPDATE_BY_ID);//已经在30行生成了update语句
-//		System.out.println("====sql==== \n"+script3.sql);
-//		result.setName("xxxx");
-//		System.out.println("更新影响的行数："+script3.update(result));
+		SQLScript script2 = manager.getScript(User.class,SQLManager.SELECT_BY_ID);
+		System.out.println("====sql==== \n"+script2.getSql());
+		User u = (User) script2.getById(result);//默认返回的是user.getById
+		printUser(u);
+		
+		SQLScript script3 = manager.getScript(User.class,SQLManager.UPDATE_BY_ID);//已经在30行生成了update语句
+		System.out.println("====sql==== \n"+script3.getSql());
+		result.setName("xxxx");
+		System.out.println("更新影响的行数："+script3.update(result));
 		
     }
     //便于测试

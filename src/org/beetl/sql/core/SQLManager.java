@@ -20,9 +20,6 @@ public class SQLManager {
 	public static final int UPDATE_BY_ID = 5;
 	public static final int INSERT = 6;
 
-	public SQLManager() {
-		// for framework ,sprint .etc
-	}
 
 	public SQLManager(DBStyle dbStyle, SQLLoader loader, ConnectionSource ds) {
 		this.dbStyle = dbStyle;
@@ -34,18 +31,7 @@ public class SQLManager {
 		this.sqlLoader.setDbs(dbStyle);
 	}
 
-	public SQLManager(DBStyle dbStyle, SQLLoader sqlLoader,
-			ConnectionSource ds, NameConversion nc,
-			MetadataManager metadataManager) {
-		this.dbStyle = dbStyle;
-		this.sqlLoader = sqlLoader;
-		this.ds = ds;
-		this.nc = nc;
-		this.dbStyle.setNameConversion(this.nc);
-		this.dbStyle.setMetadataManager(metadataManager);
-		this.sqlLoader.setDbs(dbStyle);
-	}
-
+	
 	public SQLManager(DBStyle dbStyle, SQLLoader sqlLoader,
 			ConnectionSource ds, NameConversion nc, Interceptor[] inters) {
 		this.dbStyle = dbStyle;
@@ -53,9 +39,12 @@ public class SQLManager {
 		this.ds = ds;
 		this.nc = nc;
 		this.inters = inters;
+		this.dbStyle.setNameConversion(this.nc);
+		this.dbStyle.setMetadataManager(new MetadataManager(this.ds));
+		this.sqlLoader.setDbs(dbStyle);
 	}
 
-	protected SQLResult getSQLResult(String id, Map<String, Object> paras) {
+	public SQLResult getSQLResult(String id, Map<String, Object> paras) {
 		SQLScript script = getScript(id);
 		return script.run(paras);
 	}

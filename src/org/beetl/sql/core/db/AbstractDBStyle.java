@@ -6,7 +6,7 @@ import java.util.List;
 import org.beetl.core.Configuration;
 import org.beetl.sql.core.NameConversion;
 import org.beetl.sql.core.SQLSource;
-import org.beetl.sql.core.beetl.Beetl;
+import org.beetl.sql.core.engine.Beetl;
 import org.beetl.sql.core.kit.StringKit;
 /**
  * 按照mysql来的，oralce需要重载insert，page方法
@@ -17,8 +17,15 @@ public abstract class AbstractDBStyle implements DBStyle {
 	
 	protected NameConversion nameConversion;
 	protected MetadataManager metadataManager;
-	protected String STATEMENTSTART;// 定界符开始符号
-	protected String STATEMENTEND;// 定界符结束符号
+	protected String STATEMENT_START;// 定界符开始符号
+	protected String STATEMENT_END;// 定界符结束符号
+	
+	protected String HOLDER_START;// 站位符开始符号
+	protected String HOLDER_END;// 站位符结束符号
+	
+
+	
+	
 
 	protected String lineSeparator = System.getProperty("line.separator", "\n");
 	
@@ -26,17 +33,22 @@ public abstract class AbstractDBStyle implements DBStyle {
 	
 	public AbstractDBStyle() {
 		Configuration cf = Beetl.instance().getGroupTemplate().getConf();
-		STATEMENTSTART = cf.getStatementStart();
-		STATEMENTEND = cf.getStatementEnd();
+		STATEMENT_START = cf.getStatementStart();
+		STATEMENT_END = cf.getStatementEnd();
+		if(STATEMENT_END==null||STATEMENT_END.length()==0){
+			STATEMENT_END = lineSeparator;
+		}
+		HOLDER_START = cf.getPlaceholderStart();
+		HOLDER_END = cf.getPlaceholderEnd();
 	}
 	public abstract AbstractDBStyle instance();
 
 	public String getSTATEMENTSTART() {
-		return STATEMENTSTART;
+		return STATEMENT_START;
 	}
 
 	public String getSTATEMENTEND() {
-		return STATEMENTEND;
+		return STATEMENT_END;
 	}
 	
 	public NameConversion getNameConversion() {
@@ -81,7 +93,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 		String condition = appendIdCondition(cls);
 		// 这一步还需不需要？
 		if (condition == null) {
-			condition = " where id=${id}";
+			condition = " where id="+HOLDER_START+"id"+HOLDER_END;
 		}
 		return new SQLSource(new StringBuffer("select * from ").append(tableName).append(condition).toString());
 	}
@@ -106,7 +118,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 		String tableName = nameConversion.getTableName(cls.getSimpleName());
 		String condition = appendIdCondition(cls);
 		if (condition == null) {
-			condition = " where id=${id}";
+			condition = " where id="+HOLDER_START+"id"+HOLDER_END;
 		}
 		return new SQLSource(new StringBuffer("delete from ").append(tableName).append(condition).toString());
 	}
@@ -134,7 +146,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 		}
 		String condition = appendIdCondition(cls);
 		if (condition == null) {
-			condition = " where id=${id}";
+			condition = " where id="+HOLDER_START+"id"+HOLDER_END;
 		}
 		sql = removeComma(sql, condition);
 		return new SQLSource(sql.toString());
@@ -184,7 +196,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 	 */
 	private StringBuilder removeComma(StringBuilder sql, String condition) {
 		return sql.delete(sql.lastIndexOf(","),sql.length() ).append(lineSeparator
-				+ STATEMENTSTART + "} " + STATEMENTEND + lineSeparator
+				+ STATEMENT_START + "} " + STATEMENT_END + lineSeparator
 				+ (condition == null ? "" : condition));
 	}
 
@@ -197,9 +209,9 @@ public abstract class AbstractDBStyle implements DBStyle {
 	private String appendSetColumn(String tableName,String fieldName) {
 		String colName = nameConversion.getColName(fieldName);
 		if (metadataManager.existColName(tableName, colName)) {
-			return STATEMENTSTART + "if(!isEmpty(" + fieldName + ")){"
-					+ STATEMENTEND + "\t" + colName + "=${" + fieldName + "},"
-					+ lineSeparator + STATEMENTSTART + "}" + STATEMENTEND;
+			return STATEMENT_START + "if(!isEmpty(" + fieldName + ")){"
+					+ STATEMENT_END + "\t" + colName + "="+HOLDER_START + fieldName + HOLDER_END+","
+					+ lineSeparator + STATEMENT_START + "}" + STATEMENT_END;
 		}
 		return "";
 	}
@@ -213,9 +225,9 @@ public abstract class AbstractDBStyle implements DBStyle {
 		String colName = nameConversion.getColName(fieldName);
 		String connector = " and ";
 		if (metadataManager.existColName(tableName, colName)) {
-			return STATEMENTSTART + "if(!isEmpty(" + fieldName + ")){"
-					+ STATEMENTEND + connector + colName + "=${" + fieldName
-					+ "}" + lineSeparator + STATEMENTSTART + "}" + STATEMENTEND;
+			return STATEMENT_START + "if(!isEmpty(" + fieldName + ")){"
+					+ STATEMENT_END + connector + colName + "="+HOLDER_START + fieldName
+					+ HOLDER_END+ lineSeparator + STATEMENT_START + "}" + STATEMENT_END;
 		}
 		return "";
 	}
@@ -228,9 +240,9 @@ public abstract class AbstractDBStyle implements DBStyle {
 	private String appendInsertColumn(String tableName,String fieldName) {
 		String colName = nameConversion.getColName(fieldName);
 		if (metadataManager.existColName(tableName, colName)) {
-			return STATEMENTSTART + "if(!isEmpty(" + fieldName + ")){"
-					+ STATEMENTEND + colName + ","
-					+ lineSeparator + STATEMENTSTART + "}" + STATEMENTEND;
+			return STATEMENT_START + "if(!isEmpty(" + fieldName + ")){"
+					+ STATEMENT_END + colName + ","
+					+ lineSeparator + STATEMENT_START + "}" + STATEMENT_END;
 		}
 		return "";
 	}
@@ -243,9 +255,9 @@ public abstract class AbstractDBStyle implements DBStyle {
 	private String appendInsertVlaue(String tableName,String fieldName) {
 		String colName = nameConversion.getColName(fieldName);
 		if (metadataManager.existColName(tableName, colName)) {
-			return STATEMENTSTART + "if(!isEmpty(" + fieldName + ")){"
-					+ STATEMENTEND + "${" + fieldName + "},"
-					+ lineSeparator + STATEMENTSTART + "}" + STATEMENTEND;
+			return STATEMENT_START + "if(!isEmpty(" + fieldName + ")){"
+					+ STATEMENT_END + HOLDER_START+ fieldName + HOLDER_END+","
+					+ lineSeparator + STATEMENT_START + "}" + STATEMENT_END;
 		}
 		return "";
 	}
@@ -264,9 +276,9 @@ public abstract class AbstractDBStyle implements DBStyle {
 			for (int i = 0; i < ids.size(); i++) {
 				attrName = nameConversion.getPropertyName(ids.get(i));
 				if (metadataManager.existPropertyName(cls, attrName)) {
-					condition = condition + " and " + ids.get(i) + "= ${"
+					condition = condition + " and " + ids.get(i) + "= "+HOLDER_START
 							+ attrName
-							+ "}";
+							+ HOLDER_END;
 				}
 			}
 		}

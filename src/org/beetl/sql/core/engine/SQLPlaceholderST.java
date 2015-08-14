@@ -1,4 +1,4 @@
-package org.beetl.sql.core.beetl;
+package org.beetl.sql.core.engine;
 
 import java.io.IOException;
 import java.util.List;
@@ -8,6 +8,7 @@ import org.beetl.core.InferContext;
 import org.beetl.core.exception.BeetlException;
 import org.beetl.core.statement.Expression;
 import org.beetl.core.statement.FormatExpression;
+import org.beetl.core.statement.FunctionExpression;
 import org.beetl.core.statement.PlaceholderST;
 import org.beetl.core.statement.Statement;
 import org.beetl.core.statement.Type;
@@ -31,6 +32,14 @@ public class SQLPlaceholderST extends Statement
 	{
 		try{
 			Object value = expression.evaluate(ctx);
+			if(expression instanceof FunctionExpression){
+				FunctionExpression fun = (FunctionExpression)expression;
+				if(fun.token.text.equals("text")){
+					ctx.byteWriter.writeString(value!=null?value.toString():"");
+					return ;
+				}
+			}
+			
 			ctx.byteWriter.writeString("?");
 			List list = (List)ctx.getGlobal("_paras");
 			list.add(value);
