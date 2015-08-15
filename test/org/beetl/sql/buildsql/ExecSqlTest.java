@@ -50,7 +50,7 @@ public class ExecSqlTest {
 		user.setAge(1);
 		Map<String, Object> paras = new HashMap<String, Object>();
 		paras.put("user", user);
-		List<User> result = script.select( paras, User.class);
+		List<User> result = script.select(paras, User.class);
 		System.out.println(result.get(0));
 	}
 	
@@ -73,7 +73,7 @@ public class ExecSqlTest {
 		
 		Map<String, Object> paras = new HashMap<String, Object>();
 		paras.put("age", 12);
-		List<User> result = script.select( paras, User.class);
+		List<User> result = script.select(paras, User.class);
 		System.out.println(result.get(0));
 	}
 	
@@ -104,7 +104,10 @@ public class ExecSqlTest {
 	public void selectAll(){
 		
 		SQLScript script = manager.getScript(User.class, SQLManager.SELECT_ALL);
-		script.selectAll();
+		List<User> userList = script.select(null, User.class);
+		for(User user : userList){
+			System.out.println(user);
+		}
 		
 	}
 	

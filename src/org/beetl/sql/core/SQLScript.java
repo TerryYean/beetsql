@@ -35,9 +35,13 @@ public class SQLScript {
 		GroupTemplate gt = Beetl.instance().getGroupTemplate();
 		Template t = gt.getTemplate(sql);
 		List<Object> jdbcPara = new LinkedList<Object>();
-		for (Entry<String, Object> entry : paras.entrySet()) {
-			t.binding(entry.getKey(), entry.getValue());
+		
+		if(paras != null){
+			for (Entry<String, Object> entry : paras.entrySet()) {
+				t.binding(entry.getKey(), entry.getValue());
+			}
 		}
+		
 		t.binding("_paras", jdbcPara);
 		t.binding("_manager", this.sm);
 		t.binding("_id", id);
@@ -120,24 +124,16 @@ public class SQLScript {
 		return resultList;
 	}
 	
-	/**
-	 * 查询所有记录
-	 */
-	public void selectAll() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public List<Object> select(Connection conn, Map<String, Object> paras,
+	public List<Object> select(ConnectionSource conn, Map<String, Object> paras,
 			Class<?> mapping) {
 		throw new UnsupportedOperationException();
 	}
 
-	public List<Object> select(Connection conn, Map<String, Object> paras,
+	public List<Object> select(ConnectionSource conn, Map<String, Object> paras,
 			Class<?> mapping, long start, long end) {
 		throw new UnsupportedOperationException();
 	}
-
+	
 	public int update(Object obj) {
 		Map<String, Object> paras = new HashMap<String, Object>();
 //		String tableName = obj.getClass().getSimpleName().toLowerCase();
