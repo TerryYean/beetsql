@@ -9,13 +9,12 @@ import java.util.List;
  */
 public class MySqlStyle extends AbstractDBStyle {
 	
-
-
+	private String pageNumber = "pageNumber";
+	private String pageSize = "pageSize";
 
 	@Override
 	public String getPageSQL(String sql) {
-		return sql+" offset ? limit ?";
-
+		return sql+" limit " + HOLDER_START + pageNumber + HOLDER_END + " , " + HOLDER_START + pageSize + HOLDER_END;
 	}
 
 	@Override

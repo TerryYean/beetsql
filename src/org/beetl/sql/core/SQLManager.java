@@ -21,9 +21,9 @@ public class SQLManager {
 	public static final int INSERT = 6;
 
 
-	public SQLManager(DBStyle dbStyle, SQLLoader loader, ConnectionSource ds) {
+	public SQLManager(DBStyle dbStyle, SQLLoader sqlLoader, ConnectionSource ds) {
 		this.dbStyle = dbStyle;
-		this.sqlLoader = loader;
+		this.sqlLoader = sqlLoader;
 		this.ds = ds;
 		this.nc = new HumpNameConversion();
 		this.dbStyle.setNameConversion(this.nc);

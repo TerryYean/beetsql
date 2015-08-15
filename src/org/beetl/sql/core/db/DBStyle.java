@@ -11,7 +11,6 @@ import org.beetl.sql.core.SQLSource;
  */
 public interface DBStyle {
 
-
 	public SQLSource getInsert(Class<?> c);
 	public SQLSource getSelectById(Class<?> c);
 	public String getPageSQL(String sql);
@@ -26,7 +25,7 @@ public interface DBStyle {
 	public SQLSource generationInsert(Class<?> cls);
 	
 	public NameConversion getNameConversion();
-	public void setNameConversion(NameConversion nameConversion);
 	public MetadataManager getMetadataManager();
+	public void setNameConversion(NameConversion nameConversion);
 	public void setMetadataManager(MetadataManager metadataManager);
 }

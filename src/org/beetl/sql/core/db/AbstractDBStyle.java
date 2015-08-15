@@ -15,21 +15,14 @@ import org.beetl.sql.core.kit.StringKit;
  */
 public abstract class AbstractDBStyle implements DBStyle {
 	
+	protected static AbstractDBStyle adbs;
 	protected NameConversion nameConversion;
 	protected MetadataManager metadataManager;
 	protected String STATEMENT_START;// 定界符开始符号
 	protected String STATEMENT_END;// 定界符结束符号
-	
 	protected String HOLDER_START;// 站位符开始符号
 	protected String HOLDER_END;// 站位符结束符号
-	
-
-	
-	
-
 	protected String lineSeparator = System.getProperty("line.separator", "\n");
-	
-	protected static AbstractDBStyle adbs;
 	
 	public AbstractDBStyle() {
 		Configuration cf = Beetl.instance().getGroupTemplate().getConf();
@@ -66,11 +59,6 @@ public abstract class AbstractDBStyle implements DBStyle {
 	public void setMetadataManager(MetadataManager metadataManager) {
 		this.metadataManager = metadataManager;
 	}
-
-
-	
-
-	
 
 	@Override
 	public SQLSource getInsert(Class<?> c) {

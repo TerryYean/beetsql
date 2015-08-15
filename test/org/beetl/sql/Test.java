@@ -83,7 +83,7 @@ public class Test {
 		
 		SQLScript script2 = manager.getScript(User.class,SQLManager.SELECT_BY_ID);
 		System.out.println("====sql==== \n"+script2.getSql());
-		User u = (User) script2.getById(result);//默认返回的是user.getById
+		User u = (User) script2.uniqueResult(result);//默认返回的是user.getById
 		printUser(u);
 		
 		SQLScript script3 = manager.getScript(User.class,SQLManager.UPDATE_BY_ID);//已经在30行生成了update语句

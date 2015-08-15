@@ -214,7 +214,7 @@ public class SQLScript {
 		return rs;
 	}
 
-	public Object getById( Object obj) {
+	public Object uniqueResult( Object obj) {
 //		Map<String, Object> paras = new HashMap<String, Object>();
 //		String tableName = obj.getClass().getSimpleName().toLowerCase();
 		String tableName = this.sm.nc.getTableName(obj.getClass().getSimpleName());
