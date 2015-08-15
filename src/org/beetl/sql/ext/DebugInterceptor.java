@@ -1,6 +1,5 @@
 package org.beetl.sql.ext;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.beetl.sql.core.Interceptor;

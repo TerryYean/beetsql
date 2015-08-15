@@ -23,7 +23,7 @@ import org.junit.Test;
 
 /**  
  * @ClassName: ManagerGeneraTest   
- * @Description: TODO  
+ * @Description: 生成sql模板测试  
  * @author: suxj  
  * @date:2015年8月14日 下午1:52:18     
  */

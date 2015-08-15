@@ -74,22 +74,22 @@ public class Test {
     	System.out.println("=====count=====\n"+script.getSql());
     }
     public static void testManager(){
-    	SQLLoader loader = ClasspathLoader.instance("/sql/mysql");
-		SQLManager manager = new SQLManager(getStyle(),loader,ds);
-		
-		SQLScript script = manager.getScript("user.selectUser");
-		Map<String, Object> paras = getUserParas();
-		User result = script.single( paras, User.class);
-		
-		SQLScript script2 = manager.getScript(User.class,SQLManager.SELECT_BY_ID);
-		System.out.println("====sql==== \n"+script2.getSql());
-		User u = (User) script2.uniqueResult(result);//默认返回的是user.getById
-		printUser(u);
-		
-		SQLScript script3 = manager.getScript(User.class,SQLManager.UPDATE_BY_ID);//已经在30行生成了update语句
-		System.out.println("====sql==== \n"+script3.getSql());
-		result.setName("xxxx");
-		System.out.println("更新影响的行数："+script3.update(result));
+//    	SQLLoader loader = ClasspathLoader.instance("/sql/mysql");
+//		SQLManager manager = new SQLManager(getStyle(),loader,ds);
+//		
+//		SQLScript script = manager.getScript("user.selectUser");
+//		Map<String, Object> paras = getUserParas();
+//		List<User> result = script.single( paras, User.class);
+//		
+//		SQLScript script2 = manager.getScript(User.class,SQLManager.SELECT_BY_ID);
+//		System.out.println("====sql==== \n"+script2.getSql());
+//		User u = (User) script2.unique(result);//默认返回的是user.getById
+//		printUser(u);
+//		
+//		SQLScript script3 = manager.getScript(User.class,SQLManager.UPDATE_BY_ID);//已经在30行生成了update语句
+//		System.out.println("====sql==== \n"+script3.getSql());
+//		result.setName("xxxx");
+//		System.out.println("更新影响的行数："+script3.update(result));
 		
     }
     //便于测试

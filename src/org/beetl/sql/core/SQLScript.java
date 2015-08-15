@@ -1,11 +1,9 @@
 package org.beetl.sql.core;
 
-import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,7 +15,7 @@ import org.beetl.core.Template;
 import org.beetl.sql.core.db.KeyHolder;
 import org.beetl.sql.core.engine.Beetl;
 import org.beetl.sql.core.mapping.QueryMapping;
-import org.beetl.sql.core.mapping.handler.BeanHandler;
+import org.beetl.sql.core.mapping.handler.BeanListHandler;
 
 public class SQLScript {
 	
@@ -59,29 +57,39 @@ public class SQLScript {
 		
 	}
 	
-	public Object singleSelect(Object paras, Class<?> target) {
+	/**
+	 * 查询是传入Pojo实体，直接绑定到_root。可以在sql中使用#age#，而无需#user.age#
+	 * @param paras
+	 * @param target
+	 * @return
+	 */
+	public <T> T singleSelect(Object paras, Class<T> target) {
+		
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("_root", paras);
-		Object o = single(map,target);
+		List<T> result = select(map, target);
 		
-		return o;
+		if(result.size() > 0){
+			return result.get(0);
+		}
+		return null;
 	}
 
 	/**
-	 * 查询，返回一个mapping类实例
+	 * 查询,返回一个pojo集合
 	 * 
 	 * @param conn
 	 * @param paras
 	 * @param mapping
 	 * @return
 	 */
-	public <T> T single(Map<String, Object> paras, Class<T> clazz) {
+	public <T> List<T> select(Map<String, Object> paras, Class<T> clazz) {
 		SQLResult result = run(paras);
 		String sql = result.jdbcSql;
 		List<Object> objs = result.jdbcPara;
 		ResultSet rs = null;
 		PreparedStatement ps = null;
-		T model = null;
+		List<T> resultList = null;
 		InterceptorContext ctx = this.callInterceptorAsBefore(this.id,sql, objs);
 		sql = ctx.getSql();
 		objs = ctx.getParas();
@@ -92,7 +100,7 @@ public class SQLScript {
 				ps.setObject(i + 1, objs.get(i));
 			rs = ps.executeQuery();
 //			model = getModel(rs, mapping);
-			model = queryMapping.query(rs, new BeanHandler<T>(clazz, this.sm.nc));
+			resultList = queryMapping.query(rs, new BeanListHandler<T>(clazz, this.sm.nc));
 			this.callInterceptorAsAfter(ctx);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -109,7 +117,15 @@ public class SQLScript {
 				e.printStackTrace();
 			}
 		}
-		return model;
+		return resultList;
+	}
+	
+	/**
+	 * 查询所有记录
+	 */
+	public void selectAll() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	public List<Object> select(Connection conn, Map<String, Object> paras,
@@ -158,20 +174,25 @@ public class SQLScript {
 		return rs;
 	}
 
-	public Object uniqueResult( Object obj) {
+	/**
+	 * 查询单条记录
+	 * @param obj
+	 * @return
+	 */
+	public <T> T unique(T obj) {
 		
-		return singleSelect(obj, obj.getClass());
+		return (T) singleSelect(obj, obj.getClass());
 	}
 
-	public String getFieldValue(Field field, Object obj)
-			throws IllegalArgumentException, IllegalAccessException {
-		if (field.getType().equals(java.sql.Date.class)
-				|| field.getType().equals(java.util.Date.class)) {
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-			return sdf.format(field.get(obj));
-		}
-		return field.get(obj).toString();
-	}
+//	public String getFieldValue(Field field, Object obj)
+//			throws IllegalArgumentException, IllegalAccessException {
+//		if (field.getType().equals(java.sql.Date.class)
+//				|| field.getType().equals(java.util.Date.class)) {
+//			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//			return sdf.format(field.get(obj));
+//		}
+//		return field.get(obj).toString();
+//	}
 
 	private InterceptorContext callInterceptorAsBefore(String sqlId,String sql,List<Object> paras){
 		
@@ -206,5 +227,5 @@ public class SQLScript {
 	public void setSql(String sql) {
 		this.sql = sql;
 	}
-	
+
 }
