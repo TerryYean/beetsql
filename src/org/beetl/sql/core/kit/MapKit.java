@@ -14,6 +14,7 @@ package org.beetl.sql.core.kit;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**  
@@ -22,7 +23,7 @@ import java.util.Map;
  * @author: suxj  
  * @date:2015年8月12日 下午5:37:08     
  */
-public class PojoKit {
+public class MapKit {
 	
 	/**
 	 * 
@@ -62,6 +63,26 @@ public class PojoKit {
 			e.printStackTrace();
 		}
 		return reMap;
+	}
+	
+	/**
+	 * 将pkNames和value一一对应
+	 * @param pkNames
+	 * @param value
+	 * @return
+	 */
+	public static Map<String, Object> pksSetValue(List<String> pkNames, Object ...value){
+		
+		if(pkNames.size() != value.length){
+			return null;
+		}
+		
+		Map<String, Object> paras = new HashMap<String, Object>(value.length);
+		for(int i=0 ;i<pkNames.size() ;i++){
+			paras.put(pkNames.get(i), value[i]);
+		}
+		
+		return paras;
 	}
 
 }

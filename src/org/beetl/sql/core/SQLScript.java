@@ -1,6 +1,5 @@
 package org.beetl.sql.core;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,8 +12,11 @@ import java.util.Map.Entry;
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
 import org.beetl.sql.core.db.KeyHolder;
+import org.beetl.sql.core.db.MetadataManager;
 import org.beetl.sql.core.engine.Beetl;
+import org.beetl.sql.core.kit.MapKit;
 import org.beetl.sql.core.mapping.QueryMapping;
+import org.beetl.sql.core.mapping.handler.BeanHandler;
 import org.beetl.sql.core.mapping.handler.BeanListHandler;
 
 public class SQLScript {
@@ -175,11 +177,86 @@ public class SQLScript {
 	 * @param obj
 	 * @return
 	 */
-	public <T> T unique(T obj) {
+	public <T> T unique(Class<T> clazz, Object ...value) {
 		
-		return (T) singleSelect(obj, obj.getClass());
+		MetadataManager mm = this.sm.getDbStyle().getMetadataManager();
+		List<String> pkNames = mm.getIds(this.sm.getNc().getTableName(clazz.getSimpleName()));
+		
+		Map<String, Object> paras = MapKit.pksSetValue(pkNames, value);
+		paras.put("_root", clazz);
+		
+		SQLResult result = run(paras);
+		String sql = result.jdbcSql;
+		List<Object> objs = result.jdbcPara;
+		ResultSet rs = null;
+		PreparedStatement ps = null;
+		T model = null;
+		InterceptorContext ctx = this.callInterceptorAsBefore(this.id,sql, objs);
+		sql = ctx.getSql();
+		objs = ctx.getParas();
+		try {
+			ps = sm.getDs().getReadConn(ctx).prepareStatement(sql);
+			for (int i = 0; i < objs.size(); i++)
+				ps.setObject(i + 1, objs.get(i));
+			rs = ps.executeQuery();
+			model = queryMapping.query(rs, new BeanHandler<T>(clazz, this.sm.nc));
+			this.callInterceptorAsAfter(ctx);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (rs != null)
+					rs.close();
+				if (ps != null)
+					ps.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return model;
 	}
 
+	/**
+	 * 根据Id删除
+	 * @param j 
+	 * @param user
+	 */
+	public int deleteById(Class<?> clazz, Object ...value) {
+		
+		MetadataManager mm = this.sm.getDbStyle().getMetadataManager();
+		List<String> pkNames = mm.getIds(this.sm.getNc().getTableName(clazz.getSimpleName()));
+		
+		Map<String, Object> paras = MapKit.pksSetValue(pkNames, value);
+		paras.put("_root", clazz);
+		
+		SQLResult result = run(paras);
+		String sql = result.jdbcSql;
+		List<Object> objs = result.jdbcPara;
+		
+		InterceptorContext ctx = this.callInterceptorAsBefore(this.id,sql, objs);
+		sql = ctx.getSql();
+		objs = ctx.getParas();
+		int rs = 0;
+		PreparedStatement ps = null;
+		try {
+			ps = sm.getDs().getWriteConn(ctx).prepareStatement(sql);
+			for (int i = 0; i < objs.size(); i++)
+				ps.setObject(i + 1, objs.get(i));
+			rs = ps.executeUpdate();
+			this.callInterceptorAsAfter(ctx);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return rs;
+	}
+	
 //	public String getFieldValue(Field field, Object obj)
 //			throws IllegalArgumentException, IllegalAccessException {
 //		if (field.getType().equals(java.sql.Date.class)

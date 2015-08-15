@@ -149,4 +149,8 @@ public class SQLManager {
 		this.dbStyle.setNameConversion(nc);
 	}
 
+	public DBStyle getDbStyle() {
+		return dbStyle;
+	}
+
 }

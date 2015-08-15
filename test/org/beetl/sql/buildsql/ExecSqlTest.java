@@ -82,13 +82,11 @@ public class ExecSqlTest {
 		
 		SQLScript script = manager.getScript(User.class, SQLManager.SELECT_BY_ID);
 	
-		User user = new User();
-		user.setId(3);
-		User result = script.unique(user);
+		User result = script.unique(User.class, 4, 5);//4,5为联合主键值
 		System.out.println(result);
 	}
 	
-//	不支持该写法：select-by-id感觉api需要改进，用户体验不好
+//	不支持该写法：
 //	@Test
 //	public void selectById4(){
 //		
@@ -111,11 +109,18 @@ public class ExecSqlTest {
 		
 	}
 	
+	/**
+	 * 联合主键
+	 */
 	@Test
 	public void deleteById(){
 		
 		SQLScript script = manager.getScript(User.class, SQLManager.DELETE_BY_ID);
-//		script.deleteById()
+		System.out.println(script.getSql());
+		User user = new User();
+		user.setId(4);
+		int i = script.deleteById(User.class, 4, 5);
+		System.out.println(i);
 		
 	}
 
