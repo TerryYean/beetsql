@@ -1,5 +1,6 @@
 package org.beetl.sql.core;
 
+import java.util.List;
 import java.util.Map;
 
 import org.beetl.sql.core.db.DBStyle;
@@ -20,7 +21,6 @@ public class SQLManager {
 	public static final int UPDATE_BY_ID = 5;
 	public static final int INSERT = 6;
 
-
 	public SQLManager(DBStyle dbStyle, SQLLoader sqlLoader, ConnectionSource ds) {
 		this.dbStyle = dbStyle;
 		this.sqlLoader = sqlLoader;
@@ -30,7 +30,6 @@ public class SQLManager {
 		this.dbStyle.setMetadataManager(new MetadataManager(this.ds));
 		this.sqlLoader.setDbs(dbStyle);
 	}
-
 	
 	public SQLManager(DBStyle dbStyle, SQLLoader sqlLoader,
 			ConnectionSource ds, NameConversion nc, Interceptor[] inters) {
@@ -56,8 +55,14 @@ public class SQLManager {
 		return script;
 	}
 
-	public SQLScript getScript(Class<?> cls, int flag) {
-		switch (flag) {
+	/**
+	 * 生成增删改查模板
+	 * @param cls
+	 * @param tempId
+	 * @return
+	 */
+	public SQLScript getScript(Class<?> cls, int tempId) {
+		switch (tempId) {
 			case SELECT_BY_ID: {
 				String template = sqlLoader.getSelectByid(cls).getTemplate();
 				SQLScript script = new SQLScript(template, this);
@@ -99,7 +104,7 @@ public class SQLManager {
 			}
 		}
 	}
-
+	
 	/****
 	 * 获取为分页语句
 	 * @param sql
@@ -111,6 +116,7 @@ public class SQLManager {
 		}
 		return new SQLScript(dbStyle.getPageSQL(sql), this);
 	}
+	
 	/****
 	 * 获取总行数语句
 	 * @param sql
@@ -123,6 +129,64 @@ public class SQLManager {
 		sql = "select count(*) "+sql.toLowerCase().substring(sql.indexOf("from"));
 		return new SQLScript(sql, this);
 	}
+	
+	/**
+	 * 通过sqlId进行查询:查询自定义语句
+	 * @param sqlId
+	 * @param clazz
+	 * @param paras
+	 * @return List<Pojo>
+	 */
+	public <T> List<T> select(String sqlId, Class<T> clazz, Map<String, Object> paras) { 
+		
+		SQLScript script = getScript(sqlId);
+		
+		return script.select(clazz, paras);
+	}
+	
+	/**
+	 * btsql自动生成查询语句
+	 * @param tempId
+	 * @param clazz
+	 * @param paras
+	 * @return
+	 */
+	public <T> List<T> selectAll(Class<T> clazz) {
+
+		SQLScript script = getScript(clazz, SQLManager.SELECT_ALL);
+
+		return script.select(clazz, null);
+	}
+	
+	/**
+	 * 获取唯一记录
+	 * @param clazz
+	 * @param value
+	 * @return
+	 */
+	public <T> T unique(Class<T> clazz, Object ...value) {
+		
+		SQLScript script = getScript(clazz, SQLManager.SELECT_BY_ID);
+		
+		return script.unique(clazz, value);
+	}
+	
+	/**
+	 * 根据Id删除数据：支持联合主键
+	 * @param clazz
+	 * @param value
+	 * @return
+	 */
+	public int deleteById(Class<?> clazz, Object ...value) {
+		
+		SQLScript script = getScript(clazz, SQLManager.DELETE_BY_ID);
+		
+		return script.deleteById(clazz, value);
+	}
+	
+	
+	
+	//===============get/set===============
 
 	public SQLLoader getSqlLoader() {
 		return sqlLoader;

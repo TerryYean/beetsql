@@ -18,6 +18,7 @@ import org.beetl.sql.core.kit.MapKit;
 import org.beetl.sql.core.mapping.QueryMapping;
 import org.beetl.sql.core.mapping.handler.BeanHandler;
 import org.beetl.sql.core.mapping.handler.BeanListHandler;
+import org.beetl.sql.core.mapping.handler.MapListHandler;
 
 public class SQLScript {
 	
@@ -73,7 +74,7 @@ public class SQLScript {
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("_root", paras);
-		List<T> result = select(map, target);
+		List<T> result = select(target, map);
 		
 		if(result.size() > 0){
 			return result.get(0);
@@ -89,7 +90,7 @@ public class SQLScript {
 	 * @param mapping
 	 * @return
 	 */
-	public <T> List<T> select(Map<String, Object> paras, Class<T> clazz) {
+	public <T> List<T> select(Class<T> clazz, Map<String, Object> paras) {
 		SQLResult result = run(paras);
 		String sql = result.jdbcSql;
 		List<Object> objs = result.jdbcPara;
@@ -99,17 +100,20 @@ public class SQLScript {
 		InterceptorContext ctx = this.callInterceptorAsBefore(this.id,sql, objs);
 		sql = ctx.getSql();
 		objs = ctx.getParas();
-		// 执行jdbc
 		try {
 			ps = sm.getDs().getReadConn(ctx).prepareStatement(sql);
 			for (int i = 0; i < objs.size(); i++)
 				ps.setObject(i + 1, objs.get(i));
 			rs = ps.executeQuery();
-//			model = getModel(rs, mapping);
-			resultList = queryMapping.query(rs, new BeanListHandler<T>(clazz, this.sm.nc));
+			
+			if(clazz.isAssignableFrom(Map.class)){ //如果是Map的子类或者父类，返回List<Map<String,Object>>
+				resultList = (List<T>) queryMapping.query(rs, new MapListHandler(this.sm.nc));
+			}else{									//如果不是Map，理想成Pojo，返回List<pojo>
+				resultList = queryMapping.query(rs, new BeanListHandler<T>(clazz, this.sm.nc));
+			}
+			
 			this.callInterceptorAsAfter(ctx);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			try {
@@ -117,9 +121,7 @@ public class SQLScript {
 					rs.close();
 				if (ps != null)
 					ps.close();
-				// if(conn != null)conn.close();由连接池来管理？
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -300,5 +302,5 @@ public class SQLScript {
 	public void setSql(String sql) {
 		this.sql = sql;
 	}
-
+	
 }

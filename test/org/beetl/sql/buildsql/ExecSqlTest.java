@@ -44,13 +44,11 @@ public class ExecSqlTest {
 	@Test
 	public void selectById() {
 		
-		SQLScript script = manager.getScript("user.selectUser");
-		
 		User user = new User();
 		user.setAge(1);
 		Map<String, Object> paras = new HashMap<String, Object>();
 		paras.put("user", user);
-		List<User> result = script.select(paras, User.class);
+		List<User> result = manager.select("user.selectUser", User.class, paras);
 		System.out.println(result.get(0));
 	}
 	
@@ -69,20 +67,25 @@ public class ExecSqlTest {
 	@Test
 	public void selectById2() {
 		
-		SQLScript script = manager.getScript("user.selectUser2");
-		
 		Map<String, Object> paras = new HashMap<String, Object>();
 		paras.put("age", 12);
-		List<User> result = script.select(paras, User.class);
+		List<User> result = manager.select("user.selectUser2", User.class, paras);
 		System.out.println(result.get(0));
 	}
 	
 	@Test
-	public void selectById3(){
+	public void selectById3() {
 		
-		SQLScript script = manager.getScript(User.class, SQLManager.SELECT_BY_ID);
+		Map<String, Object> paras = new HashMap<String, Object>();
+		paras.put("age", 12);
+		List<Map> result = manager.select("user.selectUser2", Map.class, paras);
+		System.out.println(result.get(0));
+	}
 	
-		User result = script.unique(User.class, 4, 5);//4,5为联合主键值
+	@Test
+	public void selectById4(){
+		
+		User result = manager.unique(User.class, 4, 5);//4,5为联合主键值
 		System.out.println(result);
 	}
 	
@@ -101,8 +104,7 @@ public class ExecSqlTest {
 	@Test
 	public void selectAll(){
 		
-		SQLScript script = manager.getScript(User.class, SQLManager.SELECT_ALL);
-		List<User> userList = script.select(null, User.class);
+		List<User> userList = manager.selectAll(User.class);
 		for(User user : userList){
 			System.out.println(user);
 		}
@@ -115,11 +117,9 @@ public class ExecSqlTest {
 	@Test
 	public void deleteById(){
 		
-		SQLScript script = manager.getScript(User.class, SQLManager.DELETE_BY_ID);
-		System.out.println(script.getSql());
 		User user = new User();
 		user.setId(4);
-		int i = script.deleteById(User.class, 4, 5);
+		int i = manager.deleteById(User.class, 4, 5);
 		System.out.println(i);
 		
 	}
