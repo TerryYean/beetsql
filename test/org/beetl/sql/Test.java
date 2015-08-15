@@ -79,7 +79,7 @@ public class Test {
 		
 		SQLScript script = manager.getScript("user.selectUser");
 		Map<String, Object> paras = getUserParas();
-		User result = script.singleSelect( paras, User.class);
+		User result = script.single( paras, User.class);
 		
 		SQLScript script2 = manager.getScript(User.class,SQLManager.SELECT_BY_ID);
 		System.out.println("====sql==== \n"+script2.getSql());

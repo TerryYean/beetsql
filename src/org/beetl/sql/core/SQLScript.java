@@ -1,8 +1,6 @@
 package org.beetl.sql.core;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,8 +16,6 @@ import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
 import org.beetl.sql.core.db.KeyHolder;
 import org.beetl.sql.core.engine.Beetl;
-import org.beetl.sql.core.kit.PojoKit;
-import org.beetl.sql.core.kit.StringKit;
 import org.beetl.sql.core.mapping.QueryMapping;
 import org.beetl.sql.core.mapping.handler.BeanHandler;
 
@@ -66,12 +62,10 @@ public class SQLScript {
 	public Object singleSelect(Object paras, Class<?> target) {
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("_root", paras);
-		Object o = singleSelect(map,target);
+		Object o = single(map,target);
 		
 		return o;
 	}
-	
-	
 
 	/**
 	 * 查询，返回一个mapping类实例
@@ -81,7 +75,7 @@ public class SQLScript {
 	 * @param mapping
 	 * @return
 	 */
-	public <T> T singleSelect(Map<String, Object> paras, Class<T> clazz) {
+	public <T> T single(Map<String, Object> paras, Class<T> clazz) {
 		SQLResult result = run(paras);
 		String sql = result.jdbcSql;
 		List<Object> objs = result.jdbcPara;
@@ -128,56 +122,6 @@ public class SQLScript {
 		throw new UnsupportedOperationException();
 	}
 
-	
-
-	/***
-	 * 获取一个实例
-	 * 
-	 * @param rs
-	 * @param mapping
-	 * @return
-	 */
-	public Object getModel(ResultSet rs, Class<?> mapping) {
-		Object model = null;
-		try {
-			model = mapping.newInstance();
-			Method[] methods = mapping.getDeclaredMethods();
-			try {
-				if (rs.next()) {
-					for (Method method : methods) {
-						String methodName = method.getName();
-						if (methodName.startsWith("set")) {
-							String attrName = StringKit.toLowerCaseFirstOne(methodName
-									.substring(3));
-							method.invoke(model, rs.getObject(attrName));
-						}
-					}
-				} else {
-					return null;
-				}
-			} catch (SecurityException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return model;
-	}
-
 	public int update(Object obj) {
 		Map<String, Object> paras = new HashMap<String, Object>();
 //		String tableName = obj.getClass().getSimpleName().toLowerCase();
@@ -215,11 +159,8 @@ public class SQLScript {
 	}
 
 	public Object uniqueResult( Object obj) {
-//		Map<String, Object> paras = new HashMap<String, Object>();
-//		String tableName = obj.getClass().getSimpleName().toLowerCase();
-		String tableName = this.sm.nc.getTableName(obj.getClass().getSimpleName());
-//		paras.put(tableName, obj);
-		return singleSelect( obj, obj.getClass());
+		
+		return singleSelect(obj, obj.getClass());
 	}
 
 	public String getFieldValue(Field field, Object obj)
@@ -232,15 +173,6 @@ public class SQLScript {
 		return field.get(obj).toString();
 	}
 
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-	
-	
 	private InterceptorContext callInterceptorAsBefore(String sqlId,String sql,List<Object> paras){
 		
 		InterceptorContext ctx = new InterceptorContext(sqlId,sql,paras);
@@ -250,7 +182,6 @@ public class SQLScript {
 		return ctx;
 	}
 	
-	
 	private void callInterceptorAsAfter(InterceptorContext ctx ){
 		if(sm.inters==null) return  ;
 		
@@ -258,6 +189,14 @@ public class SQLScript {
 			in.befor(ctx);
 		}
 		return ;
+	}
+	
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getSql() {
