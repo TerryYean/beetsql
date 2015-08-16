@@ -12,6 +12,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
+ * http://dev.mysql.com/doc/connector-j/en/connector-j-reference-type-conversions.html
+ * 
  * @author suxj
  *
  */
