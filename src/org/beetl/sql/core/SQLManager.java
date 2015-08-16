@@ -20,7 +20,8 @@ public class SQLManager {
 	public static final int SELECT_ALL = 3;
 	public static final int UPDATE_ALL = 4;
 	public static final int UPDATE_BY_ID = 5;
-	public static final int INSERT = 6;
+	public static final int UPDATE_BY_ID_BATCH = 6;
+	public static final int INSERT = 7;
 
 	public SQLManager(DBStyle dbStyle, SQLLoader sqlLoader, ConnectionSource ds) {
 		this.dbStyle = dbStyle;
@@ -86,12 +87,17 @@ public class SQLManager {
 				return script;
 			}
 			case UPDATE_ALL: {
-				String template = sqlLoader.getUpdataAll(cls).getTemplate();
+				String template = sqlLoader.getUpdateAll(cls).getTemplate();
 				SQLScript script = new SQLScript(template, this);
 				return script;
 			}
 			case UPDATE_BY_ID: {
-				String template = sqlLoader.getUpdataByid(cls).getTemplate();
+				String template = sqlLoader.getUpdateByid(cls).getTemplate();
+				SQLScript script = new SQLScript(template, this);
+				return script;
+			}
+			case UPDATE_BY_ID_BATCH: {
+				String template = sqlLoader.getBatchUpdateByid(cls).getTemplate();
 				SQLScript script = new SQLScript(template, this);
 				return script;
 			}
@@ -125,7 +131,7 @@ public class SQLManager {
 	 */
 	public SQLScript getCountSqlScript(String sql) {
 		if(!sql.toLowerCase().startsWith("select")){
-			throw new UnsupportedOperationException();
+			throw new RuntimeException("这不是一个查询语句");
 		}
 		sql = "select count(*) "+sql.toLowerCase().substring(sql.indexOf("from"));
 		return new SQLScript(sql, this);
@@ -243,7 +249,6 @@ public class SQLManager {
 	public int updateById(Object obj){
 		
 		SQLScript script = getScript(obj.getClass(), SQLManager.UPDATE_BY_ID);
-		
 		return script.update(obj);
 	}
 	

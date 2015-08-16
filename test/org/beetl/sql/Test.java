@@ -29,8 +29,8 @@ public class Test {
     public static void main(String[] args) {
 //    	testSimple();
 //		testIf();
-    		testManager();
-//    	testManagergenera();
+//    		testManager();
+    	testManagergenera();
     	//testUse();
 //    	testNameConve();
 	}
@@ -72,6 +72,8 @@ public class Test {
     	System.out.println("=====page=====\n"+script.getSql());
     	script = manager.getCountSqlScript(manager.getScript(User.class,SQLManager.SELECT_BY_TEMPLATE).getSql());
     	System.out.println("=====count=====\n"+script.getSql());
+    	script = manager.getScript(User.class,SQLManager.UPDATE_BY_ID_BATCH);
+    	System.out.println("=====batchUpdate=====\n"+script.getSql());
     }
     public static void testManager(){
 //    	SQLLoader loader = ClasspathLoader.instance("/sql/mysql");
@@ -126,7 +128,7 @@ public class Test {
 		private  Connection getConn() {
 			String driver = "com.mysql.jdbc.Driver";
 	        String dbName = "test";
-	        String passwrod = "lijzh780214";
+	        String passwrod = "root";
 	        String userName = "root";
 	        String url = "jdbc:mysql://localhost:3306/" + dbName;
 	        String sql = "select * from users";

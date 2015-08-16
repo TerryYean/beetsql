@@ -167,29 +167,50 @@ public class ClasspathLoader implements SQLLoader {
 	}
 
 	@Override
-	public SQLSource getUpdataAll(Class<?> cls) {
+	public SQLSource getUpdateAll(Class<?> cls) {
 		String className = cls.getSimpleName().toLowerCase();
 		SQLSource tempSource = sqlSourceMap.get(className + ".updateAll");
 		if (tempSource != null) {
 			return tempSource;
 		}
-		tempSource = dbs.generationUpdataAll(cls);
+		tempSource = dbs.generationUpdateAll(cls);
 		sqlSourceMap.put(className + ".updateAll", tempSource);
 		return tempSource;
 	}
 
 	@Override
-	public SQLSource getUpdataByid(Class<?> cls) {
+	public SQLSource getUpdateByid(Class<?> cls) {
 		String className = cls.getSimpleName().toLowerCase();
 		SQLSource tempSource = sqlSourceMap.get(className + ".updateByid");
 		if (tempSource != null) {
 			return tempSource;
 		}
-		tempSource = dbs.generationUpdataByid(cls);
+		tempSource = dbs.generationUpdateByid(cls);
 		sqlSourceMap.put(className + ".updateByid", tempSource);
 		return tempSource;
 	}
-
+	@Override
+	public SQLSource getUpdateTemplate(Class<?> cls) {
+		String className = cls.getSimpleName().toLowerCase();
+		SQLSource tempSource = sqlSourceMap.get(className + ".updateTemplate");
+		if (tempSource != null) {
+			return tempSource;
+		}
+		tempSource = dbs.generationUpdateTemplate(cls);
+		sqlSourceMap.put(className + ".updateTemplate", tempSource);
+		return tempSource;
+	}
+	@Override
+	public SQLSource getBatchUpdateByid(Class<?> cls) {
+		String className = cls.getSimpleName().toLowerCase();
+		SQLSource tempSource = sqlSourceMap.get(className + ".batchUpdateByid");
+		if (tempSource != null) {
+			return tempSource;
+		}
+		tempSource = dbs.generationBatchUpdateByid(cls);
+		sqlSourceMap.put(className + ".batchUpdateByid", tempSource);
+		return tempSource;
+	}
 	@Override
 	public SQLSource getInsert(Class<?> cls) {
 		String className = cls.getSimpleName().toLowerCase();
@@ -209,5 +230,4 @@ public class ClasspathLoader implements SQLLoader {
 	public void setDbs(DBStyle dbs) {
 		this.dbs = dbs;
 	}
-	
 }

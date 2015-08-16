@@ -37,7 +37,7 @@ public class UpdateByIdTest {
 		
 		User user = new User();
 		user.setId(4);
-		user.setName("14");
+		user.setName("张三");
 		user.setAge(100);
 //		user.setUserName("sfjsfksjhfjkshfshdjfhsjkfhdshjk");
 		

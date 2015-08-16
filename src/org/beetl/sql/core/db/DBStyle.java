@@ -25,8 +25,10 @@ public interface DBStyle {
 	public SQLSource generationSelectByTemplate(Class<?> cls);
 	public SQLSource generationDeleteByid(Class<?> cls);
 	public SQLSource generationSelectAll(Class<?> cls);
-	public SQLSource generationUpdataAll(Class<?> cls);
-	public SQLSource generationUpdataByid(Class<?> cls);
+	public SQLSource generationUpdateAll(Class<?> cls);
+	public SQLSource generationUpdateByid(Class<?> cls);
+	public SQLSource generationUpdateTemplate(Class<?> cls);
+	public SQLSource generationBatchUpdateByid(Class<?> cls);
 	public SQLSource generationInsert(Class<?> cls);
 	
 	public int getIdType(Method idMethod);
