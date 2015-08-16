@@ -19,18 +19,11 @@ package org.beetl.sql.pojo;
  * @date:2015年8月12日 下午3:01:55
  */
 public class User {
-	int id;
+	Integer id;
 	String name;
-	int age;
+	Integer age;
 	String userName;
 
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
 
 	public String getName() {
 		return name;
@@ -40,11 +33,19 @@ public class User {
 		this.name = name;
 	}
 
-	public int getAge() {
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public Integer getAge() {
 		return age;
 	}
 
-	public void setAge(int age) {
+	public void setAge(Integer age) {
 		this.age = age;
 	}
 
