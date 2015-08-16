@@ -1,11 +1,15 @@
 package org.beetl.sql.core.db;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
 
 import org.beetl.core.Configuration;
 import org.beetl.sql.core.NameConversion;
 import org.beetl.sql.core.SQLSource;
+import org.beetl.sql.core.annotatoin.AssignID;
+import org.beetl.sql.core.annotatoin.AutoID;
+import org.beetl.sql.core.annotatoin.SeqID;
 import org.beetl.sql.core.engine.Beetl;
 import org.beetl.sql.core.kit.StringKit;
 /**
@@ -60,11 +64,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 		this.metadataManager = metadataManager;
 	}
 
-	@Override
-	public SQLSource getInsert(Class<?> c) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
 	@Override
 	public SQLSource getSelectById(Class<?> c) {
@@ -155,16 +155,35 @@ public abstract class AbstractDBStyle implements DBStyle {
 		StringBuilder colSql = new StringBuilder("(");
 		StringBuilder valSql = new StringBuilder(" VALUES (");
 		String fieldName = null;
+		int idType = DBStyle.ID_ASSIGN ;
 		Method[] methods = cls.getDeclaredMethods();
 		for (Method method : methods) {
 			if(method.getName().startsWith("get")){
 				fieldName = StringKit.toLowerCaseFirstOne(method.getName().substring(3));
+				List<String> ids = this.metadataManager.getIds(tableName);
+				if(ids.contains(fieldName)){
+					idType = this.getIdType(method);
+					if(idType==DBStyle.ID_AUTO){
+						continue ; //忽略这个字段
+					}else if(idType==DBStyle.ID_SEQ){
+						if(ids.size()!=1) throw new RuntimeException("序列期望一个，但有"+ids);
+						colSql.append(appendInsertColumn(tableName, fieldName));
+						valSql.append( HOLDER_START+ "_tempKey" + HOLDER_END+",");
+						continue;
+					}else if(idType==DBStyle.ID_ASSIGN){
+						//normal
+					}
+				}
+				
+				
 				colSql.append(appendInsertColumn(tableName, fieldName));
 				valSql.append(appendInsertVlaue(tableName, fieldName));
 			}
 		}
 		sql.append(removeComma(colSql, null).append(")").append(removeComma(valSql, null)).append(")").toString());
-		return new SQLSource(sql.toString());
+		SQLSource source = new SQLSource(sql.toString());
+		source.setIdType(idType);
+		return source;
 	}
 	/****
 	 * 去掉逗号加上条件并换行

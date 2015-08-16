@@ -95,8 +95,8 @@ public class SQLManager {
 				return script;
 			}
 			case INSERT: {
-				String template = sqlLoader.getInsert(cls).getTemplate();
-				SQLScript script = new SQLScript(template, this);
+				SQLSource source = sqlLoader.getInsert(cls);
+				SQLScript script = new SQLScript(source, this);
 				return script;
 			}
 			default: {

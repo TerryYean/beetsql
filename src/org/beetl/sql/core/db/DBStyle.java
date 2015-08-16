@@ -1,5 +1,6 @@
 package org.beetl.sql.core.db;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
 import org.beetl.sql.core.NameConversion;
@@ -11,7 +12,11 @@ import org.beetl.sql.core.SQLSource;
  */
 public interface DBStyle {
 
-	public SQLSource getInsert(Class<?> c);
+	public static final int ID_ASSIGN = 1 ;
+	public static final int ID_AUTO = 2 ;
+	public static final int ID_SEQ = 3 ;
+	
+	
 	public SQLSource getSelectById(Class<?> c);
 	public String getPageSQL(String sql);
 	public List<Object> getPagePara(List<Object> paras,int start,int size);
@@ -23,6 +28,9 @@ public interface DBStyle {
 	public SQLSource generationUpdataAll(Class<?> cls);
 	public SQLSource generationUpdataByid(Class<?> cls);
 	public SQLSource generationInsert(Class<?> cls);
+	
+	public int getIdType(Method idMethod);
+	
 	
 	public NameConversion getNameConversion();
 	public MetadataManager getMetadataManager();

@@ -21,7 +21,7 @@ public class MySqlConnectoinSource implements ConnectionSource {
         String dbName = "test";
         String passwrod = "123456";
         String userName = "root";
-        String url = "jdbc:mysql://localhost:3306/" + dbName;
+        String url = "jdbc:mysql://127.0.0.1:3306/" + dbName;
         Connection conn = null;
         try {
 			Class.forName(driver);

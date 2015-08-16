@@ -3,6 +3,7 @@ package org.beetl.sql.core;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.Map.Entry;
 
 import org.beetl.core.GroupTemplate;
 import org.beetl.core.Template;
+import org.beetl.sql.core.db.DBStyle;
 import org.beetl.sql.core.db.KeyHolder;
 import org.beetl.sql.core.db.MetadataManager;
 import org.beetl.sql.core.engine.Beetl;
@@ -25,10 +27,20 @@ public class SQLScript {
 	SQLManager sm;
 	String id ;
     String sql;
+    SQLSource sqlSource;
 	String jdbcSql;
+	
 	QueryMapping queryMapping = QueryMapping.getInstance();
 
-	public SQLScript(String sql,SQLManager sm) {
+	public SQLScript(SQLSource sqlSource,SQLManager sm) {
+		this.sqlSource = sqlSource;
+		this.sql = sqlSource.getTemplate();
+		this.sm = sm ;
+
+	}
+	
+	public SQLScript(String sqlSource,SQLManager sm) {
+		this.sqlSource = new SQLSource(sql);
 		this.sql = sql;
 		this.sm = sm ;
 
@@ -57,11 +69,86 @@ public class SQLScript {
 	}
 	
 	public void insert(Object paras){
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("_root", paras);
+		SQLResult result = this.run(map);
+		String sql = result.jdbcSql;
+		List<Object> objs = result.jdbcPara;
+		InterceptorContext ctx = this.callInterceptorAsBefore(this.id,sql, objs);
+		sql = ctx.getSql();
+		objs = ctx.getParas();
+		PreparedStatement ps = null;
+		try {
+			ps = sm.getDs().getWriteConn(ctx).prepareStatement(sql);
+			for (int i = 0; i < objs.size(); i++)
+				ps.setObject(i + 1, objs.get(i));
+			ps.executeUpdate();
+			this.callInterceptorAsAfter(ctx);
+		} catch (SQLException e) {
+			//@todo: 异常处理
+			throw new RuntimeException(e);
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		
 	}
 	
 	public void insert(Object paras,KeyHolder holder){
-		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("_root", paras);
+		SQLResult result = this.run(map);
+		String sql = result.jdbcSql;
+		List<Object> objs = result.jdbcPara;
+		InterceptorContext ctx = this.callInterceptorAsBefore(this.id,sql, objs);
+		sql = ctx.getSql();
+		objs = ctx.getParas();
+		PreparedStatement ps = null;
+		try {
+			if(this.sqlSource.getIdType()==DBStyle.ID_ASSIGN){
+				ps = sm.getDs().getWriteConn(ctx).prepareStatement(sql);
+			}else if(this.sqlSource.getIdType()==DBStyle.ID_AUTO){
+				ps = sm.getDs().getWriteConn(ctx).prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+			}else{
+				String seqName = sqlSource.getSeqName();
+				PreparedStatement seqPs = sm.getDs().getWriteConn(ctx).prepareStatement("select "+seqName+".NEXTVAL from dual");
+				ResultSet seqRs = seqPs.executeQuery();
+				
+				if(seqRs.next()){
+					Object key =seqRs.getObject(0);
+					// 也许要做类型转化，todo
+					holder.setKey(key);
+					map.put("_tempKey", key);
+				}
+			}
+			
+			for (int i = 0; i < objs.size(); i++)
+				ps.setObject(i + 1, objs.get(i));
+			ps.executeUpdate();
+			
+			if(this.sqlSource.getIdType()==DBStyle.ID_AUTO){
+				ResultSet seqRs = ps.getGeneratedKeys();
+				seqRs.next();
+				Object key =seqRs.getObject(1);
+				holder.setKey(key);
+			}
+			this.callInterceptorAsAfter(ctx);
+		} catch (SQLException e) {
+			//@todo: 异常处理
+			throw new RuntimeException(e);
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	/**
