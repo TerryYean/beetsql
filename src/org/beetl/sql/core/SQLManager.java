@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.beetl.sql.core.db.DBStyle;
 import org.beetl.sql.core.db.MetadataManager;
+import org.beetl.sql.core.kit.MapKit;
 
 public class SQLManager {
 	
@@ -145,6 +146,9 @@ public class SQLManager {
 	}
 	
 	/**
+	 * 
+	 * select * from use
+	 * 
 	 * btsql自动生成查询语句
 	 * @param tempId
 	 * @param clazz
@@ -159,6 +163,9 @@ public class SQLManager {
 	}
 	
 	/**
+	 * 
+	 * select * from user where 1=1 and id= #id#
+	 * 
 	 * 获取唯一记录
 	 * @param clazz
 	 * @param value
@@ -172,6 +179,36 @@ public class SQLManager {
 	}
 	
 	/**
+	 * 
+	 * select * from user where 1=1 
+		@if(!isEmpty(name)){
+		 and name=#name#
+		@}
+		@if(!isEmpty(id)){
+		 and id=#id#
+		@}
+		@if(!isEmpty(age)){
+		 and age=#age#
+		@}
+		@if(!isEmpty(userName)){
+		 and userName=#userName#
+		@}
+	 * 
+	 * @param user
+	 * @return
+	 */
+	public <T> List<T> selectByTemplement(T t) {
+		
+		SQLScript script = getScript(t.getClass(), SQLManager.SELECT_BY_TEMPLATE);
+		Map<String, Object> param = MapKit.convertObjToMap(t);
+		
+		return (List<T>) script.select(t.getClass(), param);
+	}
+	
+	/**
+	 * 
+	 * delete from user where 1=1 and id= #id#
+	 * 
 	 * 根据Id删除数据：支持联合主键
 	 * @param clazz
 	 * @param value
@@ -184,14 +221,66 @@ public class SQLManager {
 		return script.deleteById(clazz, value);
 	}
 	
+	/**
+	 * 
+	 * 需要处理","的问题，可能会出现update set user name=#name#, wehre 1=1 and ....的情况
+	 * 
+		update user set 
+		@if(!isEmpty(name)){
+			name=#name#,
+		@}
+		@if(!isEmpty(age)){
+			age=#age#,
+		@}
+		@if(!isEmpty(userName)){
+			userName=#userName#
+		@} 
+		 where 1=1 and id= #id# and name= #name#
+	 * 
+	 * @param obj
+	 * @return
+	 */
+	public int updateById(Object obj){
+		
+		SQLScript script = getScript(obj.getClass(), SQLManager.UPDATE_BY_ID);
+		
+		return script.update(obj);
+	}
+	
+	/**
+	 * 
+	 * 需要处理","的问题，可能会出现update set user name=#name#, wehre 1=1 and ....的情况
+	 * 
+	 * update user set 
+		@if(!isEmpty(name)){
+			name=#name#,
+		@}
+		@if(!isEmpty(id)){
+			id=#id#,
+		@}
+		@if(!isEmpty(age)){
+			age=#age#,
+		@}
+		@if(!isEmpty(userName)){
+			userName=#userName#
+		@} 
+	 * @return
+	 */
+	public int updateAll(Class<?> clazz, Object param){
+		
+		SQLScript script = getScript(clazz, SQLManager.UPDATE_ALL);
+		
+		return script.update(param);
+	}
+	
 	
 	
 	//OK - SELECT_BY_ID
 	//OK - SELECT_ALL
 	//OK - DELETE_BY_ID
-	//SELECT_BY_TEMPLATE
+	//OK - SELECT_BY_TEMPLATE
+	//OK - UPDATE_BY_ID
 	//UPDATE_ALL
-	//UPDATE_BY_ID
 	//INSERT
 	//page
 	//count

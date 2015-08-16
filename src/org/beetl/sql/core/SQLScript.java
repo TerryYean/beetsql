@@ -140,8 +140,6 @@ public class SQLScript {
 	
 	public int update(Object obj) {
 		Map<String, Object> paras = new HashMap<String, Object>();
-//		String tableName = obj.getClass().getSimpleName().toLowerCase();
-//		paras.put(tableName, obj);
 		paras.put("_root", obj);
 		SQLResult result = run(paras);
 		String sql = result.jdbcSql;

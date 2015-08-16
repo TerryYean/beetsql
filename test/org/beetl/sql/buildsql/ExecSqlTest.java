@@ -123,6 +123,49 @@ public class ExecSqlTest {
 		
 	}
 	
+	/**
+	 * TODO 注意：如果Pojo中int id；没有设置值，那么会默认认为id=0，
+	 * 可能导致查不出数据，建议将int设置为Integer（如果没set值，为null）
+	 */
+	@Test
+	public void selectByTemplement(){
+		
+		User user = new User();
+		user.setAge(5);
+		List<User> userList = manager.selectByTemplement(user);
+		System.out.println(userList.size());
+		
+		for(User u : userList){
+			System.out.println(u);
+		}
+	}
+	
+	@Test
+	public void updateById(){
+		
+		User user = new User();
+		user.setId(4);
+		user.setName("14");
+		user.setAge(100);
+//		user.setUserName("sfjsfksjhfjkshfshdjfhsjkfhdshjk");
+		
+		int i = manager.updateById(user);
+		System.out.println(i);
+	}
+	
+	@Test
+	public void updateAll(){
+		
+		User user = new User();
+//		user.setId(4);
+//		user.setName("14");
+		user.setAge(11);
+//		user.setUserName("aaa");
+		
+		int i = manager.updateAll(User.class, user);
+		System.out.println(i);
+	}
+	
 	
 
 }
