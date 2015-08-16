@@ -10,7 +10,6 @@ import java.util.Map;
 import org.beetl.sql.core.ClasspathLoader;
 import org.beetl.sql.core.SQLLoader;
 import org.beetl.sql.core.SQLManager;
-import org.beetl.sql.core.SQLScript;
 import org.beetl.sql.core.db.MySqlStyle;
 import org.beetl.sql.pojo.User;
 import org.junit.Before;
@@ -42,13 +41,13 @@ public class ExecSqlTest {
 	    @}
 	 */
 	@Test
-	public void selectById() {
+	public void selectBySqlId() {
 		
 		User user = new User();
 		user.setAge(1);
 		Map<String, Object> paras = new HashMap<String, Object>();
 		paras.put("user", user);
-		List<User> result = manager.select("user.selectUser", User.class, paras);
+		List<User> result = manager.selectBySqlId("user.selectUser", User.class, paras);
 		System.out.println(result.get(0));
 	}
 	
@@ -65,33 +64,33 @@ public class ExecSqlTest {
 	    @}
 	 */
 	@Test
-	public void selectById2() {
+	public void selectBySqlId2() {
 		
 		Map<String, Object> paras = new HashMap<String, Object>();
 		paras.put("age", 12);
-		List<User> result = manager.select("user.selectUser2", User.class, paras);
+		List<User> result = manager.selectBySqlId("user.selectUser2", User.class, paras);
 		System.out.println(result.get(0));
 	}
 	
 	@Test
-	public void selectById3() {
+	public void selectBySqlId3() {
 		
 		Map<String, Object> paras = new HashMap<String, Object>();
 		paras.put("age", 12);
-		List<Map> result = manager.select("user.selectUser2", Map.class, paras);
+		List<Map> result = manager.selectBySqlId("user.selectUser2", Map.class, paras);
 		System.out.println(result.get(0));
 	}
 	
 	@Test
-	public void selectById4(){
+	public void selectById(){
 		
-		User result = manager.unique(User.class, 4, 5);//4,5为联合主键值
+		User result = manager.selectById(User.class, 4, 5);//4,5为联合主键值
 		System.out.println(result);
 	}
 	
 //	不支持该写法：
 //	@Test
-//	public void selectById4(){
+//	public void selectById2(){
 //		
 //		SQLScript script = manager.getScript(User.class, SQLManager.SELECT_BY_ID);
 //	
@@ -123,5 +122,7 @@ public class ExecSqlTest {
 		System.out.println(i);
 		
 	}
+	
+	
 
 }

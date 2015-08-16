@@ -137,7 +137,7 @@ public class SQLManager {
 	 * @param paras
 	 * @return List<Pojo>
 	 */
-	public <T> List<T> select(String sqlId, Class<T> clazz, Map<String, Object> paras) { 
+	public <T> List<T> selectBySqlId(String sqlId, Class<T> clazz, Map<String, Object> paras) { 
 		
 		SQLScript script = getScript(sqlId);
 		
@@ -164,11 +164,11 @@ public class SQLManager {
 	 * @param value
 	 * @return
 	 */
-	public <T> T unique(Class<T> clazz, Object ...value) {
+	public <T> T selectById(Class<T> clazz, Object ...pkValues) {
 		
 		SQLScript script = getScript(clazz, SQLManager.SELECT_BY_ID);
 		
-		return script.unique(clazz, value);
+		return script.unique(clazz, pkValues);
 	}
 	
 	/**
@@ -183,6 +183,18 @@ public class SQLManager {
 		
 		return script.deleteById(clazz, value);
 	}
+	
+	
+	
+	//OK - SELECT_BY_ID
+	//OK - SELECT_ALL
+	//OK - DELETE_BY_ID
+	//SELECT_BY_TEMPLATE
+	//UPDATE_ALL
+	//UPDATE_BY_ID
+	//INSERT
+	//page
+	//count
 	
 	
 	
