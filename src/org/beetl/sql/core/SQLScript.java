@@ -39,7 +39,7 @@ public class SQLScript {
 
 	}
 	
-	public SQLScript(String sqlSource,SQLManager sm) {
+	public SQLScript(String sql,SQLManager sm) {
 		this.sqlSource = new SQLSource(sql);
 		this.sql = sql;
 		this.sm = sm ;
