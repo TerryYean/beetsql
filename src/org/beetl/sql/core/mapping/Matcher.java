@@ -13,6 +13,7 @@
 package org.beetl.sql.core.mapping;
 
 /**  
+ * 扩展：废弃
  * @ClassName: Matcher   
  * @Description: 映射器  
  * @author: suxj  

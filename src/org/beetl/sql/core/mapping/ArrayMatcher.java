@@ -13,6 +13,7 @@
 package org.beetl.sql.core.mapping;
 
 /**  
+ * 扩展：废弃
  * @ClassName: ArrayMatcher   
  * @Description: 二维数组映射  
  * @author: suxj  

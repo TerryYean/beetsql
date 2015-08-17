@@ -17,6 +17,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 /**  
+ * 扩展：废弃
  * @ClassName: StrategyBeanProcessor   
  * @Description: 策略模式的BeanProcessor，用来扩展Pojo字段和数据库字段的映射  
  * @author: suxj  

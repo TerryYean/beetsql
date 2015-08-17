@@ -13,6 +13,7 @@
 package org.beetl.sql.core.mapping;
 
 /**  
+ * 扩展：废弃
  * @ClassName: HumpMatcher   
  * @Description: 驼峰映射  比如数据库字段table_name对应pojo字段tbaleName
  * @author: suxj  
