@@ -215,14 +215,49 @@ public class SQLScript {
 		return resultList;
 	}
 	
-	public List<Object> select(ConnectionSource conn, Map<String, Object> paras,
+	public List<Object> select( Map<String, Object> paras,
 			Class<?> mapping) {
 		throw new UnsupportedOperationException();
 	}
-
-	public List<Object> select(ConnectionSource conn, Map<String, Object> paras,
+	/**
+	 *  翻页 
+	 * @param paras
+	 * @param mapping
+	 * @param start
+	 * @param end
+	 * @return
+	 */
+	public List<Object> select(Map<String, Object> paras,
 			Class<?> mapping, long start, long end) {
+		//@todo GK
 		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 * 翻页，通上
+	 * @param paras
+	 * @param mapping
+	 * @param start
+	 * @param end
+	 * @return
+	 */
+	public List<Object> select(Object paras,
+			Class<?> mapping, long start, long end) {
+		Map map = new HashMap();
+		map.put("_root", paras);
+		return this.select(paras, mapping, start, end);
+	}
+	/**
+	 * 翻页总数
+	 * @param paras
+	 * @return
+	 */
+	public long selectCount(Object paras){
+		return this.singleSelect(paras, Long.class);
+	}
+	
+	public long selectCount(Map paras){
+		return this.singleSelect(paras, Long.class);
 	}
 	
 	public int update(Object obj) {

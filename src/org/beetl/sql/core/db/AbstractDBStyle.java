@@ -92,6 +92,21 @@ public abstract class AbstractDBStyle implements DBStyle {
 		}
 		return new SQLSource(new StringBuffer("select * from ").append(tableName).append(condition).toString());
 	}
+	
+	public SQLSource generationSelectCountByTemplate(Class<?> cls){
+		String fieldName = null;
+		String condition = " where 1=1 " + lineSeparator;
+		Method[] methods = cls.getDeclaredMethods();
+		String tableName = nameConversion.getTableName(cls.getSimpleName());
+		for (Method method : methods) {
+			if(method.getName().startsWith("get")){
+				fieldName = StringKit.toLowerCaseFirstOne(method.getName().substring(3));
+				condition = condition + appendWhere(tableName, fieldName);
+			}
+		}
+		return new SQLSource(new StringBuffer("select count(*) from ").append(tableName).append(condition).toString());
+
+	}
 
 	@Override
 	public SQLSource generationDeleteByid(Class<?> cls) {

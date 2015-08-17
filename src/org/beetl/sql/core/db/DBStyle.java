@@ -23,6 +23,7 @@ public interface DBStyle {
 	
 	public SQLSource generationSelectByid(Class<?> cls);
 	public SQLSource generationSelectByTemplate(Class<?> cls);
+	public SQLSource generationSelectCountByTemplate(Class<?> cls);
 	public SQLSource generationDeleteByid(Class<?> cls);
 	public SQLSource generationSelectAll(Class<?> cls);
 	public SQLSource generationUpdateAll(Class<?> cls);
