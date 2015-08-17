@@ -12,8 +12,9 @@ public class SQLManager {
 	private DBStyle dbStyle;
 	private SQLLoader sqlLoader;
 	private ConnectionSource ds = null;//数据库连接管理 TODO 应该指定一个默认数据库连接管理
-	NameConversion nc = null;//名字转换器
+	private NameConversion nc = null;//名字转换器
 	Interceptor[] inters = {};
+	
 	public static final int SELECT_BY_ID = 0;
 	public static final int SELECT_BY_TEMPLATE = 1;
 	public static final int DELETE_BY_ID = 2;

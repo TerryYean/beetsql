@@ -194,9 +194,9 @@ public class SQLScript {
 			rs = ps.executeQuery();
 			
 			if(clazz.isAssignableFrom(Map.class)){ //如果是Map的子类或者父类，返回List<Map<String,Object>>
-				resultList = (List<T>) queryMapping.query(rs, new MapListHandler(this.sm.nc));
+				resultList = (List<T>) queryMapping.query(rs, new MapListHandler(this.sm.getNc()));
 			}else{									//如果不是Map，理想成Pojo，返回List<pojo>
-				resultList = queryMapping.query(rs, new BeanListHandler<T>(clazz, this.sm.nc));
+				resultList = queryMapping.query(rs, new BeanListHandler<T>(clazz, this.sm.getNc()));
 			}
 			
 			this.callInterceptorAsAfter(ctx);
@@ -286,7 +286,7 @@ public class SQLScript {
 			for (int i = 0; i < objs.size(); i++)
 				ps.setObject(i + 1, objs.get(i));
 			rs = ps.executeQuery();
-			model = queryMapping.query(rs, new BeanHandler<T>(clazz, this.sm.nc));
+			model = queryMapping.query(rs, new BeanHandler<T>(clazz, this.sm.getNc()));
 			this.callInterceptorAsAfter(ctx);
 		} catch (SQLException e) {
 			e.printStackTrace();

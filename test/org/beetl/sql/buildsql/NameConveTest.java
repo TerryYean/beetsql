@@ -51,7 +51,6 @@ public class NameConveTest {
 		
 		Assert.assertEquals(unc.getTableName(User.class.getSimpleName()), "user");
 		
-		
 		Assert.assertEquals(unc.getColName("userName"), "user_name");
 		Assert.assertEquals(unc.getColName("UserName"), "user_name");
 		
