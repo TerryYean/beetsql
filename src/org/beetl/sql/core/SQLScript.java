@@ -96,21 +96,11 @@ public class SQLScript {
 	public void insert(Object paras,KeyHolder holder){
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("_root", paras);
-		SQLResult result = this.run(map);
-		String sql = result.jdbcSql;
-		List<Object> objs = result.jdbcPara;
-		InterceptorContext ctx = this.callInterceptorAsBefore(this.id,sql, objs);
-		sql = ctx.getSql();
-		objs = ctx.getParas();
 		PreparedStatement ps = null;
 		try {
-			if(this.sqlSource.getIdType()==DBStyle.ID_ASSIGN){
-				ps = sm.getDs().getWriteConn(ctx).prepareStatement(sql);
-			}else if(this.sqlSource.getIdType()==DBStyle.ID_AUTO){
-				ps = sm.getDs().getWriteConn(ctx).prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
-			}else{
+			if(this.sqlSource.getIdType()==DBStyle.ID_SEQ){
 				String seqName = sqlSource.getSeqName();
-				PreparedStatement seqPs = sm.getDs().getWriteConn(ctx).prepareStatement("select "+seqName+".NEXTVAL from dual");
+				PreparedStatement seqPs = sm.getDs().getWriteConn(null).prepareStatement("select "+seqName+".NEXTVAL from dual");
 				ResultSet seqRs = seqPs.executeQuery();
 				
 				if(seqRs.next()){
@@ -119,6 +109,22 @@ public class SQLScript {
 					holder.setKey(key);
 					map.put("_tempKey", key);
 				}
+			}
+		
+		SQLResult result = this.run(map);
+		String sql = result.jdbcSql;
+		List<Object> objs = result.jdbcPara;
+		InterceptorContext ctx = this.callInterceptorAsBefore(this.id,sql, objs);
+		sql = ctx.getSql();
+		objs = ctx.getParas();
+	
+		
+			if(this.sqlSource.getIdType()==DBStyle.ID_ASSIGN){
+				ps = sm.getDs().getWriteConn(ctx).prepareStatement(sql);
+			}else if(this.sqlSource.getIdType()==DBStyle.ID_AUTO){
+				ps = sm.getDs().getWriteConn(ctx).prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+			}else{
+				ps = sm.getDs().getWriteConn(ctx).prepareStatement(sql);
 			}
 			
 			for (int i = 0; i < objs.size(); i++)
