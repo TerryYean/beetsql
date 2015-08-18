@@ -23,7 +23,7 @@ public class SelectByIdTest {
 	
 	@Before
 	public void before(){
-		loader = ClasspathLoader.instance("/sql/mysql");
+		loader = new ClasspathLoader("/sql/mysql");
 		manager = new SQLManager(new MySqlStyle(), loader, new MySqlConnectoinSource());
 	}
 

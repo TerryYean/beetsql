@@ -6,17 +6,23 @@ import java.util.Properties;
 
 import org.beetl.core.Configuration;
 import org.beetl.core.GroupTemplate;
-import org.beetl.core.resource.StringTemplateResourceLoader;
+import org.beetl.sql.core.SQLLoader;
 
 public class Beetl {
-	private static Beetl beetl = new Beetl();
-	GroupTemplate gt = null;
-  
-	private Beetl() {
+	
+	GroupTemplate gt = null;  
+	public Beetl(SQLLoader loader) {
 		try {
-			StringTemplateResourceLoader resourceLoader = new StringTemplateResourceLoader();
-			Configuration cfg =new Configuration(loadDefaultConfig());
+			StringSqlTemplateLoader resourceLoader = new StringSqlTemplateLoader(loader);
+			Properties ps = loadDefaultConfig();
+			Properties ext = loadExtConfig();
+			ps.putAll(ext);
+			Configuration cfg =new Configuration(ps);			
 			gt = new GroupTemplate(resourceLoader, cfg);
+			
+			boolean product = Boolean.parseBoolean(ps.getProperty("PRODUCT_MODE"));
+			loader.setAutoCheck(!product);
+			
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
@@ -41,10 +47,22 @@ public class Beetl {
 		}
 		return ps;	
 	}
-
-	public static Beetl instance() {
-		return beetl;
+	
+	
+	public Properties loadExtConfig () {
+		Properties ps  = new Properties();
+		InputStream ins = this.getClass().getResourceAsStream(
+				"/btsql-ext.properties");
+		if(ins==null) return ps;
+		try {
+			ps.load(ins);
+		} catch (IOException e) {
+			throw new RuntimeException("默认配置文件加载错:/btsql.properties");
+		}
+		return ps;	
 	}
+
+
 
 	public GroupTemplate getGroupTemplate() {
 		return gt;

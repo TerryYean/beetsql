@@ -27,7 +27,7 @@ public class SelectBySqlIdTest {
 	
 	@Before
 	public void before(){
-		loader = ClasspathLoader.instance("/sql/mysql");
+		loader = new ClasspathLoader("/sql/mysql");
 		manager = new SQLManager(new MySqlStyle(), loader, new MySqlConnectoinSource());
 	}
 
@@ -45,7 +45,7 @@ public class SelectBySqlIdTest {
 	public void selectBySqlId() {
 		
 		User user = new User();
-		user.setAge(1);
+		user.setAge(11);
 		Map<String, Object> paras = new HashMap<String, Object>();
 		paras.put("user", user);
 		List<User> result = manager.selectBySqlId("user.selectUser", User.class, paras);

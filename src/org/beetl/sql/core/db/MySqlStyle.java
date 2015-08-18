@@ -9,7 +9,7 @@ import org.beetl.sql.core.annotatoin.AutoID;
 import org.beetl.sql.core.annotatoin.SeqID;
 
 /**
- * 没有什么
+ * 数据库差异：mysql数据库
  * @author xiandafu
  *
  */
@@ -30,16 +30,7 @@ public class MySqlStyle extends AbstractDBStyle {
 		return paras;
 	}
 
-	@Override
-	public AbstractDBStyle instance() {
-		if(adbs == null){
-			adbs = new MySqlStyle();
-		}
-		return adbs;
-	}
-
 	public MySqlStyle() {
-		super();
 	}
 
 	@Override

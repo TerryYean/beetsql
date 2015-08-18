@@ -1,9 +1,13 @@
 package org.beetl.sql.core;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,12 +19,12 @@ import org.beetl.core.Template;
 import org.beetl.sql.core.db.DBStyle;
 import org.beetl.sql.core.db.KeyHolder;
 import org.beetl.sql.core.db.MetadataManager;
-import org.beetl.sql.core.engine.Beetl;
 import org.beetl.sql.core.kit.MapKit;
 import org.beetl.sql.core.mapping.QueryMapping;
 import org.beetl.sql.core.mapping.handler.BeanHandler;
 import org.beetl.sql.core.mapping.handler.BeanListHandler;
 import org.beetl.sql.core.mapping.handler.MapListHandler;
+import org.beetl.sql.core.mapping.handler.ScalarHandler;
 
 public class SQLScript {
 	
@@ -38,17 +42,10 @@ public class SQLScript {
 		this.sm = sm ;
 
 	}
-	
-	public SQLScript(String sql,SQLManager sm) {
-		this.sqlSource = new SQLSource(sql);
-		this.sql = sql;
-		this.sm = sm ;
-
-	}
 
 	protected SQLResult run(Map<String, Object> paras) {
-		GroupTemplate gt = Beetl.instance().getGroupTemplate();
-		Template t = gt.getTemplate(sql);
+		GroupTemplate gt = sm.beetl.getGroupTemplate();
+		Template t = gt.getTemplate(sqlSource.getId());
 		List<Object> jdbcPara = new LinkedList<Object>();
 		
 		if(paras != null){
@@ -95,8 +92,6 @@ public class SQLScript {
 				e.printStackTrace();
 			}
 		}
-		
-		
 	}
 	
 	public void insert(Object paras,KeyHolder holder){
@@ -123,7 +118,7 @@ public class SQLScript {
 					Object key =seqRs.getObject(0);
 					// 也许要做类型转化，todo
 					holder.setKey(key);
-					map.put("_tempKey", key);
+					map.put("_tempKey", key); //TODO 这里貌似有问题。上面已经this.run(map)了
 				}
 			}
 			
@@ -193,11 +188,7 @@ public class SQLScript {
 				ps.setObject(i + 1, objs.get(i));
 			rs = ps.executeQuery();
 			
-			if(clazz.isAssignableFrom(Map.class)){ //如果是Map的子类或者父类，返回List<Map<String,Object>>
-				resultList = (List<T>) queryMapping.query(rs, new MapListHandler(this.sm.getNc()));
-			}else{									//如果不是Map，理想成Pojo，返回List<pojo>
-				resultList = queryMapping.query(rs, new BeanListHandler<T>(clazz, this.sm.getNc()));
-			}
+			resultList = mappingSelect(rs, clazz);
 			
 			this.callInterceptorAsAfter(ctx);
 		} catch (SQLException e) {
@@ -214,6 +205,58 @@ public class SQLScript {
 		}
 		return resultList;
 	}
+	
+	/**
+	 * 
+	 * @MethodName: mappingSelect   
+	 * @Description: 查询情景不同，调用的handler不同  
+	 * @param @param rs
+	 * @param @param clazz
+	 * @param @param paras
+	 * @param @return  
+	 * @return List<T>  
+	 * @throws
+	 */
+	public <T> List<T> mappingSelect(ResultSet rs, Class<T> clazz){
+		List<T> resultList = new ArrayList<T>();
+		
+		if(isBaseDataType(clazz)){ //基本数据类型，如果有需要可以继续在isBaseDataType()添加
+			T result = queryMapping.query(rs, new ScalarHandler<T>());
+			resultList.add(result);
+		} else if(clazz.isAssignableFrom(Map.class)){ //如果是Map的子类或者父类，返回List<Map<String,Object>>
+			resultList = (List<T>) queryMapping.query(rs, new MapListHandler(this.sm.getNc()));
+		} else{
+			resultList = queryMapping.query(rs, new BeanListHandler<T>(clazz, this.sm.getNc()));
+		}
+		
+		return resultList;
+		
+	}
+	
+	/**  
+	  * 判断一个类是否为基本数据类型。  
+	  * @param clazz 要判断的类。  
+	  * @return true 表示为基本数据类型。  
+	  */ 
+	 private static boolean isBaseDataType(Class<?> clazz)
+	 {   
+	     return 
+	     (   
+	         clazz.equals(String.class) ||   
+	         clazz.equals(Integer.class)||   
+	         clazz.equals(Byte.class) ||   
+	         clazz.equals(Long.class) ||   
+	         clazz.equals(Double.class) ||   
+	         clazz.equals(Float.class) ||   
+	         clazz.equals(Character.class) ||   
+	         clazz.equals(Short.class) ||   
+	         clazz.equals(BigDecimal.class) ||   
+	         clazz.equals(BigInteger.class) ||   
+	         clazz.equals(Boolean.class) ||   
+	         clazz.equals(Date.class) ||   
+	         clazz.isPrimitive()   
+	     );   
+	 }
 	
 	public List<Object> select( Map<String, Object> paras,
 			Class<?> mapping) {

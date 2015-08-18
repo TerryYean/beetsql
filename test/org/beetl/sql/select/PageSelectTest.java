@@ -1,7 +1,9 @@
 /**
  * 
  */
-package org.beetl.sql.update;
+package org.beetl.sql.select;
+
+import java.util.List;
 
 import org.beetl.sql.buildsql.MySqlConnectoinSource;
 import org.beetl.sql.core.ClasspathLoader;
@@ -11,12 +13,12 @@ import org.beetl.sql.core.db.MySqlStyle;
 import org.beetl.sql.pojo.User;
 import org.junit.Before;
 import org.junit.Test;
-
+import static org.beetl.sql.core.kit.Constants.*;
 /**
  * @author suxinjie
  *
  */
-public class UpdateAllTest {
+public class PageSelectTest {
 
 	private SQLLoader loader;
 	private SQLManager manager;
@@ -27,24 +29,17 @@ public class UpdateAllTest {
 		manager = new SQLManager(new MySqlStyle(), loader, new MySqlConnectoinSource());
 	}
 
-	/**
-	 * TODO 未测试完：需要处理","的问题，可能会出现update set user name=#name#, wehre 1=1 and ....的情况
-	 * 
-	 * TODO 新增trim方法修改后测试
-	 */
 	@Test
-	public void updateAll(){
-		
+	public void selectAll(){
 		User user = new User();
-//		user.setId(4);
-//		user.setName("14");
 		user.setAge(11);
-//		user.setUserName("aaa");
+		long total = manager.selectCountByTemplate(user);
+		System.out.println(total);
+//		List<User> userList = manager.selectAll(User.class);
+//		for(User user : userList){
+//			System.out.println(user);
+//		}
 		
-		int i = manager.updateAll(User.class, user);
-		System.out.println(i);
 	}
 	
-	
-
 }

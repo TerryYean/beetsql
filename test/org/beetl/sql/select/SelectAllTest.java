@@ -13,7 +13,6 @@ import org.beetl.sql.core.db.MySqlStyle;
 import org.beetl.sql.pojo.User;
 import org.junit.Before;
 import org.junit.Test;
-
 /**
  * @author suxinjie
  *
@@ -25,7 +24,7 @@ public class SelectAllTest {
 	
 	@Before
 	public void before(){
-		loader = ClasspathLoader.instance("/sql/mysql");
+		loader = new ClasspathLoader("/sql/mysql");
 		manager = new SQLManager(new MySqlStyle(), loader, new MySqlConnectoinSource());
 	}
 
