@@ -1,7 +1,7 @@
 package org.beetl.sql.core.db;
 
 import java.lang.reflect.Method;
-import java.util.List;
+import java.util.Map;
 
 import org.beetl.sql.core.NameConversion;
 import org.beetl.sql.core.SQLSource;
@@ -17,11 +17,10 @@ public interface DBStyle {
 	public static final int ID_AUTO = 2 ;
 	public static final int ID_SEQ = 3 ;
 	
-	public String getPageSQL(String sql);
-	public List<Object> getPagePara(List<Object> paras,int start,int size);
+	public static String OFFSET = "_pageOffset";
+	public static String PAGE_SIZE = "_pageSize";
 	
-	public int getIdType(Method idMethod);
-	
+
 	public void init(Beetl beetl);
 	
 	public SQLSource genSelectById(Class<?> cls);
@@ -34,6 +33,13 @@ public interface DBStyle {
 	public SQLSource genUpdateTemplate(Class<?> cls);
 	public SQLSource genBatchUpdateById(Class<?> cls);
 	public SQLSource genInsert(Class<?> cls);
+	
+	
+	public String getPageSQL(String sql);
+	public void initPagePara(Map paras,long start,long size);
+	
+	public int getIdType(Method idMethod);
+	
 	
 	public NameConversion getNameConversion();
 	public MetadataManager getMetadataManager();
