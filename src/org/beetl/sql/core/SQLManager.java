@@ -237,11 +237,9 @@ public class SQLManager {
 	}
 	
 	
-public <T> long selectCountByTemplate(T t) {
+	public <T> long selectCountByTemplate(T t) {
 		
 		SQLScript script = getScript(t.getClass(), SELECT_ACCOUNT_BY_TEMPLATE);
-		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("_root",t);		
 		Long l = script.singleSelect(t, Long.class);
 		return l;
 	}

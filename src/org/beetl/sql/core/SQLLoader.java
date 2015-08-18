@@ -1,8 +1,5 @@
 package org.beetl.sql.core;
 
-import org.beetl.sql.core.db.DBStyle;
-
-
 public interface SQLLoader {
 	public SQLSource getSQL(String id);
 	public boolean isModified(String id);

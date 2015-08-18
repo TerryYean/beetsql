@@ -13,7 +13,6 @@ import org.beetl.sql.core.db.MySqlStyle;
 import org.beetl.sql.pojo.User;
 import org.junit.Before;
 import org.junit.Test;
-import static org.beetl.sql.core.kit.Constants.*;
 /**
  * @author suxinjie
  *
