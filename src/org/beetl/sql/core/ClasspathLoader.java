@@ -62,7 +62,7 @@ public class ClasspathLoader implements SQLLoader {
 	
 	@Override
 	public boolean isModified(String id) {
-		File file = this.getFile(id);
+		File file = this.getFile(id);	//TODO 可能会有问题：感觉应该是处理id，id可能是user.selectUser ，应该处理为user.md
 		if(file==null) return true;
 		long lastModify = file.lastModified();
 		Long oldVersion = sqlSourceVersion.get(id);
