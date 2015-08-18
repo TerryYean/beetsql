@@ -19,7 +19,6 @@ import org.beetl.core.Template;
 import org.beetl.sql.core.db.DBStyle;
 import org.beetl.sql.core.db.KeyHolder;
 import org.beetl.sql.core.db.MetadataManager;
-import org.beetl.sql.core.engine.Beetl;
 import org.beetl.sql.core.kit.MapKit;
 import org.beetl.sql.core.mapping.QueryMapping;
 import org.beetl.sql.core.mapping.handler.BeanHandler;
@@ -43,7 +42,6 @@ public class SQLScript {
 		this.sm = sm ;
 
 	}
-
 
 	protected SQLResult run(Map<String, Object> paras) {
 		GroupTemplate gt = sm.beetl.getGroupTemplate();
@@ -94,8 +92,6 @@ public class SQLScript {
 				e.printStackTrace();
 			}
 		}
-		
-		
 	}
 	
 	public void insert(Object paras,KeyHolder holder){

@@ -17,10 +17,12 @@ public interface DBStyle {
 	public static final int ID_AUTO = 2 ;
 	public static final int ID_SEQ = 3 ;
 	
-	
-	public SQLSource getSelectById(Class<?> c);
 	public String getPageSQL(String sql);
 	public List<Object> getPagePara(List<Object> paras,int start,int size);
+	
+	public int getIdType(Method idMethod);
+	
+	public void init(Beetl beetl);
 	
 	public SQLSource genSelectById(Class<?> cls);
 	public SQLSource genSelectByTemplate(Class<?> cls);
@@ -32,11 +34,6 @@ public interface DBStyle {
 	public SQLSource genUpdateTemplate(Class<?> cls);
 	public SQLSource genBatchUpdateById(Class<?> cls);
 	public SQLSource genInsert(Class<?> cls);
-	
-	public void init(Beetl beetl);
-	
-	public int getIdType(Method idMethod);
-	
 	
 	public NameConversion getNameConversion();
 	public MetadataManager getMetadataManager();

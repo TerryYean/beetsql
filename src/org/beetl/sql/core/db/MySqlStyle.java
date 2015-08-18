@@ -7,10 +7,9 @@ import java.util.List;
 import org.beetl.sql.core.annotatoin.AssignID;
 import org.beetl.sql.core.annotatoin.AutoID;
 import org.beetl.sql.core.annotatoin.SeqID;
-import org.beetl.sql.core.engine.Beetl;
 
 /**
- * 没有什么
+ * 数据库差异：mysql数据库
  * @author xiandafu
  *
  */
@@ -30,8 +29,6 @@ public class MySqlStyle extends AbstractDBStyle {
 		paras.add(size);
 		return paras;
 	}
-
-	
 
 	public MySqlStyle() {
 	}

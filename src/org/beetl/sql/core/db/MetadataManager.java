@@ -71,7 +71,7 @@ public class MetadataManager {
 	}
 
 	/***
-	 * 
+	 * 字段是否存在
 	 * @param cls
 	 * @param colName
 	 * @return

@@ -18,7 +18,6 @@ import java.util.Map;
 import org.beetl.sql.core.db.DBStyle;
 import org.beetl.sql.core.db.MetadataManager;
 import org.beetl.sql.core.engine.Beetl;
-import org.beetl.sql.core.kit.MapKit;
 
 public class SQLManager {
 	
@@ -28,8 +27,6 @@ public class SQLManager {
 	private NameConversion nc = null;//名字转换器
 	Interceptor[] inters = {};
 	Beetl beetl = null;
-	
-		
 
 	public SQLManager(DBStyle dbStyle, SQLLoader sqlLoader, ConnectionSource ds) {
 		beetl = new Beetl(sqlLoader);
@@ -89,7 +86,6 @@ public class SQLManager {
 				tempSource = this.dbStyle.genSelectByTemplate(cls);
 				break ;
 			}
-			
 			case SELECT_ACCOUNT_BY_TEMPLATE: {
 				tempSource = this.dbStyle.genSelectCountByTemplate(cls);
 				break ;
@@ -122,11 +118,10 @@ public class SQLManager {
 				throw new UnsupportedOperationException();
 			}
 		}
-		tempSource.setId(id);
-			sqlLoader.addSQL(id, tempSource);
-			return new SQLScript(tempSource,this);
-			
 		
+		tempSource.setId(id);
+		sqlLoader.addSQL(id, tempSource);
+		return new SQLScript(tempSource,this);
 	}
 	
 	/****
@@ -171,7 +166,6 @@ public class SQLManager {
 	public <T> List<T> selectBySqlId(String sqlId, Class<T> clazz, Map<String, Object> paras) { 
 		
 		SQLScript script = getScript(sqlId);
-		
 		return script.select(clazz, paras);
 	}
 	
@@ -188,7 +182,6 @@ public class SQLManager {
 	public <T> List<T> selectAll(Class<T> clazz) {
 
 		SQLScript script = getScript(clazz, SELECT_ALL);
-
 		return script.select(clazz, null);
 	}
 	
@@ -204,7 +197,6 @@ public class SQLManager {
 	public <T> T selectById(Class<T> clazz, Object ...pkValues) {
 		
 		SQLScript script = getScript(clazz, SELECT_BY_ID);
-		
 		return script.unique(clazz, pkValues);
 	}
 	
@@ -232,11 +224,18 @@ public class SQLManager {
 		SQLScript script = getScript(t.getClass(), SELECT_BY_TEMPLATE);
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("_root",t);
-		
 		return (List<T>) script.select(t.getClass(), param);
 	}
 	
-	
+	/**
+	 * 查询总数
+	 * @MethodName: selectCountByTemplate   
+	 * @Description: TODO  
+	 * @param @param t
+	 * @param @return  
+	 * @return long  
+	 * @throws
+	 */
 	public <T> long selectCountByTemplate(T t) {
 		
 		SQLScript script = getScript(t.getClass(), SELECT_ACCOUNT_BY_TEMPLATE);
@@ -256,7 +255,6 @@ public class SQLManager {
 	public int deleteById(Class<?> clazz, Object ...value) {
 		
 		SQLScript script = getScript(clazz, DELETE_BY_ID);
-		
 		return script.deleteById(clazz, value);
 	}
 	
@@ -307,7 +305,6 @@ public class SQLManager {
 	public int updateAll(Class<?> clazz, Object param){
 		
 		SQLScript script = getScript(clazz, UPDATE_ALL);
-		
 		return script.update(param);
 	}
 	

@@ -8,7 +8,6 @@ import org.beetl.sql.core.NameConversion;
 import org.beetl.sql.core.SQLSource;
 import org.beetl.sql.core.engine.Beetl;
 import org.beetl.sql.core.kit.StringKit;
-import static org.beetl.sql.core.kit.Constants.*;
 /**
  * 按照mysql来的，oralce需要重载insert，page方法
  * @author xiandafu
@@ -29,6 +28,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 	
 	}
 	
+	@Override
 	public void init(Beetl beetl){
 		Configuration cf =beetl.getGroupTemplate().getConf();
 		STATEMENT_START = cf.getStatementStart();
@@ -40,7 +40,6 @@ public abstract class AbstractDBStyle implements DBStyle {
 		HOLDER_END = cf.getPlaceholderEnd();
 	}
 
-
 	public String getSTATEMENTSTART() {
 		return STATEMENT_START;
 	}
@@ -49,33 +48,26 @@ public abstract class AbstractDBStyle implements DBStyle {
 		return STATEMENT_END;
 	}
 	
+	@Override
 	public NameConversion getNameConversion() {
 		return nameConversion;
 	}
 
+	@Override
 	public void setNameConversion(NameConversion nameConversion) {
 		this.nameConversion = nameConversion;
 	}
 
+	@Override
 	public MetadataManager getMetadataManager() {
 		return metadataManager;
 	}
 
+	@Override
 	public void setMetadataManager(MetadataManager metadataManager) {
 		this.metadataManager = metadataManager;
 	}
 
-	
-
-	@Override
-	public SQLSource getSelectById(Class<?> c) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	/***
-	 * 生成selectbyid语句
-	 */
 	@Override
 	public SQLSource genSelectById(Class<?> cls) {
 		String tableName = nameConversion.getTableName(cls.getSimpleName());
@@ -98,6 +90,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 		return new SQLSource(new StringBuffer("select * from ").append(tableName).append(condition).toString());
 	}
 	
+	@Override
 	public SQLSource genSelectCountByTemplate(Class<?> cls){
 		String fieldName = null;
 		String condition = " where 1=1 " + lineSeparator;
@@ -125,9 +118,6 @@ public abstract class AbstractDBStyle implements DBStyle {
 		return new SQLSource(new StringBuffer("select * from ").append(nameConversion.getTableName(cls.getSimpleName())).toString());
 	}
 
-	/****
-	 * 自动生成update语句
-	 */
 	@Override
 	public SQLSource genUpdateById(Class<?> cls) {
 		String tableName = nameConversion.getTableName(cls.getSimpleName());
@@ -145,9 +135,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 		sql = removeComma(sql, condition);
 		return new SQLSource(sql.toString());
 	}
-	/*****
-	 * 更新paraCls传入的值,条件为conditionaCls传入的值
-	 */
+	
 	@Override
 	public SQLSource genUpdateTemplate (Class<?> cls) {
 		String tableName = nameConversion.getTableName(cls.getSimpleName());
@@ -165,9 +153,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 		sql = removeComma(sql, condition);
 		return new SQLSource(sql.toString());
 	}
-	/****
-	 * 生成更新所有记录
-	 */
+
 	@Override
 	public SQLSource genUpdateAll(Class<?> cls) {
 		String tableName = nameConversion.getTableName(cls.getSimpleName());
@@ -183,9 +169,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 		sql = removeComma(sql, null);
 		return new SQLSource(sql.toString());
 	}
-	/****
-	 * 根据id批量更新记录
-	 */
+
 	@Override
 	public SQLSource genBatchUpdateById(Class<?> cls) {
 		String tableName = nameConversion.getTableName(cls.getSimpleName());
@@ -208,10 +192,8 @@ public abstract class AbstractDBStyle implements DBStyle {
 		sql = removeComma(sql, condition.toString());
 		return new SQLSource(sql.toString());
 	}
-	/****
-	 * 生成insert语句
-	 * @return
-	 */
+
+	@Override
 	public SQLSource genInsert(Class<?> cls) {
 		String tableName = nameConversion.getTableName(cls.getSimpleName());
 		StringBuilder sql = new StringBuilder("insert into " + tableName + lineSeparator);
@@ -246,6 +228,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 		source.setIdType(idType);
 		return source;
 	}
+	
 	/****
 	 * 去掉逗号后面的加上结束符和条件并换行
 	 * 
@@ -269,6 +252,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 		}
 		return "";
 	}
+	
 	/***
 	 * 生成一个追加在set子句的后面sql(示例：name=${name},)有Empty判断
 	 * @param tableName
@@ -288,6 +272,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 		}
 		return "";
 	}
+	
 	/*****
 	 * 生成一个追加在where子句的后面sql(示例：name=${name} and)
 	 * @param tableName
@@ -308,6 +293,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 		}
 		return "";
 	}
+	
 	/****
 	 * 生成一个追加在insert into 子句的后面sql(示例：name,)
 	 * @param tableName
@@ -321,6 +307,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 		}
 		return "";
 	}
+	
 	/****
 	 * 生成一个追加在insert into value子句的后面sql(示例：name=${name},)
 	 * @param tableName
@@ -334,6 +321,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 		}
 		return "";
 	}
+	
 	/***
 	 * 生成主键条件子句（示例 whrer 1=1 and id=${id}）
 	 * @param tableName
@@ -357,6 +345,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 		}
 		return condition;
 	}
+	
 	/****
 	 * 生成一个循环读取Id列表
 	 * @param tableName
@@ -369,6 +358,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 				.append(HOLDER_START+ "obj."+idName + HOLDER_END+",").append(lineSeparator)
 				.append(STATEMENT_START).append("}}").append(STATEMENT_END).toString();
 	}
+	
 	/****
 	 * 生成批量更新set子句
 	 * @param tableName
