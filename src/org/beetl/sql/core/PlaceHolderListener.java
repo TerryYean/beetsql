@@ -1,5 +1,6 @@
 package org.beetl.sql.core;
 
+import java.util.List;
 import java.util.Stack;
 
 import org.beetl.core.Event;
@@ -11,6 +12,10 @@ import org.beetl.sql.core.engine.SQLVarRef;
 
 public class PlaceHolderListener implements Listener {
 
+	List textFunList = null;
+	public PlaceHolderListener(List textFunList){
+		this.textFunList = textFunList;
+	}
 	@SuppressWarnings("rawtypes")
 	@Override
 	public Object onEvent(Event e) {
@@ -18,7 +23,7 @@ public class PlaceHolderListener implements Listener {
 		Object o = stack.peek();
 		if (o instanceof PlaceholderST) {
 			PlaceholderST gf = (PlaceholderST) o;
-			SQLPlaceholderST rf = new SQLPlaceholderST(gf);
+			SQLPlaceholderST rf = new SQLPlaceholderST(gf,textFunList);
 			return rf;
 		} else if (o instanceof VarRef) {
 			VarRef ref = (VarRef) o;

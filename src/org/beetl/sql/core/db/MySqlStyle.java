@@ -7,6 +7,7 @@ import java.util.List;
 import org.beetl.sql.core.annotatoin.AssignID;
 import org.beetl.sql.core.annotatoin.AutoID;
 import org.beetl.sql.core.annotatoin.SeqID;
+import org.beetl.sql.core.engine.Beetl;
 
 /**
  * 没有什么
@@ -30,16 +31,9 @@ public class MySqlStyle extends AbstractDBStyle {
 		return paras;
 	}
 
-	@Override
-	public AbstractDBStyle instance() {
-		if(adbs == null){
-			adbs = new MySqlStyle();
-		}
-		return adbs;
-	}
+	
 
 	public MySqlStyle() {
-		super();
 	}
 
 	@Override

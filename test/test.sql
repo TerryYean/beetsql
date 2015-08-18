@@ -110,3 +110,12 @@ CREATE TABLE `user3` (
 -- Records of user3
 -- ----------------------------
 INSERT INTO `user3` VALUES ('beetlSql', 'M', null, null, null, null, '这是text类型', '这是tinytext类型', '合适mediumtext类型', '这是longtext类型', '1000000001', '101', '10001', '1000001', '', '1000000000000000001', '12.35', '12', '123456789', '2015-08-20', '20:01:51.000000', '2015-08-18 20:01:56', '2015-08-09 20:02:09', '2015');
+
+
+-- 测试主键
+DROP TABLE IF EXISTS `role`;
+CREATE TABLE `role` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(20) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1

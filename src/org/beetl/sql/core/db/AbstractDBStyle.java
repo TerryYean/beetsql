@@ -8,6 +8,7 @@ import org.beetl.sql.core.NameConversion;
 import org.beetl.sql.core.SQLSource;
 import org.beetl.sql.core.engine.Beetl;
 import org.beetl.sql.core.kit.StringKit;
+import static org.beetl.sql.core.kit.Constants.*;
 /**
  * 按照mysql来的，oralce需要重载insert，page方法
  * @author xiandafu
@@ -25,7 +26,11 @@ public abstract class AbstractDBStyle implements DBStyle {
 	protected String lineSeparator = System.getProperty("line.separator", "\n");
 	
 	public AbstractDBStyle() {
-		Configuration cf = Beetl.instance().getGroupTemplate().getConf();
+	
+	}
+	
+	public void init(Beetl beetl){
+		Configuration cf =beetl.getGroupTemplate().getConf();
 		STATEMENT_START = cf.getStatementStart();
 		STATEMENT_END = cf.getStatementEnd();
 		if(STATEMENT_END==null||STATEMENT_END.length()==0){
@@ -34,7 +39,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 		HOLDER_START = cf.getPlaceholderStart();
 		HOLDER_END = cf.getPlaceholderEnd();
 	}
-	public abstract AbstractDBStyle instance();
+
 
 	public String getSTATEMENTSTART() {
 		return STATEMENT_START;
@@ -72,14 +77,14 @@ public abstract class AbstractDBStyle implements DBStyle {
 	 * 生成selectbyid语句
 	 */
 	@Override
-	public SQLSource generationSelectByid(Class<?> cls) {
+	public SQLSource genSelectById(Class<?> cls) {
 		String tableName = nameConversion.getTableName(cls.getSimpleName());
 		String condition = appendIdCondition(cls);
 		return new SQLSource(new StringBuffer("select * from ").append(tableName).append(condition).toString());
 	}
 
 	@Override
-	public SQLSource generationSelectByTemplate(Class<?> cls) {
+	public SQLSource genSelectByTemplate(Class<?> cls) {
 		String fieldName = null;
 		String condition = " where 1=1 " + lineSeparator;
 		Method[] methods = cls.getDeclaredMethods();
@@ -93,7 +98,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 		return new SQLSource(new StringBuffer("select * from ").append(tableName).append(condition).toString());
 	}
 	
-	public SQLSource generationSelectCountByTemplate(Class<?> cls){
+	public SQLSource genSelectCountByTemplate(Class<?> cls){
 		String fieldName = null;
 		String condition = " where 1=1 " + lineSeparator;
 		Method[] methods = cls.getDeclaredMethods();
@@ -109,14 +114,14 @@ public abstract class AbstractDBStyle implements DBStyle {
 	}
 
 	@Override
-	public SQLSource generationDeleteByid(Class<?> cls) {
+	public SQLSource genDeleteById(Class<?> cls) {
 		String tableName = nameConversion.getTableName(cls.getSimpleName());
 		String condition = appendIdCondition(cls);
 		return new SQLSource(new StringBuffer("delete from ").append(tableName).append(condition).toString());
 	}
 
 	@Override
-	public SQLSource generationSelectAll(Class<?> cls) {
+	public SQLSource genSelectAll(Class<?> cls) {
 		return new SQLSource(new StringBuffer("select * from ").append(nameConversion.getTableName(cls.getSimpleName())).toString());
 	}
 
@@ -124,7 +129,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 	 * 自动生成update语句
 	 */
 	@Override
-	public SQLSource generationUpdateByid(Class<?> cls) {
+	public SQLSource genUpdateById(Class<?> cls) {
 		String tableName = nameConversion.getTableName(cls.getSimpleName());
 		StringBuilder sql = new StringBuilder("update ").append(tableName).append(" set ").append(lineSeparator);
 		String fieldName = null;
@@ -144,7 +149,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 	 * 更新paraCls传入的值,条件为conditionaCls传入的值
 	 */
 	@Override
-	public SQLSource generationUpdateTemplate (Class<?> cls) {
+	public SQLSource genUpdateTemplate (Class<?> cls) {
 		String tableName = nameConversion.getTableName(cls.getSimpleName());
 		StringBuilder sql = new StringBuilder("update ").append(tableName).append(" set ").append(lineSeparator);
 		String fieldName = null;
@@ -164,7 +169,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 	 * 生成更新所有记录
 	 */
 	@Override
-	public SQLSource generationUpdateAll(Class<?> cls) {
+	public SQLSource genUpdateAll(Class<?> cls) {
 		String tableName = nameConversion.getTableName(cls.getSimpleName());
 		StringBuilder sql = new StringBuilder("update ").append(tableName).append(" set ").append(lineSeparator);
 		String fieldName = null;
@@ -182,7 +187,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 	 * 根据id批量更新记录
 	 */
 	@Override
-	public SQLSource generationBatchUpdateByid(Class<?> cls) {
+	public SQLSource genBatchUpdateById(Class<?> cls) {
 		String tableName = nameConversion.getTableName(cls.getSimpleName());
 		List<String> ids = this.metadataManager.getIds(tableName);
 		if(ids.size()!=1) throw new RuntimeException("序列期望一个，但有"+ids);//暂时如此
@@ -207,7 +212,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 	 * 生成insert语句
 	 * @return
 	 */
-	public SQLSource generationInsert(Class<?> cls) {
+	public SQLSource genInsert(Class<?> cls) {
 		String tableName = nameConversion.getTableName(cls.getSimpleName());
 		StringBuilder sql = new StringBuilder("insert into " + tableName + lineSeparator);
 		StringBuilder colSql = new StringBuilder("(");

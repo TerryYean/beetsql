@@ -1,10 +1,23 @@
 package org.beetl.sql.core;
 
+import static org.beetl.sql.core.kit.Constants.DELETE_BY_ID;
+import static org.beetl.sql.core.kit.Constants.INSERT;
+import static org.beetl.sql.core.kit.Constants.SELECT_ACCOUNT_BY_TEMPLATE;
+import static org.beetl.sql.core.kit.Constants.SELECT_ALL;
+import static org.beetl.sql.core.kit.Constants.SELECT_BY_ID;
+import static org.beetl.sql.core.kit.Constants.SELECT_BY_TEMPLATE;
+import static org.beetl.sql.core.kit.Constants.UPDATE_ALL;
+import static org.beetl.sql.core.kit.Constants.UPDATE_BY_ID;
+import static org.beetl.sql.core.kit.Constants.UPDATE_BY_ID_BATCH;
+import static org.beetl.sql.core.kit.Constants.classSQL;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.beetl.sql.core.db.DBStyle;
 import org.beetl.sql.core.db.MetadataManager;
+import org.beetl.sql.core.engine.Beetl;
 import org.beetl.sql.core.kit.MapKit;
 
 public class SQLManager {
@@ -14,28 +27,25 @@ public class SQLManager {
 	private ConnectionSource ds = null;//数据库连接管理 TODO 应该指定一个默认数据库连接管理
 	private NameConversion nc = null;//名字转换器
 	Interceptor[] inters = {};
+	Beetl beetl = null;
 	
-	public static final int SELECT_BY_ID = 0;
-	public static final int SELECT_BY_TEMPLATE = 1;
-	public static final int DELETE_BY_ID = 2;
-	public static final int SELECT_ALL = 3;
-	public static final int UPDATE_ALL = 4;
-	public static final int UPDATE_BY_ID = 5;
-	public static final int UPDATE_BY_ID_BATCH = 6;
-	public static final int INSERT = 7;
+		
 
 	public SQLManager(DBStyle dbStyle, SQLLoader sqlLoader, ConnectionSource ds) {
+		beetl = new Beetl(sqlLoader);
 		this.dbStyle = dbStyle;
 		this.sqlLoader = sqlLoader;
 		this.ds = ds;
 		this.nc = new HumpNameConversion();
 		this.dbStyle.setNameConversion(this.nc);
 		this.dbStyle.setMetadataManager(new MetadataManager(this.ds));
-		this.sqlLoader.setDbs(dbStyle);
+		this.dbStyle.init(beetl);
+		
 	}
 	
 	public SQLManager(DBStyle dbStyle, SQLLoader sqlLoader,
 			ConnectionSource ds, NameConversion nc, Interceptor[] inters) {
+		beetl = new Beetl(sqlLoader);
 		this.dbStyle = dbStyle;
 		this.sqlLoader = sqlLoader;
 		this.ds = ds;
@@ -43,7 +53,7 @@ public class SQLManager {
 		this.inters = inters;
 		this.dbStyle.setNameConversion(this.nc);
 		this.dbStyle.setMetadataManager(new MetadataManager(this.ds));
-		this.sqlLoader.setDbs(dbStyle);
+		this.dbStyle.init(beetl);
 	}
 
 	public SQLResult getSQLResult(String id, Map<String, Object> paras) {
@@ -52,9 +62,8 @@ public class SQLManager {
 	}
 
 	public SQLScript getScript(String id) {
-		String template = sqlLoader.getSQL(id).getTemplate();
-		SQLScript script = new SQLScript(template, this);
-		script.setId(id);
+		SQLSource source  = sqlLoader.getSQL(id);
+		SQLScript script = new SQLScript(source, this);	
 		return script;
 	}
 
@@ -65,52 +74,59 @@ public class SQLManager {
 	 * @return
 	 */
 	public SQLScript getScript(Class<?> cls, int tempId) {
+		String className = cls.getSimpleName().toLowerCase();
+		String id = className +"."+ classSQL[tempId];
+		SQLSource tempSource = this.sqlLoader.getSQL(id);
+		if (tempSource != null) {
+			return new SQLScript(tempSource,this);
+		}
 		switch (tempId) {
-			case SELECT_BY_ID: {
-				String template = sqlLoader.getSelectByid(cls).getTemplate();
-				SQLScript script = new SQLScript(template, this);
-				return script;
+			case SELECT_BY_ID: {			
+				tempSource = this.dbStyle.genSelectById(cls);
+				break ;
 			}
 			case SELECT_BY_TEMPLATE: {
-				String template = sqlLoader.getSelectByTemplate(cls)
-						.getTemplate();
-				SQLScript script = new SQLScript(template, this);
-				return script;
+				tempSource = this.dbStyle.genSelectByTemplate(cls);
+				break ;
+			}
+			
+			case SELECT_ACCOUNT_BY_TEMPLATE: {
+				tempSource = this.dbStyle.genSelectCountByTemplate(cls);
+				break ;
 			}
 			case DELETE_BY_ID: {
-				String template = sqlLoader.getDeleteByid(cls).getTemplate();
-				SQLScript script = new SQLScript(template, this);
-				return script;
+				tempSource = this.dbStyle.genDeleteById(cls);
+				break ;
 			}
 			case SELECT_ALL: {
-				String template = sqlLoader.getSelectAll(cls).getTemplate();
-				SQLScript script = new SQLScript(template, this);
-				return script;
+				tempSource = this.dbStyle.genSelectAll(cls);
+				break ;
 			}
 			case UPDATE_ALL: {
-				String template = sqlLoader.getUpdateAll(cls).getTemplate();
-				SQLScript script = new SQLScript(template, this);
-				return script;
+				tempSource = this.dbStyle.genUpdateAll(cls);
+				break ;
 			}
 			case UPDATE_BY_ID: {
-				String template = sqlLoader.getUpdateByid(cls).getTemplate();
-				SQLScript script = new SQLScript(template, this);
-				return script;
+				tempSource = this.dbStyle.genBatchUpdateById(cls);
+				break ;
 			}
 			case UPDATE_BY_ID_BATCH: {
-				String template = sqlLoader.getBatchUpdateByid(cls).getTemplate();
-				SQLScript script = new SQLScript(template, this);
-				return script;
+				tempSource = this.dbStyle.genBatchUpdateById(cls);
+				break ;
 			}
 			case INSERT: {
-				SQLSource source = sqlLoader.getInsert(cls);
-				SQLScript script = new SQLScript(source, this);
-				return script;
+				tempSource = this.dbStyle.genInsert(cls);
+				break ;
 			}
 			default: {
 				throw new UnsupportedOperationException();
 			}
 		}
+		tempSource.setId(id);
+			sqlLoader.addSQL(id, tempSource);
+			return new SQLScript(tempSource,this);
+			
+		
 	}
 	
 	/****
@@ -118,25 +134,32 @@ public class SQLManager {
 	 * @param sql
 	 * @return
 	 */
-	public SQLScript getPageSqlScript(String sql) {
-		if(!sql.toLowerCase().startsWith("select")){
-			throw new UnsupportedOperationException();
+	public SQLScript getPageSqlScript(String selectId) {
+		String pageId = selectId+"-page";
+		SQLSource source  = sqlLoader.getSQL(pageId);
+		if(source!=null){
+			return  new SQLScript(source, this);
 		}
-		return new SQLScript(dbStyle.getPageSQL(sql), this);
+		SQLSource script = sqlLoader.getSQL(selectId);
+		String template = script.getTemplate();
+		String pageTemplate = dbStyle.getPageSQL(template);
+		source = new SQLSource(pageId,pageTemplate);
+		sqlLoader.addSQL(pageId, source);
+		return new SQLScript(source, this);
 	}
 	
-	/****
-	 * 获取总行数语句
-	 * @param sql
-	 * @return
-	 */
-	public SQLScript getCountSqlScript(String sql) {
-		if(!sql.toLowerCase().startsWith("select")){
-			throw new RuntimeException("这不是一个查询语句");
-		}
-		sql = "select count(*) "+sql.toLowerCase().substring(sql.indexOf("from"));
-		return new SQLScript(sql, this);
-	}
+//	/****
+//	 * 获取总行数语句
+//	 * @param sql
+//	 * @return
+//	 */
+//	public SQLScript getCountSqlScript(String sql) {
+//		if(!sql.toLowerCase().startsWith("select")){
+//			throw new RuntimeException("这不是一个查询语句");
+//		}
+//		sql = "select count(*) "+sql.toLowerCase().substring(sql.indexOf("from"));
+//		return new SQLScript(sql, this);
+//	}
 	
 	/**
 	 * 通过sqlId进行查询:查询自定义语句
@@ -164,7 +187,7 @@ public class SQLManager {
 	 */
 	public <T> List<T> selectAll(Class<T> clazz) {
 
-		SQLScript script = getScript(clazz, SQLManager.SELECT_ALL);
+		SQLScript script = getScript(clazz, SELECT_ALL);
 
 		return script.select(clazz, null);
 	}
@@ -180,7 +203,7 @@ public class SQLManager {
 	 */
 	public <T> T selectById(Class<T> clazz, Object ...pkValues) {
 		
-		SQLScript script = getScript(clazz, SQLManager.SELECT_BY_ID);
+		SQLScript script = getScript(clazz, SELECT_BY_ID);
 		
 		return script.unique(clazz, pkValues);
 	}
@@ -204,12 +227,23 @@ public class SQLManager {
 	 * @param user
 	 * @return
 	 */
-	public <T> List<T> selectByTemplement(T t) {
+	public <T> List<T> selectByTemplate(T t) {
 		
-		SQLScript script = getScript(t.getClass(), SQLManager.SELECT_BY_TEMPLATE);
-		Map<String, Object> param = MapKit.convertObjToMap(t);
+		SQLScript script = getScript(t.getClass(), SELECT_BY_TEMPLATE);
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("_root",t);
 		
 		return (List<T>) script.select(t.getClass(), param);
+	}
+	
+	
+public <T> long selectCountByTemplate(T t) {
+		
+		SQLScript script = getScript(t.getClass(), SELECT_ACCOUNT_BY_TEMPLATE);
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("_root",t);		
+		Long l = script.singleSelect(t, Long.class);
+		return l;
 	}
 	
 	/**
@@ -223,7 +257,7 @@ public class SQLManager {
 	 */
 	public int deleteById(Class<?> clazz, Object ...value) {
 		
-		SQLScript script = getScript(clazz, SQLManager.DELETE_BY_ID);
+		SQLScript script = getScript(clazz, DELETE_BY_ID);
 		
 		return script.deleteById(clazz, value);
 	}
@@ -249,7 +283,7 @@ public class SQLManager {
 	 */
 	public int updateById(Object obj){
 		
-		SQLScript script = getScript(obj.getClass(), SQLManager.UPDATE_BY_ID);
+		SQLScript script = getScript(obj.getClass(), UPDATE_BY_ID);
 		return script.update(obj);
 	}
 	
@@ -274,7 +308,7 @@ public class SQLManager {
 	 */
 	public int updateAll(Class<?> clazz, Object param){
 		
-		SQLScript script = getScript(clazz, SQLManager.UPDATE_ALL);
+		SQLScript script = getScript(clazz, UPDATE_ALL);
 		
 		return script.update(param);
 	}

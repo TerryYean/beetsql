@@ -38,17 +38,11 @@ public class SQLScript {
 		this.sm = sm ;
 
 	}
-	
-	public SQLScript(String sql,SQLManager sm) {
-		this.sqlSource = new SQLSource(sql);
-		this.sql = sql;
-		this.sm = sm ;
 
-	}
 
 	protected SQLResult run(Map<String, Object> paras) {
-		GroupTemplate gt = Beetl.instance().getGroupTemplate();
-		Template t = gt.getTemplate(sql);
+		GroupTemplate gt = sm.beetl.getGroupTemplate();
+		Template t = gt.getTemplate(sqlSource.getId());
 		List<Object> jdbcPara = new LinkedList<Object>();
 		
 		if(paras != null){

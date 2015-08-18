@@ -18,12 +18,14 @@ public class SQLPlaceholderST extends Statement
 	public Expression expression;
 	public Type type = null;
 	FormatExpression format;
+	List textFunList ;
 
-	public SQLPlaceholderST(PlaceholderST st)
+	public SQLPlaceholderST(PlaceholderST st,List textFunList)
 	{
 		super(st.token);
 		this.type = st.type;
 		this.expression = st.expression;
+		this.textFunList = textFunList;
 
 	}
 
@@ -34,7 +36,8 @@ public class SQLPlaceholderST extends Statement
 			Object value = expression.evaluate(ctx);
 			if(expression instanceof FunctionExpression){
 				FunctionExpression fun = (FunctionExpression)expression;
-				if(fun.token.text.equals("text")){
+				String funName = fun.token.text;
+				if(textFunList.contains(funName)){
 					ctx.byteWriter.writeString(value!=null?value.toString():"");
 					return ;
 				}

@@ -5,13 +5,14 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import org.beetl.sql.core.annotatoin.AssignID;
-import org.beetl.sql.core.annotatoin.AutoID;
 import org.beetl.sql.core.annotatoin.SeqID;
+import org.beetl.sql.core.engine.Beetl;
 
 public class OracleStyle extends AbstractDBStyle {
 
 	
-
+		public OracleStyle(){
+		}
 		@Override
 		public String getPageSQL(String sql) {
 			// TODO Auto-generated method stub
@@ -24,11 +25,7 @@ public class OracleStyle extends AbstractDBStyle {
 			return null;
 		}
 
-		@Override
-		public AbstractDBStyle instance() {
-			// TODO Auto-generated method stub
-			return null;
-		}
+		
 		
 		@Override
 		public int getIdType(Method idMethod) {

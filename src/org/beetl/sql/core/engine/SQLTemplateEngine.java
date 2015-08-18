@@ -1,6 +1,9 @@
 package org.beetl.sql.core.engine;
 
 import java.io.Reader;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.beetl.core.GroupTemplate;
@@ -20,13 +23,26 @@ public class SQLTemplateEngine extends DefaultTemplateEngine
     {
             Program program = super.createProgram(resource, reader, textMap, cr, gt);
             modifyStatemetn(resource,program,gt);
+            
             return program;
     }
     private void modifyStatemetn(Resource resource,Program program,GroupTemplate gt){
             Statement[] sts = program.metaData.statements;
             StatementParser parser = new StatementParser(sts, gt, resource.getId());
-            parser.addListener(PlaceholderST.class, new PlaceHolderListener());
-            parser.addListener(VarRef.class, new PlaceHolderListener());
+            String textOutput = (String)gt.getConf().getPs().get("TEXT");   
+            String textExtOutput = (String)gt.getConf().getPs().get("TEXT-EXT");  
+            if(textExtOutput!=null){
+            	textOutput=textExtOutput+","+textExtOutput;
+            }
+            List list ;
+            if(textOutput!=null){
+            	String[] textFun = textOutput.split(",");
+            	list = Arrays.asList(textFun);
+            }else{
+            	list = Collections.EMPTY_LIST;
+            }
+            parser.addListener(PlaceholderST.class, new PlaceHolderListener(list));
+            parser.addListener(VarRef.class, new PlaceHolderListener(list));
             
             parser.parse();
     }

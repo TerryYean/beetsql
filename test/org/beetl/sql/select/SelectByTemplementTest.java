@@ -25,7 +25,7 @@ public class SelectByTemplementTest {
 	
 	@Before
 	public void before(){
-		loader = ClasspathLoader.instance("/sql/mysql");
+		loader = new ClasspathLoader("/sql/mysql");
 		manager = new SQLManager(new MySqlStyle(), loader, new MySqlConnectoinSource());
 	}
 
@@ -38,7 +38,7 @@ public class SelectByTemplementTest {
 		
 		User user = new User();
 		user.setAge(5);
-		List<User> userList = manager.selectByTemplement(user);
+		List<User> userList = manager.selectByTemplate(user);
 		System.out.println(userList.size());
 		
 		for(User u : userList){
