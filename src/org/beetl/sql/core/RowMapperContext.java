@@ -3,6 +3,10 @@ package org.beetl.sql.core;
 import java.util.HashMap;
 import java.util.Map;
 
+/** 在调用时候允许访问上下文，也允许缓存变量，以避免再次读取数据库
+ * @author xiandafu
+ *
+ */
 public class RowMapperContext {
 	SQLManager sm;
 	SQLScript script;
