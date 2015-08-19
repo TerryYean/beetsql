@@ -72,7 +72,6 @@ public class Test {
 //    	System.out.println("=====page=====\n"+script.getSql());
 //    	script = manager.getCountSqlScript(manager.getScript(User.class,SELECT_BY_TEMPLATE).getSql());
     	System.out.println("=====count=====\n"+script.getSql());
-    	script = manager.getScript(User.class,UPDATE_BY_ID_BATCH);
     	System.out.println("=====batchUpdate=====\n"+script.getSql());
     }
     public static void testManager(){

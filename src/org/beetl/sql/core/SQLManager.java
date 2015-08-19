@@ -8,7 +8,6 @@ import static org.beetl.sql.core.kit.Constants.SELECT_BY_ID;
 import static org.beetl.sql.core.kit.Constants.SELECT_BY_TEMPLATE;
 import static org.beetl.sql.core.kit.Constants.UPDATE_ALL;
 import static org.beetl.sql.core.kit.Constants.UPDATE_BY_ID;
-import static org.beetl.sql.core.kit.Constants.UPDATE_BY_ID_BATCH;
 import static org.beetl.sql.core.kit.Constants.classSQL;
 
 import java.util.HashMap;
@@ -103,11 +102,7 @@ public class SQLManager {
 				break ;
 			}
 			case UPDATE_BY_ID: {
-				tempSource = this.dbStyle.genBatchUpdateById(cls);
-				break ;
-			}
-			case UPDATE_BY_ID_BATCH: {
-				tempSource = this.dbStyle.genBatchUpdateById(cls);
+				tempSource = this.dbStyle.genUpdateById(cls);
 				break ;
 			}
 			case INSERT: {
@@ -332,9 +327,20 @@ public class SQLManager {
 	 * @return
 	 */
 	public int updateById(Object obj){
-		
 		SQLScript script = getScript(obj.getClass(), UPDATE_BY_ID);
 		return script.update(obj);
+	}
+	/****
+	 * 批量更新
+	 * @param list
+	 * @return
+	 */
+	public int[] updateByIdBatch(List<?> list){
+		if(list == null || list.isEmpty()){
+			return null;
+		}
+		SQLScript script = getScript(list.get(0).getClass(), UPDATE_BY_ID);
+		return script.updateBatch(list);
 	}
 	
 	/**
