@@ -178,15 +178,7 @@ public class SQLScript {
 		return this.select(clazz, map);
 	}
 
-	/**
-	 * 查询,返回一个pojo集合
-	 * 
-	 * @param conn
-	 * @param paras
-	 * @param mapping
-	 * @return
-	 */
-	public <T> List<T> select(Class<T> clazz, Map<String, Object> paras) {
+	public <T> List<T> select(Class<T> clazz, Map<String, Object> paras,RowMapper mapper) {
 		SQLResult result = run(paras);
 		String sql = result.jdbcSql;
 		List<Object> objs = result.jdbcPara;
@@ -218,6 +210,17 @@ public class SQLScript {
 			}
 		}
 		return resultList;
+	}
+	/**
+	 * 查询,返回一个pojo集合
+	 * 
+	 * @param conn
+	 * @param paras
+	 * @param mapping
+	 * @return
+	 */
+	public <T> List<T> select(Class<T> clazz, Map<String, Object> paras) {
+		return this.select(clazz, paras,null);
 	}
 	
 	/**

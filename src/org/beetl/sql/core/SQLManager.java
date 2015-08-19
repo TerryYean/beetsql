@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.beetl.sql.core.db.AbstractDBStyle;
 import org.beetl.sql.core.db.DBStyle;
 import org.beetl.sql.core.db.MetadataManager;
 import org.beetl.sql.core.engine.Beetl;
@@ -165,6 +164,12 @@ public class SQLManager {
 	 * @return List<Pojo>
 	 */
 	public <T> List<T> select(String sqlId, Class<T> clazz, Map<String, Object> paras) { 
+		
+		SQLScript script = getScript(sqlId);
+		return script.select(clazz, paras);
+	}
+	
+	public <T> List<T> select(String sqlId, Class<T> clazz, Map<String, Object> paras,RowMapper mapper) { 
 		
 		SQLScript script = getScript(sqlId);
 		return script.select(clazz, paras);
