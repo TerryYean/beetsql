@@ -48,7 +48,7 @@ public class SelectBySqlIdTest {
 		user.setAge(11);
 		Map<String, Object> paras = new HashMap<String, Object>();
 		paras.put("user", user);
-		List<User> result = manager.selectBySqlId("user.selectUser", User.class, paras);
+		List<User> result = manager.select("user.selectUser", User.class, paras);
 		System.out.println(result.get(0));
 	}
 	
@@ -69,7 +69,7 @@ public class SelectBySqlIdTest {
 		
 		Map<String, Object> paras = new HashMap<String, Object>();
 		paras.put("age", 12);
-		List<User> result = manager.selectBySqlId("user.selectUser2", User.class, paras);
+		List<User> result = manager.select("user.selectUser2", User.class, paras);
 		System.out.println(result.get(0));
 	}
 	
@@ -78,7 +78,7 @@ public class SelectBySqlIdTest {
 		
 		Map<String, Object> paras = new HashMap<String, Object>();
 		paras.put("age", 12);
-		List<Map> result = manager.selectBySqlId("user.selectUser2", Map.class, paras);
+		List<Map> result = manager.select("user.selectUser2", Map.class, paras);
 		System.out.println(result.get(0));
 	}
 	

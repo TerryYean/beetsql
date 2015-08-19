@@ -3,6 +3,7 @@ package org.beetl.sql.core.db;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 
 import org.beetl.sql.core.annotatoin.AssignID;
 import org.beetl.sql.core.annotatoin.AutoID;
@@ -15,19 +16,19 @@ import org.beetl.sql.core.annotatoin.SeqID;
  */
 public class MySqlStyle extends AbstractDBStyle {
 	
-	private String pageNumber = "pageNumber";
-	private String pageSize = "pageSize";
+
 
 	@Override
 	public String getPageSQL(String sql) {
-		return sql+" limit " + HOLDER_START + pageNumber + HOLDER_END + " , " + HOLDER_START + pageSize + HOLDER_END;
+		return sql+" limit " + HOLDER_START + OFFSET + HOLDER_END + " , " + HOLDER_START + PAGE_SIZE + HOLDER_END;
 	}
 
 	@Override
-	public List<Object> getPagePara(List<Object> paras, int start, int size) {
-		paras.add(start);
-		paras.add(size);
-		return paras;
+	public void initPagePara(Map param,long start,long size) {
+		// TODO Auto-generated method stub
+		param.put(DBStyle.OFFSET,start-1);
+		param.put(DBStyle.PAGE_SIZE,size);
+		return ;
 	}
 
 	public MySqlStyle() {

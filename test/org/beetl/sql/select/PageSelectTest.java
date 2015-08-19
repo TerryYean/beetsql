@@ -29,16 +29,33 @@ public class PageSelectTest {
 		manager = new SQLManager(new MySqlStyle(), loader, new MySqlConnectoinSource());
 	}
 
-	@Test
-	public void selectAll(){
+//	@Test
+	public void selectPageByTemplate(){
 		User user = new User();
 		user.setAge(11);
 		long total = manager.selectCountByTemplate(user);
 		System.out.println(total);
+		List<User> userList  = manager.selectByTemplate(user,1,2);
+		
 //		List<User> userList = manager.selectAll(User.class);
-//		for(User user : userList){
-//			System.out.println(user);
-//		}
+		for(User t : userList){
+			System.out.println(t);
+		}
+		
+	}
+	
+	@Test
+	public void selectAll(){
+		User user = new User();
+		user.setAge(11);
+		long total = manager.singleSelect("user.selectCountUser2", user, Long.class);
+		System.out.println(total);
+		List<User> userList  = manager.select("user.selectUser2", User.class, user, 1,2);
+		
+//		List<User> userList = manager.selectAll(User.class);
+		for(User t : userList){
+			System.out.println(t);
+		}
 		
 	}
 	

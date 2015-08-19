@@ -40,6 +40,7 @@ public class SQLScript {
 		this.sqlSource = sqlSource;
 		this.sql = sqlSource.getTemplate();
 		this.sm = sm ;
+		this.id = sqlSource.getId();
 
 	}
 
@@ -169,6 +170,13 @@ public class SQLScript {
 		}
 		return null;
 	}
+	
+	public <T> List<T> select(Class<T> clazz,Object paras) {
+		
+		Map map = new HashMap();
+		map.put("_root", paras);
+		return this.select(clazz, map);
+	}
 
 	/**
 	 * 查询,返回一个pojo集合
@@ -264,10 +272,7 @@ public class SQLScript {
 	     );   
 	 }
 	
-	public List<Object> select( Map<String, Object> paras,
-			Class<?> mapping) {
-		throw new UnsupportedOperationException();
-	}
+
 	/**
 	 *  翻页 
 	 * @param paras
@@ -276,10 +281,12 @@ public class SQLScript {
 	 * @param end
 	 * @return
 	 */
-	public List<Object> select(Map<String, Object> paras,
-			Class<?> mapping, long start, long end) {
-		//@todo GK
-		throw new UnsupportedOperationException();
+	public <T> List<T> select(Map<String, Object> paras,
+			Class<T> mapping, long start, long size) {
+		SQLScript pageScript = this.sm.getPageSqlScript(this.id);
+		this.sm.getDbStyle().initPagePara(paras, start, size);
+		return pageScript.select(mapping, paras);
+//		return pageScript.se
 	}
 	
 	/**
@@ -290,11 +297,11 @@ public class SQLScript {
 	 * @param end
 	 * @return
 	 */
-	public List<Object> select(Object paras,
-			Class<?> mapping, long start, long end) {
+	public <T> List<T> select(Object paras,
+			Class<T> mapping, long start, long end) {
 		Map map = new HashMap();
 		map.put("_root", paras);
-		return this.select(paras, mapping, start, end);
+		return this.select(map, mapping, start, end);
 	}
 	/**
 	 * 翻页总数

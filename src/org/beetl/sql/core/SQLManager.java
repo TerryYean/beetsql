@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.beetl.sql.core.db.AbstractDBStyle;
 import org.beetl.sql.core.db.DBStyle;
 import org.beetl.sql.core.db.MetadataManager;
 import org.beetl.sql.core.engine.Beetl;
@@ -163,11 +164,40 @@ public class SQLManager {
 	 * @param paras
 	 * @return List<Pojo>
 	 */
-	public <T> List<T> selectBySqlId(String sqlId, Class<T> clazz, Map<String, Object> paras) { 
+	public <T> List<T> select(String sqlId, Class<T> clazz, Map<String, Object> paras) { 
 		
 		SQLScript script = getScript(sqlId);
 		return script.select(clazz, paras);
 	}
+	
+	/**
+	 * 通过sqlId进行查询:查询自定义语句
+	 * @param sqlId
+	 * @param clazz
+	 * @param paras
+	 * @return List<Pojo>
+	 */
+	public <T> List<T> select(String sqlId, Class<T> clazz, Object paras) { 
+		
+		SQLScript script = getScript(sqlId);
+		return script.select(clazz, paras);
+	}
+	
+	
+	public <T> List<T> select(String sqlId, Class<T> clazz, Object paras,int start,int size) { 
+		
+		SQLScript script = getScript(sqlId);
+		return script.select(paras, clazz, start, size);
+	}
+	
+	public <T> List<T> select(String sqlId, Class<T> clazz, Map paras,int start,int size) { 
+		
+		SQLScript script = getScript(sqlId);
+		return script.select(paras, clazz, start, size);
+	}
+	
+	
+	
 	
 	/**
 	 * 
@@ -227,6 +257,18 @@ public class SQLManager {
 		return (List<T>) script.select(t.getClass(), param);
 	}
 	
+	public <T> List<T> selectByTemplate(T t,int start,int size) {
+		
+	
+		SQLScript script = getScript(t.getClass(), SELECT_BY_TEMPLATE);
+		SQLScript pageScript = this.getPageSqlScript(script.id);
+		Map<String, Object> param = new HashMap<String, Object>();
+		this.dbStyle.initPagePara(param, start, size);
+		param.put("_root",t);
+		
+		return (List<T>) pageScript.select(t.getClass(), param);
+	}
+	
 	/**
 	 * 查询总数
 	 * @MethodName: selectCountByTemplate   
@@ -242,6 +284,13 @@ public class SQLManager {
 		Long l = script.singleSelect(t, Long.class);
 		return l;
 	}
+	
+	public <T> T singleSelect(String id,Object paras, Class<T> target) {
+		SQLScript script = getScript(id);
+		return script.singleSelect(paras, target);
+	}
+	
+	
 	
 	/**
 	 * 

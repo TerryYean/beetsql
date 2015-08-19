@@ -12,6 +12,13 @@ selectUser2
     and age = #age#
     @}
     
+selectCountUser2
+===
+    select  count(*) from user where 1=1
+    @if(age==12){
+    and age = #age#
+    @}
+    
 selectAll
 ===
     select * from user 
