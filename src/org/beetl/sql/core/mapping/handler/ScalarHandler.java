@@ -13,6 +13,7 @@
 package org.beetl.sql.core.mapping.handler;
 
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 import org.beetl.sql.core.mapping.ResultSetHandler;
@@ -48,12 +49,77 @@ public class ScalarHandler<T> implements ResultSetHandler<T> {
     @SuppressWarnings("unchecked")
 	@Override
     public T handle(ResultSet rs) throws SQLException {
-
+    	
         if (rs.next()) {
             if (this.columnName == null) return (T) rs.getObject(this.columnIndex);
             return (T) rs.getObject(this.columnName);
         }
         return null;
-        
+    	
     }
+    
+   /* private Object getJavaValue(ResultSet rs) throws SQLException{
+    	
+//    	取得字段对应的java类型，如：java.lang.String
+//    	但是ResultSetMetaData的所有方法参数都是int，这样的话就只能默认取 rsmt.getColumnClassName(1);
+//    	也就是说只能支持select id from user这种写法了，只能查询一个字段，应该是满足需求的。
+//    	其他查询方式保留，方便使用者单独取出mapping进行开发
+//    	ResultSetMetaData rsmt = rs.getMetaData();
+//		String a = rsmt.getColumnClassName(1);
+    	
+    	ResultSetMetaData rsmt = rs.getMetaData();
+    	String javaType = rsmt.getColumnClassName(1);
+    	
+    	
+    	return null;
+    }
+    
+    private Object convertType(String javaType, ResultSet rs){
+    	
+//    	Mysql类型和java类型对照表
+//    	http://dev.mysql.com/doc/connector-j/en/connector-j-reference-type-conversions.html
+    	String[] typeArr = {
+    			java.lang.String.class.getName(),
+    			java.lang.Boolean.class.getName(),
+    			java.lang.Integer.class.getName(),
+    			java.lang.Long.class.getName(),
+    			java.math.BigInteger.class.getName(),
+    			java.lang.Float.class.getName(),
+    			java.lang.Double.class.getName(),
+    			java.math.BigDecimal.class.getName(),
+    			java.sql.Date.class.getName(),
+    			java.sql.Timestamp.class.getName(),
+    			java.sql.Time.class.getName(),
+    			byte[].class.getName()
+    	};
+    	
+    	if(javaType.equals(typeArr[0])){
+    		
+    	}else if(javaType.equals(typeArr[1])){
+    		
+    	}else if(javaType.equals(typeArr[2])){
+    		
+    	}else if(javaType.equals(typeArr[3])){
+    		
+    	}else if(javaType.equals(typeArr[4])){
+    		
+    	}else if(javaType.equals(typeArr[5])){
+    		
+    	}else if(javaType.equals(typeArr[6])){
+    		
+    	}else if(javaType.equals(typeArr[7])){
+    		
+    	}else if(javaType.equals(typeArr[8])){
+    		
+    	}else if(javaType.equals(typeArr[9])){
+    		
+    	}else if(javaType.equals(typeArr[10])){
+    		
+    	}else if(javaType.equals(typeArr[11])){
+    		
+    	}else{
+    		return rs.getObject(columnIndex);
+    	}
+    	
+    }*/
 }

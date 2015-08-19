@@ -97,7 +97,7 @@ public class ScalarTest {
 				+ "t_smallint,"				//java.lang.Integer
 				+ "t_mediumint,"			//java.lang.Integer
 				+ "t_bit,"					//java.lang.Boolean
-				+ "t_bigint,"				//java.lang.Number  bigint要用java.lang.Number来接受
+				+ "t_bigint,"				//java.lang.Long
 				+ "t_float,"				//java.lang.Float
 				+ "t_double,"				//java.lang.Double
 				+ "t_decimal,"				//java.math.BigDecimal
@@ -112,6 +112,7 @@ public class ScalarTest {
 //		String result = query.query(rs, new ScalarHandler<String>("t_varchar"));
 //		String result = query.query(rs, new ScalarHandler<String>("t_char"));
 //		String result = query.query(rs, new ScalarHandler<String>("t_text"));
+//		byte[] result = query.query(rs, new ScalarHandler<byte[]>("t_blob"));
 //		String result = query.query(rs, new ScalarHandler<String>("t_tinytext"));
 //		String result = query.query(rs, new ScalarHandler<String>("t_mediumtext"));
 //		String result = query.query(rs, new ScalarHandler<String>("t_longtext"));
@@ -120,7 +121,7 @@ public class ScalarTest {
 //		Integer result = query.query(rs, new ScalarHandler<Integer>("t_smallint"));
 //		Integer result = query.query(rs, new ScalarHandler<Integer>("t_mediumint"));
 //		Boolean result = query.query(rs, new ScalarHandler<Boolean>("t_bit"));
-//		Number result = query.query(rs, new ScalarHandler<Number>("t_bigint"));// bigint要用java.lang.Number来接受
+		Long result = query.query(rs, new ScalarHandler<Long>("t_bigint"));
 //		Float result = query.query(rs, new ScalarHandler<Float>("t_float"));
 //		Double result = query.query(rs, new ScalarHandler<Double>("t_double"));
 //		java.math.BigDecimal result = query.query(rs, new ScalarHandler<java.math.BigDecimal>("t_decimal"));
@@ -128,7 +129,7 @@ public class ScalarTest {
 //		java.sql.Time result = query.query(rs, new ScalarHandler<java.sql.Time>("t_time"));
 //		java.sql.Timestamp result = query.query(rs, new ScalarHandler<java.sql.Timestamp>("t_datetime"));
 //		java.sql.Timestamp result = query.query(rs, new ScalarHandler<java.sql.Timestamp>("t_timestamp"));
-		java.sql.Date result = query.query(rs, new ScalarHandler<java.sql.Date>("t_year"));
+//		java.sql.Date result = query.query(rs, new ScalarHandler<java.sql.Date>("t_year"));
 		
 		System.out.println(result);
 	}
