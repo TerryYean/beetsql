@@ -54,8 +54,8 @@ public class BasicRowProcessor implements RowProcessor {
 	}
 
 	@Override
-	public Map<String, Object> toMap(ResultSet rs) throws SQLException {
-        return this.convert.toMap(rs);
+	public Map<String, Object> toMap(ResultSet rs,Class type) throws SQLException {
+        return this.convert.toMap(type,rs);
 	}
 	
 }

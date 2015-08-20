@@ -1,5 +1,6 @@
 package org.beetl.sql.core;
 
+import org.beetl.sql.core.annotatoin.Table;
 import org.beetl.sql.core.kit.StringKit;
 
 /***
@@ -9,22 +10,23 @@ import org.beetl.sql.core.kit.StringKit;
  *
  */
 public class HumpNameConversion extends NameConversion {
-	
-	public String getTableName(String className) {
-		return StringKit.toLowerCaseFirstOne(className);
+	@Override
+	public String getTableName(Class c) {
+		Table table = (Table)c.getAnnotation(Table.class);
+		if(table!=null){
+			return table.name();
+		}
+		return StringKit.toLowerCaseFirstOne(c.getSimpleName());
 	}
-	
-	public String getColName(String attrName) {
+	@Override
+	public String getColName(Class c,String attrName) {
 		return StringKit.toLowerCaseFirstOne(attrName);
 	}
 
-	@Override
-	public String getClassName(String tableName) {
-		return StringKit.toUpperCaseFirstOne(tableName);
-	}
+	
 
 	@Override
-	public String getPropertyName(String colName) {
+	public String getPropertyName(Class c,String colName) {
 		return StringKit.toLowerCaseFirstOne(colName);
 	}
 

@@ -1,5 +1,6 @@
 package org.beetl.sql.core;
 
+import org.beetl.sql.core.annotatoin.Table;
 import org.beetl.sql.core.kit.StringKit;
 
 /***
@@ -9,22 +10,23 @@ import org.beetl.sql.core.kit.StringKit;
  *
  */
 public class UnderlinedNameConversion extends NameConversion {
-	
-	public String getTableName(String className) {
-		return StringKit.enCodeUnderlined(className);
+	@Override
+	public String getTableName(Class c) {
+		Table table = (Table)c.getAnnotation(Table.class);
+		if(table!=null){
+			return table.name();
+		}
+		return StringKit.enCodeUnderlined(c.getSimpleName());
 	}
-	
-	public String getColName(String attrName) {
+	@Override
+	public String getColName(Class c,String attrName) {
 		return StringKit.enCodeUnderlined(attrName);
 	}
 
-	@Override
-	public String getClassName(String tableName) {
-		return StringKit.toUpperCaseFirstOne(StringKit.deCodeUnderlined(tableName));
-	}
+	
 
 	@Override
-	public String getPropertyName(String colName) {
+	public String getPropertyName(Class c,String colName) {
 		return StringKit.deCodeUnderlined(colName);
 	}
 }

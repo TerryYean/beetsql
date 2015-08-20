@@ -92,7 +92,7 @@ public class BeanProcessor {
 		PropertyDescriptor[] props = this.propertyDescriptors(type);
 
 		ResultSetMetaData rsmd = rs.getMetaData();
-		int[] columnToProperty = this.mapColumnsToProperties(rsmd, props);
+		int[] columnToProperty = this.mapColumnsToProperties(type,rsmd, props);
 
 		return this.createBean(rs, type, props, columnToProperty);
 		
@@ -119,7 +119,7 @@ public class BeanProcessor {
 
 		PropertyDescriptor[] props = this.propertyDescriptors(type);
 		ResultSetMetaData rsmd = rs.getMetaData();
-		int[] columnToProperty = this.mapColumnsToProperties(rsmd, props);
+		int[] columnToProperty = this.mapColumnsToProperties(type,rsmd, props);
 
 		do {
 			results.add(this.createBean(rs, type, props, columnToProperty));
@@ -139,18 +139,18 @@ public class BeanProcessor {
 	 * @return Map<String,Object>  
 	 * @throws
 	 */
-	public Map<String, Object> toMap(ResultSet rs) throws SQLException {
+	public Map<String, Object> toMap(Class c,ResultSet rs) throws SQLException {
 
 		Map<String, Object> result = new CaseInsensitiveHashMap();
 		ResultSetMetaData rsmd = rs.getMetaData();
 		int cols = rsmd.getColumnCount();
-
+		String tableName = nc.getTableName(c);
 		for (int i = 1; i <= cols; i++) {
 			String columnName = rsmd.getColumnLabel(i);
 			if (null == columnName || 0 == columnName.length()) {
 				columnName = rsmd.getColumnName(i);
 			}
-			result.put(this.nc.getPropertyName(columnName), rs.getObject(i)); //个人感觉此处不转换会好一些，直观
+			result.put(this.nc.getPropertyName(c,columnName), rs.getObject(i)); //个人感觉此处不转换会好一些，直观
 		}
 
 		return result;
@@ -391,7 +391,7 @@ public class BeanProcessor {
 	 * @return int[]  
 	 * @throws
 	 */
-	protected int[] mapColumnsToProperties(ResultSetMetaData rsmd, PropertyDescriptor[] props) throws SQLException {
+	protected int[] mapColumnsToProperties(Class c,ResultSetMetaData rsmd, PropertyDescriptor[] props) throws SQLException {
 
 		int cols = rsmd.getColumnCount();
 		int[] columnToProperty = new int[cols + 1];
@@ -409,7 +409,7 @@ public class BeanProcessor {
 			for (int i = 0; i < props.length; i++) {
 
 //				if (propertyName.equalsIgnoreCase(props[i].getName())) {//这里是一个扩展点，用来扩展pojo属性到数据库字段的映射
-				if(props[i].getName().equalsIgnoreCase(this.nc.getPropertyName(propertyName))) {
+				if(props[i].getName().equalsIgnoreCase(this.nc.getPropertyName(c,propertyName))) {
 					columnToProperty[col] = i;
 					break;
 				}

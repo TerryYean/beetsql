@@ -20,6 +20,8 @@ import org.beetl.sql.core.mapping.BasicRowProcessor;
 import org.beetl.sql.core.mapping.ResultSetHandler;
 import org.beetl.sql.core.mapping.RowProcessor;
 
+import com.sun.javafx.collections.MappingChange.Map;
+
 /**  
  * @ClassName: MapListHandler   
  * @Description: 将rs处理为List<Map<String ,Object>>  
@@ -48,7 +50,7 @@ public class MapListHandler implements ResultSetHandler<java.util.List<java.util
 		
 		java.util.List<java.util.Map<String, Object>> rows = new java.util.ArrayList<java.util.Map<String, Object>>();
         while (rs.next()) {
-            rows.add(this.convert.toMap(rs));
+            rows.add(this.convert.toMap(rs,Map.class));
         }
         return rows;
         

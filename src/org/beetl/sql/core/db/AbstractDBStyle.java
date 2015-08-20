@@ -6,6 +6,7 @@ import java.util.List;
 import org.beetl.core.Configuration;
 import org.beetl.sql.core.NameConversion;
 import org.beetl.sql.core.SQLSource;
+import org.beetl.sql.core.annotatoin.Table;
 import org.beetl.sql.core.engine.Beetl;
 import org.beetl.sql.core.kit.StringKit;
 /**
@@ -70,7 +71,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 
 	@Override
 	public SQLSource genSelectById(Class<?> cls) {
-		String tableName = nameConversion.getTableName(cls.getSimpleName());
+		String tableName = nameConversion.getTableName(cls);
 		String condition = appendIdCondition(cls);
 		return new SQLSource(new StringBuffer("select * from ").append(tableName).append(condition).toString());
 	}
@@ -80,11 +81,11 @@ public abstract class AbstractDBStyle implements DBStyle {
 		String fieldName = null;
 		String condition = " where 1=1 " + lineSeparator;
 		Method[] methods = cls.getDeclaredMethods();
-		String tableName = nameConversion.getTableName(cls.getSimpleName());
+		String tableName = nameConversion.getTableName(cls);
 		for (Method method : methods) {
 			if(method.getName().startsWith("get")){
 				fieldName = StringKit.toLowerCaseFirstOne(method.getName().substring(3));
-				condition = condition + appendWhere(tableName, fieldName);
+				condition = condition + appendWhere(cls,tableName, fieldName);
 			}
 		}
 		return new SQLSource(new StringBuffer("select * from ").append(tableName).append(condition).toString());
@@ -95,11 +96,11 @@ public abstract class AbstractDBStyle implements DBStyle {
 		String fieldName = null;
 		String condition = " where 1=1 " + lineSeparator;
 		Method[] methods = cls.getDeclaredMethods();
-		String tableName = nameConversion.getTableName(cls.getSimpleName());
+		String tableName = nameConversion.getTableName(cls);
 		for (Method method : methods) {
 			if(method.getName().startsWith("get")){
 				fieldName = StringKit.toLowerCaseFirstOne(method.getName().substring(3));
-				condition = condition + appendWhere(tableName, fieldName);
+				condition = condition + appendWhere(cls,tableName, fieldName);
 			}
 		}
 		return new SQLSource(new StringBuffer("select count(*) from ").append(tableName).append(condition).toString());
@@ -108,19 +109,19 @@ public abstract class AbstractDBStyle implements DBStyle {
 
 	@Override
 	public SQLSource genDeleteById(Class<?> cls) {
-		String tableName = nameConversion.getTableName(cls.getSimpleName());
+		String tableName = nameConversion.getTableName(cls);
 		String condition = appendIdCondition(cls);
 		return new SQLSource(new StringBuffer("delete from ").append(tableName).append(condition).toString());
 	}
 
 	@Override
 	public SQLSource genSelectAll(Class<?> cls) {
-		return new SQLSource(new StringBuffer("select * from ").append(nameConversion.getTableName(cls.getSimpleName())).toString());
+		return new SQLSource(new StringBuffer("select * from ").append(nameConversion.getTableName(cls)).toString());
 	}
 
 	@Override
 	public SQLSource genUpdateById(Class<?> cls) {
-		String tableName = nameConversion.getTableName(cls.getSimpleName());
+		String tableName = nameConversion.getTableName(cls);
 		StringBuilder sql = new StringBuilder("update ").append(tableName).append(" set ").append(lineSeparator);
 		String fieldName = null;
 		
@@ -128,7 +129,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 		for (Method method : methods) {
 			if(method.getName().startsWith("get") && !method.getName().endsWith("Id")){//TODO 暂时限定排除ID
 				fieldName = StringKit.toLowerCaseFirstOne(method.getName().substring(3));
-				sql.append(appendSetColumnAbsolute(tableName, fieldName));
+				sql.append(appendSetColumnAbsolute(cls,tableName, fieldName));
 			}
 		}
 		String condition = appendIdCondition(cls);
@@ -138,7 +139,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 	
 	@Override
 	public SQLSource genUpdateTemplate (Class<?> cls) {
-		String tableName = nameConversion.getTableName(cls.getSimpleName());
+		String tableName = nameConversion.getTableName(cls);
 		StringBuilder sql = new StringBuilder("update ").append(tableName).append(" set ").append(lineSeparator);
 		String fieldName = null;
 		String condition = " where 1=1 " + lineSeparator;
@@ -146,8 +147,8 @@ public abstract class AbstractDBStyle implements DBStyle {
 		for (Method method : methods) {
 			if(method.getName().startsWith("get")){
 				fieldName = StringKit.toLowerCaseFirstOne(method.getName().substring(3));
-				sql.append(appendSetColumn(tableName, fieldName,"para"));
-				condition = condition + appendWhere(tableName, fieldName,"condition");
+				sql.append(appendSetColumn(cls,tableName, fieldName,"para"));
+				condition = condition + appendWhere(cls,tableName, fieldName,"condition");
 			}
 		}
 		sql = removeComma(sql, condition);
@@ -156,14 +157,14 @@ public abstract class AbstractDBStyle implements DBStyle {
 
 	@Override
 	public SQLSource genUpdateAll(Class<?> cls) {
-		String tableName = nameConversion.getTableName(cls.getSimpleName());
+		String tableName = nameConversion.getTableName(cls);
 		StringBuilder sql = new StringBuilder("update ").append(tableName).append(" set ").append(lineSeparator);
 		String fieldName = null;
 		Method[] methods = cls.getDeclaredMethods();
 		for (Method method : methods) {
 			if(method.getName().startsWith("get")){
 				fieldName = StringKit.toLowerCaseFirstOne(method.getName().substring(3));
-				sql.append(appendSetColumn(tableName, fieldName));
+				sql.append(appendSetColumn(cls,tableName, fieldName));
 			}
 		}
 		sql = removeComma(sql, null);
@@ -172,7 +173,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 
 	@Override
 	public SQLSource genInsert(Class<?> cls) {
-		String tableName = nameConversion.getTableName(cls.getSimpleName());
+		String tableName = nameConversion.getTableName(cls);
 		StringBuilder sql = new StringBuilder("insert into " + tableName + lineSeparator);
 		StringBuilder colSql = new StringBuilder("(");
 		StringBuilder valSql = new StringBuilder(" VALUES (");
@@ -189,15 +190,15 @@ public abstract class AbstractDBStyle implements DBStyle {
 						continue ; //忽略这个字段
 					}else if(idType==DBStyle.ID_SEQ){
 						if(ids.size()!=1) throw new RuntimeException("序列期望一个，但有"+ids);
-						colSql.append(appendInsertColumn(tableName, fieldName));
+						colSql.append(appendInsertColumn(cls,tableName, fieldName));
 						valSql.append( HOLDER_START+ "_tempKey" + HOLDER_END+",");
 						continue;
 					}else if(idType==DBStyle.ID_ASSIGN){
 						//normal
 					}
 				}
-				colSql.append(appendInsertColumn(tableName, fieldName));
-				valSql.append(appendInsertVlaue(tableName, fieldName));
+				colSql.append(appendInsertColumn(cls,tableName, fieldName));
+				valSql.append(appendInsertVlaue(cls,tableName, fieldName));
 			}
 		}
 		sql.append(removeComma(colSql, null).append(")").append(removeComma(valSql, null)).append(")").toString());
@@ -222,8 +223,8 @@ public abstract class AbstractDBStyle implements DBStyle {
 	 * @param fieldName
 	 * @return
 	 */
-	private String appendSetColumnAbsolute(String tableName,String fieldName) {
-		String colName = nameConversion.getColName(fieldName);
+	private String appendSetColumnAbsolute(Class c,String tableName,String fieldName) {
+		String colName = nameConversion.getColName(c,fieldName);
 		if (metadataManager.existColName(tableName, colName)) {
 			return colName + "="+HOLDER_START + fieldName + HOLDER_END+",";
 		}
@@ -236,12 +237,12 @@ public abstract class AbstractDBStyle implements DBStyle {
 	 * @param fieldName
 	 * @return
 	 */
-	private String appendSetColumn(String tableName,String fieldName,String...prefixs) {
+	private String appendSetColumn(Class c,String tableName,String fieldName,String...prefixs) {
 		String prefix = "";
 		if(prefixs.length > 0){
 			prefix = prefixs[0]+".";
 		}
-		String colName = nameConversion.getColName(fieldName);
+		String colName = nameConversion.getColName(c,fieldName);
 		if (metadataManager.existColName(tableName, colName)) {
 			return STATEMENT_START + "if(!isEmpty(" + prefix+fieldName + ")){"
 					+ STATEMENT_END + "\t" + colName + "="+HOLDER_START + prefix+fieldName + HOLDER_END+","
@@ -256,12 +257,12 @@ public abstract class AbstractDBStyle implements DBStyle {
 	 * @param fieldName
 	 * @return
 	 */
-	private String appendWhere(String tableName,String fieldName,String...prefixs) {
+	private String appendWhere(Class c,String tableName,String fieldName,String...prefixs) {
 		String prefix = "";
 		if(prefixs.length > 0){
 			prefix = prefixs[0]+".";
 		}
-		String colName = nameConversion.getColName(fieldName);
+		String colName = nameConversion.getColName(c,fieldName);
 		String connector = " and ";
 		if (metadataManager.existColName(tableName, colName)) {
 			return STATEMENT_START + "if(!isEmpty(" + prefix+fieldName + ")){"
@@ -277,8 +278,8 @@ public abstract class AbstractDBStyle implements DBStyle {
 	 * @param fieldName
 	 * @return
 	 */
-	private String appendInsertColumn(String tableName,String fieldName) {
-		String colName = nameConversion.getColName(fieldName);
+	private String appendInsertColumn(Class c,String tableName,String fieldName) {
+		String colName = nameConversion.getColName(c,fieldName);
 		if (metadataManager.existColName(tableName, colName)) {
 			return  colName + ",";
 		}
@@ -291,8 +292,8 @@ public abstract class AbstractDBStyle implements DBStyle {
 	 * @param fieldName
 	 * @return
 	 */
-	private String appendInsertVlaue(String tableName,String fieldName) {
-		String colName = nameConversion.getColName(fieldName);
+	private String appendInsertVlaue(Class c,String tableName,String fieldName) {
+		String colName = nameConversion.getColName(c,fieldName);
 		if (metadataManager.existColName(tableName, colName)) {
 			return  HOLDER_START+ fieldName + HOLDER_END+",";
 		}
@@ -305,14 +306,14 @@ public abstract class AbstractDBStyle implements DBStyle {
 	 * @return
 	 */
 	private String appendIdCondition(Class<?> cls) {
-		String tableName = nameConversion.getTableName(cls.getSimpleName());
+		String tableName = nameConversion.getTableName(cls);
 		String condition = null;
 		List<String> ids = metadataManager.getIds(tableName);
 		if (ids.size() > 0) {
 			String attrName = null;
 			condition = " where 1=1";
 			for (int i = 0; i < ids.size(); i++) {
-				attrName = nameConversion.getPropertyName(ids.get(i));
+				attrName = nameConversion.getPropertyName(cls,ids.get(i));
 				if (metadataManager.existPropertyName(cls, attrName)) {
 					condition = condition + " and " + ids.get(i) + "= "+HOLDER_START
 							+ attrName
@@ -335,6 +336,8 @@ public abstract class AbstractDBStyle implements DBStyle {
 				.append(HOLDER_START+ "obj."+idName + HOLDER_END+",").append(lineSeparator)
 				.append(STATEMENT_START).append("}}").append(STATEMENT_END).toString();
 	}
+	
+	
 	
 
 }

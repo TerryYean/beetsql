@@ -34,23 +34,7 @@ public class Test {
     	//testUse();
 //    	testNameConve();
 	}
-    public static void testNameConve(){
-    	NameConversion hnc = new HumpNameConversion();
-    	NameConversion unc = new UnderlinedNameConversion();
-    	System.out.println("========HumpNameConversion======");
-    	System.out.println("tableName--->className==="+hnc.getClassName("user"));
-    	System.out.println("className--->tableName==="+hnc.getTableName(User.class.getSimpleName()));
-    	System.out.println("attrName--->ColName==="+hnc.getColName("name"));
-    	System.out.println("ColName--->attrName==="+hnc.getPropertyName("name"));
-    	System.out.println("idlist==="+hnc.getId().toString());
-    	System.out.println("========UnderlinedNameConversion======");
-    	System.out.println("tableName--->className==="+unc.getClassName("user"));
-    	System.out.println("className--->tableName==="+unc.getTableName(User.class.getSimpleName()));
-    	System.out.println("attrName--->ColName==="+unc.getColName("userName"));
-    	System.out.println("ColName--->attrName==="+unc.getPropertyName("user_name"));
-    	System.out.println("idlist==="+unc.getId().toString());
-    	
-    }
+   
     public static void testManagergenera(){
     	SQLLoader loader = new ClasspathLoader("/sql/mysql");
 		SQLManager manager = new SQLManager(getStyle(),loader,ds);

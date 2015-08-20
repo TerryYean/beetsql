@@ -405,7 +405,7 @@ public class SQLScript {
 	public <T> T unique(Class<T> clazz, Object ...value) {
 		
 		MetadataManager mm = this.sm.getDbStyle().getMetadataManager();
-		List<String> pkNames = mm.getIds(this.sm.getNc().getTableName(clazz.getSimpleName()));
+		List<String> pkNames = mm.getIds(this.sm.getNc().getTableName(clazz));
 		
 		Map<String, Object> paras = MapKit.pksSetValue(pkNames, value);
 		paras.put("_root", clazz);
@@ -449,7 +449,7 @@ public class SQLScript {
 	public int deleteById(Class<?> clazz, Object ...value) {
 		
 		MetadataManager mm = this.sm.getDbStyle().getMetadataManager();
-		List<String> pkNames = mm.getIds(this.sm.getNc().getTableName(clazz.getSimpleName()));
+		List<String> pkNames = mm.getIds(this.sm.getNc().getTableName(clazz));
 		
 		Map<String, Object> paras = MapKit.pksSetValue(pkNames, value);
 		paras.put("_root", clazz);

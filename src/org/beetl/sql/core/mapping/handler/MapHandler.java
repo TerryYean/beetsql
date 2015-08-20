@@ -20,6 +20,8 @@ import org.beetl.sql.core.mapping.BasicRowProcessor;
 import org.beetl.sql.core.mapping.ResultSetHandler;
 import org.beetl.sql.core.mapping.RowProcessor;
 
+import com.sun.javafx.collections.MappingChange.Map;
+
 /**  
  * @ClassName: MapHandler   
  * @Description: 将rs处理为Map<String ,Object>  
@@ -46,7 +48,7 @@ public class MapHandler implements ResultSetHandler<java.util.Map<String ,Object
 
 	@Override
 	public java.util.Map<String, Object> handle(ResultSet rs) throws SQLException {
-		return rs.next() ? this.convert.toMap(rs) : null;
+		return rs.next() ? this.convert.toMap(rs,Map.class) : null;
 	}
 
 }
