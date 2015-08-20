@@ -3,6 +3,9 @@
  */
 package org.beetl.sql.update;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.beetl.sql.buildsql.MySqlConnectoinSource;
 import org.beetl.sql.core.ClasspathLoader;
 import org.beetl.sql.core.SQLLoader;
@@ -16,7 +19,7 @@ import org.junit.Test;
  * @author suxinjie
  *
  */
-public class UpdateByIdTest {
+public class UpdateByIdBatchTest {
 
 	private SQLLoader loader;
 	private SQLManager manager;
@@ -28,21 +31,20 @@ public class UpdateByIdTest {
 	}
 
 	/**
-	 * TODO 未测试完：需要处理","的问题，可能会出现update set user name=#name#, wehre 1=1 and ....的情况
+	 * TODO  测试批量修改
 	 * 
-	 * TODO 新增trim方法，修改后测试
 	 */
 	@Test
 	public void updateById(){
-		
-		User user = new User();
-		user.setId(4);
-		user.setName("张三2222");
-		user.setAge(100);
-//		user.setUserName("sfjsfksjhfjkshfshdjfhsjkfhdshjk");
-		
-		int i = manager.updateById(user);
-		System.out.println(i);
+		List<User> list = new ArrayList<User>();
+		for(int i = 0;i<20;i++){
+			User user = new User();
+			user.setId(i+1);
+			user.setName("gk_"+i);
+			user.setAge(i);
+			list.add(user);
+		}
+		int[] i = manager.updateByIdBatch(list);
 	}
 	
 }

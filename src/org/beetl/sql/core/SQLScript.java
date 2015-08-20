@@ -352,6 +352,50 @@ public class SQLScript {
 		}
 		return rs;
 	}
+	/****
+	 * 批量更新
+	 * @param obj
+	 * @return
+	 */
+	public int[] updateBatch(List<?> list) {
+		Object obj = list.get(0);
+		Map<String, Object> paras = new HashMap<String, Object>();
+		paras.put("_root", obj);
+		SQLResult result = run(paras);
+		String sql = result.jdbcSql;
+		List<Object> objs = result.jdbcPara;
+		InterceptorContext ctx = this.callInterceptorAsBefore(this.id,sql, objs);
+		sql = ctx.getSql();
+		objs = ctx.getParas();
+		int[] rs = null;
+		PreparedStatement ps = null;
+		// 执行jdbc
+		try {
+			ps = sm.getDs().getWriteConn(ctx).prepareStatement(sql);
+			for(int k = 0;k<list.size();k++ ){
+				paras.put("_root", list.get(k));
+				result = run(paras);
+				objs = result.jdbcPara;
+				for (int i = 0; i < objs.size(); i++)
+					ps.setObject(i + 1, objs.get(i));
+				ps.addBatch();
+			}
+			rs = ps.executeBatch();
+			this.callInterceptorAsAfter(ctx);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return rs;
+	}
 
 	/**
 	 * 查询单条记录

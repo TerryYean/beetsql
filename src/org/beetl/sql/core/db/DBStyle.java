@@ -31,7 +31,6 @@ public interface DBStyle {
 	public SQLSource genUpdateAll(Class<?> cls);
 	public SQLSource genUpdateById(Class<?> cls);
 	public SQLSource genUpdateTemplate(Class<?> cls);
-	public SQLSource genBatchUpdateById(Class<?> cls);
 	public SQLSource genInsert(Class<?> cls);
 	
 	

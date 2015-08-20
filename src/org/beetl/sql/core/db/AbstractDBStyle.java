@@ -171,29 +171,6 @@ public abstract class AbstractDBStyle implements DBStyle {
 	}
 
 	@Override
-	public SQLSource genBatchUpdateById(Class<?> cls) {
-		String tableName = nameConversion.getTableName(cls.getSimpleName());
-		List<String> ids = this.metadataManager.getIds(tableName);
-		if(ids.size()!=1) throw new RuntimeException("序列期望一个，但有"+ids);//暂时如此
-		String idName = ids.get(0);
-		StringBuilder sql = new StringBuilder("update ").append(tableName).append(" set ").append(lineSeparator)
-				.append(STATEMENT_START).append("trim(){").append(STATEMENT_END);
-		StringBuilder condition = new StringBuilder(" where ").append(idName).append("IN (");
-		String fieldName = null;
-		Method[] methods = cls.getDeclaredMethods();
-		for (Method method : methods) {
-			if(method.getName().startsWith("get")){
-				fieldName = StringKit.toLowerCaseFirstOne(method.getName().substring(3));
-				sql.append(appendBatchSet(tableName, fieldName,idName));
-			}
-		}
-		sql.append(STATEMENT_START).append("}").append(STATEMENT_END);
-		condition.append(appendIdList(idName)+")");
-		sql = removeComma(sql, condition.toString());
-		return new SQLSource(sql.toString());
-	}
-
-	@Override
 	public SQLSource genInsert(Class<?> cls) {
 		String tableName = nameConversion.getTableName(cls.getSimpleName());
 		StringBuilder sql = new StringBuilder("insert into " + tableName + lineSeparator);
@@ -359,26 +336,5 @@ public abstract class AbstractDBStyle implements DBStyle {
 				.append(STATEMENT_START).append("}}").append(STATEMENT_END).toString();
 	}
 	
-	/****
-	 * 生成批量更新set子句
-	 * @param tableName
-	 * @param fieldName
-	 * @return
-	 */
-	private String appendBatchSet(String tableName,String fieldName,String idName) {
-		String colName = nameConversion.getColName(fieldName);
-		if (metadataManager.existColName(tableName, colName)) {
-			StringBuilder sb = new StringBuilder(colName+" = case ").append(idName).append(lineSeparator)
-				.append(STATEMENT_START).append("for(obj in map){").append(STATEMENT_END)
-				.append(STATEMENT_START).append("if(!isEmpty(obj."+fieldName+")){").append(STATEMENT_END)
-				.append(" when ")
-				.append(HOLDER_START+ "obj."+idName + HOLDER_END)
-				.append(" then ")
-				.append(HOLDER_START+ "obj."+fieldName + HOLDER_END).append(lineSeparator)
-				.append(STATEMENT_START).append("}}").append(STATEMENT_END)
-				.append(" end ,").append(lineSeparator);
-			 return sb.toString();
-		}
-		return "";
-	}
+
 }
