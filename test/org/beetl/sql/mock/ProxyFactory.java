@@ -10,7 +10,7 @@
  * ------------------------------------------------------------------  
  * 2015年8月18日        suxj     1.0     1.0 Version  
  */ 
-package org.beetl.sql.mapping;
+package org.beetl.sql.mock;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
@@ -78,7 +78,7 @@ public class ProxyFactory {
 	/**
 	 * 
 	 * @MethodName: createTargetProxy   
-	 * @Description: 创建一个目标代理  
+	 * @Description: 创建一个目标代理 : 此处target一般为Driver,ps,rs等
 	 * @param @param target 目标类 
 	 * @param @param handler	
 	 * @param @return  

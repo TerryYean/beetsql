@@ -9,6 +9,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 
+import org.beetl.sql.mock.ProxyFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
