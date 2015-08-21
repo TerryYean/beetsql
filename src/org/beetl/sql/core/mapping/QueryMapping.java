@@ -42,8 +42,7 @@ public class QueryMapping {
 		try {
 			return rsh.handle(rs);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-		return null;
 	}
 }

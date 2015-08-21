@@ -33,7 +33,7 @@ public class PageSelectTest {
 	public void selectPageByTemplate(){
 		User user = new User();
 		user.setAge(11);
-		long total = manager.selectCountByTemplate(user);
+		long total = manager.count(user);
 		System.out.println(total);
 		List<User> userList  = manager.selectByTemplate(user,1,2);
 		

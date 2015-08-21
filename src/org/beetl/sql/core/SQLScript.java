@@ -163,6 +163,12 @@ public class SQLScript {
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("_root", paras);
+		return this.singleSelect(map, target);
+	}
+	
+	
+	public <T> T singleSelect(Map map, Class<T> target) {
+		
 		List<T> result = select(target, map);
 		
 		if(result.size() > 0){
@@ -179,6 +185,9 @@ public class SQLScript {
 	}
 
 	public <T> List<T> select(Class<T> clazz, Map<String, Object> paras,RowMapper mapper) {
+		
+		
+		
 		SQLResult result = run(paras);
 		String sql = result.jdbcSql;
 		List<Object> objs = result.jdbcPara;
@@ -285,10 +294,10 @@ public class SQLScript {
 	 * @return
 	 */
 	public <T> List<T> select(Map<String, Object> paras,
-			Class<T> mapping, long start, long size) {
+			Class<T> mapping,RowMapper mapper, long start, long size) {
 		SQLScript pageScript = this.sm.getPageSqlScript(this.id);
 		this.sm.getDbStyle().initPagePara(paras, start, size);
-		return pageScript.select(mapping, paras);
+		return pageScript.select(mapping, paras,mapper);
 //		return pageScript.se
 	}
 	
@@ -301,10 +310,10 @@ public class SQLScript {
 	 * @return
 	 */
 	public <T> List<T> select(Object paras,
-			Class<T> mapping, long start, long end) {
+			Class<T> mapping, RowMapper mapper,long start, long end) {
 		Map map = new HashMap();
 		map.put("_root", paras);
-		return this.select(map, mapping, start, end);
+		return this.select(map, mapping,mapper, start, end);
 	}
 	/**
 	 * 翻页总数
@@ -402,7 +411,7 @@ public class SQLScript {
 	 * @param obj
 	 * @return
 	 */
-	public <T> T unique(Class<T> clazz, Object ...value) {
+	public <T> T unique(Class<T> clazz,RowMapper mapper, Object ...value) {
 		
 		MetadataManager mm = this.sm.getDbStyle().getMetadataManager();
 		List<String> pkNames = mm.getIds(this.sm.getNc().getTableName(clazz));

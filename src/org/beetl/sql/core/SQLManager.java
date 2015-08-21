@@ -10,6 +10,7 @@ import static org.beetl.sql.core.kit.Constants.UPDATE_ALL;
 import static org.beetl.sql.core.kit.Constants.UPDATE_BY_ID;
 import static org.beetl.sql.core.kit.Constants.classSQL;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -138,19 +139,8 @@ public class SQLManager {
 		return new SQLScript(source, this);
 	}
 	
-//	/****
-//	 * 获取总行数语句
-//	 * @param sql
-//	 * @return
-//	 */
-//	public SQLScript getCountSqlScript(String sql) {
-//		if(!sql.toLowerCase().startsWith("select")){
-//			throw new RuntimeException("这不是一个查询语句");
-//		}
-//		sql = "select count(*) "+sql.toLowerCase().substring(sql.indexOf("from"));
-//		return new SQLScript(sql, this);
-//	}
-	
+
+	/*============ 查询部分 ==================*/
 	/**
 	 * 通过sqlId进行查询:查询自定义语句
 	 * @param sqlId
@@ -160,18 +150,17 @@ public class SQLManager {
 	 */
 	public <T> List<T> select(String sqlId, Class<T> clazz, Map<String, Object> paras) { 
 		
-		SQLScript script = getScript(sqlId);
-		return script.select(clazz, paras);
+		return this.select(sqlId, clazz, paras, null);
 	}
 	
 	public <T> List<T> select(String sqlId, Class<T> clazz, Map<String, Object> paras,RowMapper mapper) { 
 		
 		SQLScript script = getScript(sqlId);
-		return script.select(clazz, paras);
+		return script.select(clazz, paras,mapper);
 	}
 	
 	/**
-	 * 通过sqlId进行查询:查询自定义语句
+	 * 通过sqlId进行查询:输出条件是个Bean
 	 * @param sqlId
 	 * @param clazz
 	 * @param paras
@@ -179,24 +168,59 @@ public class SQLManager {
 	 */
 	public <T> List<T> select(String sqlId, Class<T> clazz, Object paras) { 
 		
+		return this.select(sqlId, clazz, paras, null);
+	}
+	
+	/**
+	 * 通过sqlId进行查询:输出条件是个Bean
+	 * @param sqlId
+	 * @param clazz
+	 * @param paras
+	 * @return List<Pojo>
+	 */
+	public <T> List<T> select(String sqlId, Class<T> clazz, Object paras,RowMapper mapper) { 
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("_root",paras);
 		SQLScript script = getScript(sqlId);
-		return script.select(clazz, paras);
+		return script.select(clazz, param,mapper);
 	}
 	
 	
+	
+	
+	/** 翻页查询
+	 * @param sqlId
+	 * @param clazz
+	 * @param paras
+	 * @param start
+	 * @param size
+	 * @return
+	 */
 	public <T> List<T> select(String sqlId, Class<T> clazz, Object paras,int start,int size) { 
 		
+		return this.select(sqlId, clazz, paras, null, start, size);
+	}
+	
+	public <T> List<T> select(String sqlId, Class<T> clazz, Object paras,RowMapper mapper,int start,int size) { 
+		
 		SQLScript script = getScript(sqlId);
-		return script.select(paras, clazz, start, size);
+		Map map = new HashMap();
+		map.put("_root", paras);
+		return script.select(map, clazz, mapper,start, size);
 	}
 	
 	public <T> List<T> select(String sqlId, Class<T> clazz, Map paras,int start,int size) { 
 		
 		SQLScript script = getScript(sqlId);
-		return script.select(paras, clazz, start, size);
+		return script.select(paras, clazz, null,start, size);
 	}
 	
 	
+	public <T> List<T> select(String sqlId, Class<T> clazz, Map paras,RowMapper mapper,int start,int size) { 
+		
+		SQLScript script = getScript(sqlId);
+		return script.select(paras, clazz, mapper,start, size);
+	}
 	
 	
 	/**
@@ -215,6 +239,13 @@ public class SQLManager {
 		return script.select(clazz, null);
 	}
 	
+	
+	public <T> List<T> selectAll(Class<T> clazz,RowMapper mapper) {
+
+		SQLScript script = getScript(clazz, SELECT_ALL);
+		return script.select(clazz, null,mapper);
+	}
+	
 	/**
 	 * 
 	 * select * from user where 1=1 and id= #id#
@@ -224,10 +255,17 @@ public class SQLManager {
 	 * @param value
 	 * @return
 	 */
-	public <T> T selectById(Class<T> clazz, Object ...pkValues) {
+	public <T> T selectById(Class<T> clazz,Object ...pkValues) {
 		
 		SQLScript script = getScript(clazz, SELECT_BY_ID);
-		return script.unique(clazz, pkValues);
+		return script.unique(clazz, null,pkValues);
+	}
+	
+
+	public <T> T selectById(Class<T> clazz, RowMapper mapper,Object ...pkValues) {
+		
+		SQLScript script = getScript(clazz, SELECT_BY_ID);
+		return script.unique(clazz, mapper,pkValues);
 	}
 	
 	/**
@@ -249,24 +287,39 @@ public class SQLManager {
 	 * @param user
 	 * @return
 	 */
+	public <T> List<T> selectByTemplate(T t,RowMapper mapper) {
+		
+		SQLScript script = getScript(t.getClass(), SELECT_BY_TEMPLATE);
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("_root",t);
+		return (List<T>) script.select(t.getClass(), param,mapper);
+	}
+	
+	
 	public <T> List<T> selectByTemplate(T t) {
 		
 		SQLScript script = getScript(t.getClass(), SELECT_BY_TEMPLATE);
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("_root",t);
-		return (List<T>) script.select(t.getClass(), param);
+		return (List<T>) script.select(t.getClass(), param,null);
 	}
+	
+
 	
 	public <T> List<T> selectByTemplate(T t,int start,int size) {
 		
+		return this.selectByTemplate(t, null, start, size);
+	}
 	
+	public <T> List<T> selectByTemplate(T t,RowMapper mapper,int start,int size) {		
+		
 		SQLScript script = getScript(t.getClass(), SELECT_BY_TEMPLATE);
 		SQLScript pageScript = this.getPageSqlScript(script.id);
 		Map<String, Object> param = new HashMap<String, Object>();
 		this.dbStyle.initPagePara(param, start, size);
 		param.put("_root",t);
 		
-		return (List<T>) pageScript.select(t.getClass(), param);
+		return (List<T>) pageScript.select(t.getClass(), param,mapper);
 	}
 	
 	/**
@@ -278,14 +331,45 @@ public class SQLManager {
 	 * @return long  
 	 * @throws
 	 */
-	public <T> long selectCountByTemplate(T t) {
+	public <T> long count(T t) {
 		
 		SQLScript script = getScript(t.getClass(), SELECT_ACCOUNT_BY_TEMPLATE);
 		Long l = script.singleSelect(t, Long.class);
 		return l;
 	}
 	
+	
+	public Long  selectLong(String id,Map paras) {
+		return this.singleSelect(id, paras, Long.class);
+	}
+	
+	public Long  selectLong(String id,Object paras) {
+		return this.singleSelect(id, paras, Long.class);
+	}
+	
+	public Integer  selectInt(String id,Object paras) {
+		return this.singleSelect(id, paras, Integer.class);
+	}
+	
+	public Integer  selectInt(String id,Map paras) {
+		return this.singleSelect(id, paras, Integer.class);
+	}
+	
+	public BigDecimal  selectBigDecimal(String id,Object paras) {
+		return this.singleSelect(id, paras, BigDecimal.class);
+	}
+	
+	public BigDecimal  selectBigDecimal(String id,Map paras) {
+		return this.singleSelect(id, paras, BigDecimal.class);
+	}
+	
 	public <T> T singleSelect(String id,Object paras, Class<T> target) {
+		SQLScript script = getScript(id);
+		return script.singleSelect(paras, target);
+	}
+	
+	
+	public <T> T singleSelect(String id,Map paras, Class<T> target) {
 		SQLScript script = getScript(id);
 		return script.singleSelect(paras, target);
 	}

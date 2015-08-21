@@ -14,13 +14,13 @@ package org.beetl.sql.core.mapping.handler;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
 
 import org.beetl.sql.core.NameConversion;
 import org.beetl.sql.core.mapping.BasicRowProcessor;
 import org.beetl.sql.core.mapping.ResultSetHandler;
 import org.beetl.sql.core.mapping.RowProcessor;
 
-import com.sun.javafx.collections.MappingChange.Map;
 
 /**  
  * @ClassName: MapHandler   
