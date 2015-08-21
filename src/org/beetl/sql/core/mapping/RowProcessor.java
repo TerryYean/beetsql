@@ -29,5 +29,5 @@ public interface RowProcessor {
 	
 	<T> List<T> toBeanList(ResultSet rs, Class<T> type) throws SQLException;
 
-	Map<String, Object> toMap(ResultSet rs, Class type) throws SQLException;
+	Map<String, Object> toMap(ResultSet rs, Class<?> type) throws SQLException;
 }

@@ -139,7 +139,7 @@ public class BeanProcessor {
 	 * @return Map<String,Object>  
 	 * @throws
 	 */
-	public Map<String, Object> toMap(Class c,ResultSet rs) throws SQLException {
+	public Map<String, Object> toMap(Class<?> c,ResultSet rs) throws SQLException {
 
 		Map<String, Object> result = new CaseInsensitiveHashMap();
 		ResultSetMetaData rsmd = rs.getMetaData();
@@ -391,7 +391,7 @@ public class BeanProcessor {
 	 * @return int[]  
 	 * @throws
 	 */
-	protected int[] mapColumnsToProperties(Class c,ResultSetMetaData rsmd, PropertyDescriptor[] props) throws SQLException {
+	protected int[] mapColumnsToProperties(Class<?> c,ResultSetMetaData rsmd, PropertyDescriptor[] props) throws SQLException {
 
 		int cols = rsmd.getColumnCount();
 		int[] columnToProperty = new int[cols + 1];
