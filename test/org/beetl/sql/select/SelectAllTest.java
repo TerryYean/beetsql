@@ -13,6 +13,7 @@ import org.beetl.sql.core.RowMapper;
 import org.beetl.sql.core.SQLLoader;
 import org.beetl.sql.core.SQLManager;
 import org.beetl.sql.core.db.MySqlStyle;
+import org.beetl.sql.pojo.Role;
 import org.beetl.sql.pojo.User;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,7 +52,8 @@ public class SelectAllTest {
 				User u = new User();
 				u.setId(rs.getInt(3));
 				u.setName(rs.getString(4));
-				
+				Role r = manager.selectById(Role.class, rs.getInt(5));
+				u.setRole(r);
 				return u;
 			}
 		});

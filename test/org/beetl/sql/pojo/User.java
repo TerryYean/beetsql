@@ -23,6 +23,7 @@ public class User {
 	String name;
 	Integer age;
 	String userName;
+	Role role;
 
 
 	public String getName() {
@@ -56,11 +57,19 @@ public class User {
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
+	
+	public Role getRole() {
+		return role;
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
+	}
 
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", name=" + name + ", age=" + age
-				+ ", userName=" + userName + "]";
+				+ ", userName=" + userName + ", role=" + role + "]";
 	}
-	
+
 }
