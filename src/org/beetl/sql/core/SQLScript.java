@@ -21,6 +21,7 @@ import org.beetl.sql.core.db.KeyHolder;
 import org.beetl.sql.core.db.MetadataManager;
 import org.beetl.sql.core.kit.MapKit;
 import org.beetl.sql.core.mapping.QueryMapping;
+import org.beetl.sql.core.mapping.RowMapperResultSetExt;
 import org.beetl.sql.core.mapping.handler.BeanHandler;
 import org.beetl.sql.core.mapping.handler.BeanListHandler;
 import org.beetl.sql.core.mapping.handler.MapListHandler;
@@ -183,11 +184,8 @@ public class SQLScript {
 		map.put("_root", paras);
 		return this.select(clazz, map);
 	}
-
-	public <T> List<T> select(Class<T> clazz, Map<String, Object> paras,RowMapper mapper) {
-		
-		
-		
+	
+	public <T> List<T> select(Class<T> clazz, Map<String, Object> paras, RowMapper<T> mapper) {
 		SQLResult result = run(paras);
 		String sql = result.jdbcSql;
 		List<Object> objs = result.jdbcPara;
@@ -202,6 +200,10 @@ public class SQLScript {
 			for (int i = 0; i < objs.size(); i++)
 				ps.setObject(i + 1, objs.get(i));
 			rs = ps.executeQuery();
+			
+			if(mapper != null){
+				return new RowMapperResultSetExt<T>(mapper).handleResultSet(rs);
+			}
 			
 			resultList = mappingSelect(rs, clazz);
 			

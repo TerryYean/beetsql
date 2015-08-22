@@ -7,10 +7,11 @@ import java.sql.SQLException;
  * @author xiandafu
  *
  */
-public interface RowMapper {
-	 public void mapRow(Object obj,ResultSet rs, int rowNum,RowMapperContext ctx) throws SQLException;
+public interface RowMapper<T> {
+	
+//	 穿Object不行，如果object为处理后的值，那么在用户实现的RowMapper中
+//	 还是要再次处理，如果是List，还是要在循环。
+//	 T mapRow(T obj,ResultSet rs) throws SQLException;
+	 
+	 T mapRow(ResultSet rs, int rowNum) throws SQLException;
 }
-
-//mapRow()参数适当减几个，晚上回家研究
-//写一个RowMap处理类供后端调用mapRow方法
-//提交代码回家搞起

@@ -3,10 +3,13 @@
  */
 package org.beetl.sql.select;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.beetl.sql.buildsql.MySqlConnectoinSource;
 import org.beetl.sql.core.ClasspathLoader;
+import org.beetl.sql.core.RowMapper;
 import org.beetl.sql.core.SQLLoader;
 import org.beetl.sql.core.SQLManager;
 import org.beetl.sql.core.db.MySqlStyle;
@@ -32,6 +35,26 @@ public class SelectAllTest {
 	public void selectAll(){
 		
 		List<User> userList = manager.selectAll(User.class);
+		for(User user : userList){
+			System.out.println(user);
+		}
+		
+	}
+	
+	@Test
+	public void selectAll_RowMapper(){
+		
+		List<User> userList = manager.selectAll(User.class, new RowMapper<User>() {
+
+			@Override
+			public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+				User u = new User();
+				u.setId(rs.getInt(3));
+				u.setName(rs.getString(4));
+				
+				return u;
+			}
+		});
 		for(User user : userList){
 			System.out.println(user);
 		}
