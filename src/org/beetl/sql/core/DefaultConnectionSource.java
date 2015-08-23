@@ -6,7 +6,7 @@ import java.util.Random;
 
 import javax.sql.DataSource;
 
-class DefaultConnectionSource implements ConnectionSource{
+public class DefaultConnectionSource implements ConnectionSource{
 	DataSource master = null;
 	DataSource[] slaves = null;
 	public DefaultConnectionSource(){
