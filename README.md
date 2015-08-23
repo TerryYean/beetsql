@@ -218,3 +218,28 @@ Spring集成
 * nc:  命名转化，有驼峰的HumpNameConversion，有数据库下划线的UnderlinedNameConversion
 
 * interceptors:DebugInterceptor 用来打印sql语句，参数和执行时间
+
+
+
+JFinal集成
+===
+
+在configPlugin 里配置BeetlSql
+
+	JFinalBeetlSql.init();
+默认会采用c3p0 作为数据源，其配置来源于jfinal 配置，如果你自己提供数据源或者主从，可以如下
+	
+	JFinalBeetlSql.init(master,slaves);
+	
+由于使用了Beetlsql，因此你无需再配置 数据库连接池插件，和ActiveRecordPlugin，如下代码可以注释掉
+
+	//		C3p0Plugin c3p0Plugin = new C3p0Plugin(PropKit.get("jdbcUrl"), PropKit.get("user"), PropKit.get("password").trim());
+	//		me.add(c3p0Plugin);
+	//		ActiveRecordPlugin arp = new ActiveRecordPlugin(c3p0Plugin);
+	//		me.add(arp);
+	//		arp.addMapping("blog", Blog.class);	// 映射blog 表到 Blog模型
+
+在controller里，可以通过JFinalBeetlSql.dao 方法获取到SQLManager
+
+	SQLManager dao = JFinalBeetlSql.dao();
+	long count = dao.selectLong("blog.count", Collections.EMPTY_MAP);
