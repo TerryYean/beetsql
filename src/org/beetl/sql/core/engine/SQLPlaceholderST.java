@@ -1,6 +1,7 @@
 package org.beetl.sql.core.engine;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.beetl.core.Context;
@@ -18,14 +19,16 @@ public class SQLPlaceholderST extends Statement
 	public Expression expression;
 	public Type type = null;
 	FormatExpression format;
-	List textFunList ;
+	static List textFunList = new ArrayList<String>();
+	static{
+		textFunList.add("text");
+	}
 
-	public SQLPlaceholderST(PlaceholderST st,List textFunList)
+	public SQLPlaceholderST(PlaceholderST st)
 	{
 		super(st.token);
 		this.type = st.type;
 		this.expression = st.expression;
-		this.textFunList = textFunList;
 
 	}
 
@@ -35,9 +38,13 @@ public class SQLPlaceholderST extends Statement
 		try{
 			Object value = expression.evaluate(ctx);
 			if(expression instanceof FunctionExpression){
+				//db 开头或者内置的方法直接输出
 				FunctionExpression fun = (FunctionExpression)expression;
 				String funName = fun.token.text;
-				if(textFunList.contains(funName)){
+				if(funName.startsWith("db")){
+					ctx.byteWriter.writeString(value!=null?value.toString():"");
+					return ;
+				}else if(textFunList.contains(funName)){
 					ctx.byteWriter.writeString(value!=null?value.toString():"");
 					return ;
 				}

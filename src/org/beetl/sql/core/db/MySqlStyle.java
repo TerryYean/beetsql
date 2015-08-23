@@ -54,4 +54,9 @@ public class MySqlStyle extends AbstractDBStyle {
 		return idType;
 		
 	}
+
+	@Override
+	public String getName() {
+		return "mysql";
+	}
 }

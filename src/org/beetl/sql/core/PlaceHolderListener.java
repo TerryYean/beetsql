@@ -12,9 +12,9 @@ import org.beetl.sql.core.engine.SQLVarRef;
 
 public class PlaceHolderListener implements Listener {
 
-	List textFunList = null;
-	public PlaceHolderListener(List textFunList){
-		this.textFunList = textFunList;
+	
+	public PlaceHolderListener(){
+		
 	}
 	@SuppressWarnings("rawtypes")
 	@Override
@@ -23,7 +23,7 @@ public class PlaceHolderListener implements Listener {
 		Object o = stack.peek();
 		if (o instanceof PlaceholderST) {
 			PlaceholderST gf = (PlaceholderST) o;
-			SQLPlaceholderST rf = new SQLPlaceholderST(gf,textFunList);
+			SQLPlaceholderST rf = new SQLPlaceholderST(gf);
 			return rf;
 		} else if (o instanceof VarRef) {
 			VarRef ref = (VarRef) o;

@@ -33,6 +33,7 @@ public interface DBStyle {
 	public SQLSource genUpdateTemplate(Class<?> cls);
 	public SQLSource genInsert(Class<?> cls);
 	
+	public String getName();
 	
 	public String getPageSQL(String sql);
 	public void initPagePara(Map paras,long start,long size);

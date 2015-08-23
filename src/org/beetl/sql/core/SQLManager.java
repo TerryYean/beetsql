@@ -2,7 +2,7 @@ package org.beetl.sql.core;
 
 import static org.beetl.sql.core.kit.Constants.DELETE_BY_ID;
 import static org.beetl.sql.core.kit.Constants.INSERT;
-import static org.beetl.sql.core.kit.Constants.SELECT_ACCOUNT_BY_TEMPLATE;
+import static org.beetl.sql.core.kit.Constants.SELECT_COUNT_BY_TEMPLATE;
 import static org.beetl.sql.core.kit.Constants.SELECT_ALL;
 import static org.beetl.sql.core.kit.Constants.SELECT_BY_ID;
 import static org.beetl.sql.core.kit.Constants.SELECT_BY_TEMPLATE;
@@ -86,7 +86,7 @@ public class SQLManager {
 				tempSource = this.dbStyle.genSelectByTemplate(cls);
 				break ;
 			}
-			case SELECT_ACCOUNT_BY_TEMPLATE: {
+			case SELECT_COUNT_BY_TEMPLATE: {
 				tempSource = this.dbStyle.genSelectCountByTemplate(cls);
 				break ;
 			}
@@ -142,7 +142,7 @@ public class SQLManager {
 
 	/*============ 查询部分 ==================*/
 	/**
-	 * 通过sqlId进行查询:查询自定义语句
+	 * 通过sqlId进行查询,查询结果映射到clazz上
 	 * @param sqlId
 	 * @param clazz
 	 * @param paras
@@ -152,7 +152,14 @@ public class SQLManager {
 		
 		return this.select(sqlId, clazz, paras, null);
 	}
-	
+	/**
+	 * 通过sqlId进行查询,查询结果映射到clazz上，mapper类可以定制映射
+	 * @param sqlId
+	 * @param clazz
+	 * @param paras
+	 * @param mapper
+	 * @return
+	 */
 	public <T> List<T> select(String sqlId, Class<T> clazz, Map<String, Object> paras,RowMapper mapper) { 
 		
 		SQLScript script = getScript(sqlId);
@@ -160,7 +167,8 @@ public class SQLManager {
 	}
 	
 	/**
-	 * 通过sqlId进行查询:输出条件是个Bean
+	 * 通过sqlId进行查询，查询结果映射到clazz上，输入条件是个Bean，Bean的属性可以被sql语句引用，如bean中有name属性,即方法getName,则sql语句可以包含
+	 * name属性，如select * from xxx where name = #name#
 	 * @param sqlId
 	 * @param clazz
 	 * @param paras
@@ -172,7 +180,8 @@ public class SQLManager {
 	}
 	
 	/**
-	 * 通过sqlId进行查询:输出条件是个Bean
+	 * 通过sqlId进行查询:查询结果映射到clazz上，输入条件是个Bean,Bean的属性可以被sql语句引用，如bean中有name属性,即方法getName,则sql语句可以包含
+	 * name属性，如select * from xxx where name = #name#。mapper类可以指定结果映射方式
 	 * @param sqlId
 	 * @param clazz
 	 * @param paras
@@ -224,10 +233,7 @@ public class SQLManager {
 	
 	
 	/**
-	 * 
-	 * select * from use
-	 * 
-	 * btsql自动生成查询语句
+	 * btsql自动生成查询语句，查询clazz代表的表的所有数据。
 	 * @param tempId
 	 * @param clazz
 	 * @param paras
@@ -247,12 +253,10 @@ public class SQLManager {
 	}
 	
 	/**
-	 * 
-	 * select * from user where 1=1 and id= #id#
-	 * 
-	 * 获取唯一记录
+	 * 根据主键查询
+	 * 获取唯一记录，如果纪录不存在，将会抛出异常
 	 * @param clazz
-	 * @param value
+	 * @param pkValues 主键 
 	 * @return
 	 */
 	public <T> T selectById(Class<T> clazz,Object ...pkValues) {
@@ -268,6 +272,7 @@ public class SQLManager {
 		return script.unique(clazz, mapper,pkValues);
 	}
 	
+	/*=========模版查询===============*/
 	/**
 	 * 
 	 * select * from user where 1=1 
@@ -287,6 +292,14 @@ public class SQLManager {
 	 * @param user
 	 * @return
 	 */
+	public <T> List<T> selectByTemplate(T t) {
+		
+		SQLScript script = getScript(t.getClass(), SELECT_BY_TEMPLATE);
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("_root",t);
+		return (List<T>) script.select(t.getClass(), param,null);
+	}
+	
 	public <T> List<T> selectByTemplate(T t,RowMapper mapper) {
 		
 		SQLScript script = getScript(t.getClass(), SELECT_BY_TEMPLATE);
@@ -296,13 +309,7 @@ public class SQLManager {
 	}
 	
 	
-	public <T> List<T> selectByTemplate(T t) {
-		
-		SQLScript script = getScript(t.getClass(), SELECT_BY_TEMPLATE);
-		Map<String, Object> param = new HashMap<String, Object>();
-		param.put("_root",t);
-		return (List<T>) script.select(t.getClass(), param,null);
-	}
+	
 	
 
 	
@@ -333,7 +340,7 @@ public class SQLManager {
 	 */
 	public <T> long count(T t) {
 		
-		SQLScript script = getScript(t.getClass(), SELECT_ACCOUNT_BY_TEMPLATE);
+		SQLScript script = getScript(t.getClass(), SELECT_COUNT_BY_TEMPLATE);
 		Long l = script.singleSelect(t, Long.class);
 		return l;
 	}
@@ -497,4 +504,10 @@ public class SQLManager {
 		return dbStyle;
 	}
 
+	public Beetl getBeetl() {
+		return beetl;
+	}
+
+	
+	
 }

@@ -3,7 +3,7 @@ package org.beetl.sql.core.kit;
 public class Constants {
 	public static final int SELECT_BY_ID = 0;
 	public static final int SELECT_BY_TEMPLATE = 1;
-	public static final int SELECT_ACCOUNT_BY_TEMPLATE = 2;	
+	public static final int SELECT_COUNT_BY_TEMPLATE = 2;	
 	public static final int DELETE_BY_ID = 3;
 	public static final int SELECT_ALL = 4;
 	public static final int UPDATE_ALL = 5;

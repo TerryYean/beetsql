@@ -41,6 +41,9 @@ public class ClasspathLoader implements SQLLoader {
 	
 	private boolean autoCheck = true;
 
+	public  ClasspathLoader() {
+		this.sqlRoot = "/sql";
+	}
 	public  ClasspathLoader(String root) {
 		this.sqlRoot = root;
 	}
@@ -158,114 +161,14 @@ public class ClasspathLoader implements SQLLoader {
 		return sqlSourceMap;
 	}
 
-//	@Override
-//	public SQLSource getSelectByid(Class<?> cls) {
-//		String className = cls.getSimpleName().toLowerCase();
-//		SQLSource tempSource = sqlSourceMap.get(className + ".selectByid");
-//		if (tempSource != null) {
-//			return tempSource;
-//		}
-//		tempSource = dbs.generationSelectByid(cls);
-//		sqlSourceMap.put(className + ".selectByid", tempSource);
-//		return tempSource;
-//	}
-//
-//	@Override
-//	public SQLSource getSelectByTemplate(Class<?> cls) {
-//		String className = cls.getSimpleName().toLowerCase();
-//		SQLSource tempSource = sqlSourceMap.get(className
-//				+ ".getByTemplate");
-//		if (tempSource != null) {
-//			return tempSource;
-//		}
-//		tempSource = dbs.generationSelectByTemplate(cls);
-//		sqlSourceMap.put(className + ".getByTemplate", tempSource);
-//		return tempSource;
-//	}
-//
-//	@Override
-//	public SQLSource getDeleteByid(Class<?> cls) {
-//		String className = cls.getSimpleName().toLowerCase();
-//		SQLSource tempSource = sqlSourceMap.get(className + ".deleteByid");
-//		if (tempSource != null) {
-//			return tempSource;
-//		}
-//		tempSource = dbs.generationDeleteByid(cls);
-//		sqlSourceMap.put(className + ".deleteByid", tempSource);
-//		return tempSource;
-//	}
-//
-//	@Override
-//	public SQLSource getSelectAll(Class<?> cls) {
-//		String className = cls.getSimpleName().toLowerCase();
-//		SQLSource tempSource = sqlSourceMap.get(className + ".selectAll");
-//		if (tempSource != null) {
-//			return tempSource;
-//		}
-//		tempSource = dbs.generationSelectAll(cls);
-//		sqlSourceMap.put(className + ".selectAll", tempSource);
-//		return tempSource;
-//	}
-//
-//	@Override
-//	public SQLSource getUpdateAll(Class<?> cls) {
-//		String className = cls.getSimpleName().toLowerCase();
-//		SQLSource tempSource = sqlSourceMap.get(className + ".updateAll");
-//		if (tempSource != null) {
-//			return tempSource;
-//		}
-//		tempSource = dbs.generationUpdateAll(cls);
-//		sqlSourceMap.put(className + ".updateAll", tempSource);
-//		return tempSource;
-//	}
-//
-//	@Override
-//	public SQLSource getUpdateByid(Class<?> cls) {
-//		String className = cls.getSimpleName().toLowerCase();
-//		SQLSource tempSource = sqlSourceMap.get(className + ".updateByid");
-//		if (tempSource != null) {
-//			return tempSource;
-//		}
-//		tempSource = dbs.generationUpdateByid(cls);
-//		sqlSourceMap.put(className + ".updateByid", tempSource);
-//		return tempSource;
-//	}
-//	@Override
-//	public SQLSource getUpdateTemplate(Class<?> cls) {
-//		String className = cls.getSimpleName().toLowerCase();
-//		SQLSource tempSource = sqlSourceMap.get(className + ".updateTemplate");
-//		if (tempSource != null) {
-//			return tempSource;
-//		}
-//		tempSource = dbs.generationUpdateTemplate(cls);
-//		sqlSourceMap.put(className + ".updateTemplate", tempSource);
-//		return tempSource;
-//	}
-//	@Override
-//	public SQLSource getBatchUpdateByid(Class<?> cls) {
-//		String className = cls.getSimpleName().toLowerCase();
-//		SQLSource tempSource = sqlSourceMap.get(className + ".batchUpdateByid");
-//		if (tempSource != null) {
-//			return tempSource;
-//		}
-//		tempSource = dbs.generationBatchUpdateByid(cls);
-//		sqlSourceMap.put(className + ".batchUpdateByid", tempSource);
-//		return tempSource;
-//	}
-//	@Override
-//	public SQLSource getInsert(Class<?> cls) {
-//		String className = cls.getSimpleName().toLowerCase();
-//		SQLSource tempSource = sqlSourceMap.get(className + ".insert");
-//		if (tempSource != null) {
-//			return tempSource;
-//		}
-//		tempSource = dbs.generationInsert(cls);
-//		sqlSourceMap.put(className + ".insert", tempSource);
-//		return tempSource;
-//	}
-
-
 	
+	
+	public String getSqlRoot() {
+		return sqlRoot;
+	}
+	public void setSqlRoot(String sqlRoot) {
+		this.sqlRoot = sqlRoot;
+	}
 	private File getFile(String id){
 		String modelName = id.substring(0, id.lastIndexOf(".") + 1);
 		URL  url = this.getClass().getResource(

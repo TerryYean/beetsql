@@ -337,7 +337,11 @@ public abstract class AbstractDBStyle implements DBStyle {
 				.append(STATEMENT_START).append("}}").append(STATEMENT_END).toString();
 	}
 	
-	
+	private String getTableName(Class c){
+		
+		return nameConversion.getTableName(c);
+		
+	}
 	
 
 }

@@ -44,4 +44,9 @@ public class OracleStyle extends AbstractDBStyle {
 
 	}
 
+	@Override
+	public String getName() {
+		return "oracle";
+	}
+
 }

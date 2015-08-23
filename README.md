@@ -6,6 +6,7 @@
 * 数据模型支持Pojo，也支持Map/List这种无模型的模型
 * SQL 模板基于Beetl实现，更容易写和调试，以及扩展
 * 无需注解，自动生成大量内置SQL，轻易完成增删改查功能
+* 简单支持关系映射而不引入复杂的OR Mapping概念和技术。
 * 支持跨数据库平台，开发者所需工作减少到最小
 * 具备Interceptor功能，可以调试，性能诊断SQL，以及扩展其他功能
 * 内置支持主从数据库，通过扩展，可以支持更复杂的分库分表逻辑
@@ -14,10 +15,10 @@
 
 代码例子
 ===
-
-	List<User>  list = SqlManager.getSQLScript("selectUser").select(paras,User.class);
-	User user = SqlManager.getSql(User.class,SELECT_BY_ID).unque(id);
-	
+	 // 执行/user.md 里的select sql
+	List<User>  list = SqlManager.select(“user.select”,paras,User.class);
+	// 使用内置的生成的sql执行
+	User user = SqlManage.selectById.unque(User.class,id);
 
 SQL例子
 ===
@@ -46,7 +47,7 @@ BeetlSQL集中管理SQL语句，SQL 可以按照业务逻辑放到一个文件�
 * XML格式过于复杂，书写不方便
 * XML 格式有保留符号，写SQL的时候也不方便，如常用的< 符号 必须转义
 
-目前SQL文件格式如下
+目前SQL文件格式非常简单，仅仅是sqlId 和sql语句本身，如下
 
 			文件一些说明，放在头部可有可无，如果有说明，可以是任意文字
 			SQL标示
@@ -57,37 +58,33 @@ BeetlSQL集中管理SQL语句，SQL 可以按照业务逻辑放到一个文件�
 			===
 			SQL语句 2
 	
-所有SQL文件建议放到一个db目录，db目录有多个子目录，表示数据库类型，比如db下有common，这是公共SQL语句
-还有mysql，oralce。当程序获取SQL语句得时候，先会根据数据库找特定数据库下的sql语句，如果未找到，会寻找common下的。如下代码
+所有SQL文件建议放到一个sql目录，sql目录有多个子目录，表示数据库类型，这是公共SQL语句放到sql目录下，特定数据库的sql语句放到各自自目录下
+当程序获取SQL语句得时候，先会根据数据库找特定数据库下的sql语句，如果未找到，会寻找sql下的。如下代码
 
-			SqlScript sql = SqlManager.getSql("sys.user.update"); 
+			SqlScript sql = SqlManager.getSql("user.update"); 
 			
-SqlManager 会根据当前使用的数据库，先找db/mysql/sys/user.md 文件，确认是否有update语句，如果没有，则会寻找db/common/sys/user.md 
+SqlManager 会根据当前使用的数据库，先找sql/mysql/user.md 文件，确认是否有update语句，如果没有，则会寻找sql/user.md 
 
 
 丰富的数据模型支持
 ===
 BeetlSql 适合各种类型的引用，对于大中小型应用，模型通常是Pojo，这样易于维护和与三方系统交互，对于特小型项目，往往不需要严格的模型，表示业务实体通常是Map/List 组合。SQL语句的输入可以是Pojo或者Map，SQL语句执行结果也可以映射到Pojo和Map。
 
-			SqlScript sql = SqlManager.getSql("user.update");
-			int result = sql.update(user);
+			int result = sqlManager.update("user.update",user);
+			List<User> list = sqlManager.select("user.select",user,User.class);
 			
-			SqlScript sql = SqlManager.getSql("user.select");
-			List<User> list = sql.select(user,User.class);
-			
-			SqlScript sql = SqlManager.getSql("user.select");
 			Map paras = new HashMap();
 			paras.put("age",11);
-			User user = sql.single(paras,User.class);
+			User user = sqlManager.single("user.select",paras,User.class);
 			//or 
-			Map user = sql.single(paras,Map.class);
+			Map user = sqlManager.single("user.select",paras,Map.class);
 		
 SQL 模板基于Beetl实现，更容易写和调试，以及扩展	
 ===		
 		
 SQL语句可以动态生成，基于Beetl语言，这是因为
 
-* beetl执行效率业界出名的高效 ，因此对于基于模板的动态sql语句，采用beetl非常合适
+* beetl执行效率高效 ，因此对于基于模板的动态sql语句，采用beetl非常合适
 
 * beetl 语法简单易用，可以通过半猜半式的方式实现，杜绝myBatis这样难懂难记得语法。BeetlSql学习曲线几乎没有
 
@@ -184,3 +181,40 @@ log表示按照一定规则分表，table可以根据输入的时间去确定是
 		where name = #name#
 
 
+Spring集成
+===
+
+	<bean id="sqlManager" class="org.beetl.sql.ext.SpringBeetlSql">
+		<property name="cs" >
+			<bean  class="org.beetl.sql.core.DefaultConnectionSource">
+				<property name="master" ref="dataSource"></property>
+			</bean>
+		</property>
+		<property name="dbStyle">
+			<bean class="org.beetl.sql.core.db.MySqlStyle"> </bean>
+		</property>
+		<property name="sqlLoader">
+			<bean class="org.beetl.sql.core.ClasspathLoader"> 
+				<property name="sqlRoot" value="/sql"></property>
+			</bean>
+		</property>
+		<property name="nc">
+			<bean class="org.beetl.sql.core.HumpNameConversion">
+			</bean>
+		</property>
+		<property name="interceptors">
+			<list>
+				<bean class="org.beetl.sql.ext.DebugInterceptor"></bean>
+			</list>
+		</property>
+	</bean>
+	
+* cs: 指定ConnectionSource，可以用系统提供的DefaultConnectionSource，支持按照CRUD决定主从。例子里只有一个master库
+
+* dbStyle: 数据库类型，目前只支持org.beetl.sql.core.db.MySqlStyle
+
+* sqlLoader: sql语句加载来源
+
+* nc:  命名转化，有驼峰的HumpNameConversion，有数据库下划线的UnderlinedNameConversion
+
+* interceptors:DebugInterceptor 用来打印sql语句，参数和执行时间

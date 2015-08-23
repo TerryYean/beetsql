@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.beetl.core.Configuration;
+import org.beetl.core.Function;
 import org.beetl.core.GroupTemplate;
 import org.beetl.sql.core.SQLLoader;
 
@@ -67,4 +68,6 @@ public class Beetl {
 	public GroupTemplate getGroupTemplate() {
 		return gt;
 	}
+	
+	
 }

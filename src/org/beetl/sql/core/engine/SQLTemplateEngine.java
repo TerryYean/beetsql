@@ -29,20 +29,9 @@ public class SQLTemplateEngine extends DefaultTemplateEngine
     private void modifyStatemetn(Resource resource,Program program,GroupTemplate gt){
             Statement[] sts = program.metaData.statements;
             StatementParser parser = new StatementParser(sts, gt, resource.getId());
-            String textOutput = (String)gt.getConf().getPs().get("TEXT");   
-            String textExtOutput = (String)gt.getConf().getPs().get("TEXT-EXT");  
-            if(textExtOutput!=null){
-            	textOutput=textExtOutput+","+textExtOutput;
-            }
-            List list ;
-            if(textOutput!=null){
-            	String[] textFun = textOutput.split(",");
-            	list = Arrays.asList(textFun);
-            }else{
-            	list = Collections.EMPTY_LIST;
-            }
-            parser.addListener(PlaceholderST.class, new PlaceHolderListener(list));
-            parser.addListener(VarRef.class, new PlaceHolderListener(list));
+            
+            parser.addListener(PlaceholderST.class, new PlaceHolderListener());
+            parser.addListener(VarRef.class, new PlaceHolderListener());
             
             parser.parse();
     }
