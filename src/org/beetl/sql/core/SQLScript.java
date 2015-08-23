@@ -249,7 +249,7 @@ public class SQLScript {
 		List<T> resultList = new ArrayList<T>();
 		
 		if(isBaseDataType(clazz)){ //基本数据类型，如果有需要可以继续在isBaseDataType()添加
-			T result = queryMapping.query(rs, new ScalarHandler<T>());
+			T result = queryMapping.query(rs, new ScalarHandler<T>(clazz));
 			resultList.add(result);
 		} else if(clazz.isAssignableFrom(Map.class)){ //如果是Map的子类或者父类，返回List<Map<String,Object>>
 			resultList = (List<T>) queryMapping.query(rs, new MapListHandler(this.sm.getNc()));

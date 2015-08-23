@@ -3,6 +3,7 @@
  */
 package org.beetl.sql.mapping;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
 
@@ -35,7 +36,7 @@ public class ScalarTest {
 		String sql = "select id from user1 where id=1";
 		ResultSet rs = base.getRs(conn, sql);
 		QueryMapping query = QueryMapping.getInstance();
-		Integer id = query.query(rs, new ScalarHandler<Integer>());
+		Integer id = query.query(rs, new ScalarHandler<Integer>(Integer.class));
 		System.out.println(id);
 		
 	}
@@ -46,7 +47,7 @@ public class ScalarTest {
 		String sql = "select id from user1 order by id desc";// 默认取第一条
 		ResultSet rs = base.getRs(base.getConn(), sql);
 		QueryMapping query = QueryMapping.getInstance();
-		Integer id = query.query(rs, new ScalarHandler<Integer>());//默认就去第一个字段
+		Integer id = query.query(rs, new ScalarHandler<Integer>(Integer.class));//默认就去第一个字段
 		System.out.println(id);
 	}
 	
@@ -56,17 +57,18 @@ public class ScalarTest {
 		String sql = "select age ,id ,name from user1 where id=1";// 默认取第一条记录的第一个字段（age）
 		ResultSet rs = base.getRs(base.getConn(), sql);
 		QueryMapping query = QueryMapping.getInstance();
-		Integer id = query.query(rs, new ScalarHandler<Integer>(1));//如果有多个字段可以自定义取第几个
+		Integer id = query.query(rs, new ScalarHandler<Integer>(2 ,Integer.class));//如果有多个字段可以自定义取第几个
 		System.out.println(id);
 	}
 	
+	//TODO 好困，睡晚在弄根据name取值的
 	@Test
 	public void query4() {
 		
 		String sql = "select age, id from user1";//count（*） 是long类型
 		ResultSet rs = base.getRs(base.getConn(), sql);
 		QueryMapping query = QueryMapping.getInstance();
-		Integer id = query.query(rs, new ScalarHandler<Integer>("id"));//如果有多个字段可以根据字段name取
+		Integer id = query.query(rs, new ScalarHandler<Integer>("id" ,Integer.class));//如果有多个字段可以根据字段name取
 		System.out.println(id);
 	}
 	
@@ -76,7 +78,12 @@ public class ScalarTest {
 		String sql = "select count(*) from user1";
 		ResultSet rs = base.getRs(base.getConn(), sql);
 		QueryMapping query = QueryMapping.getInstance();
-		Long id = query.query(rs, new ScalarHandler<Long>());
+//		Long id = query.query(rs, new ScalarHandler(Long.class));
+//		Long id = query.query(rs, new ScalarHandler<Long>(Long.class));
+//		Integer id = query.query(rs, new ScalarHandler<Integer>(Integer.class));
+//		Integer id = query.query(rs, new ScalarHandler(Integer.class));
+		BigDecimal id = query.query(rs, new ScalarHandler<BigDecimal>(BigDecimal.class));
+//		BigDecimal id = query.query(rs, new ScalarHandler(BigDecimal.class));
 		System.out.println(id);
 	}
 	
@@ -121,7 +128,7 @@ public class ScalarTest {
 //		Integer result = query.query(rs, new ScalarHandler<Integer>("t_smallint"));
 //		Integer result = query.query(rs, new ScalarHandler<Integer>("t_mediumint"));
 //		Boolean result = query.query(rs, new ScalarHandler<Boolean>("t_bit"));
-		Long result = query.query(rs, new ScalarHandler<Long>("t_bigint"));
+		Long result = query.query(rs, new ScalarHandler<Long>("t_bigint" ,Long.class));
 //		Float result = query.query(rs, new ScalarHandler<Float>("t_float"));
 //		Double result = query.query(rs, new ScalarHandler<Double>("t_double"));
 //		java.math.BigDecimal result = query.query(rs, new ScalarHandler<java.math.BigDecimal>("t_decimal"));

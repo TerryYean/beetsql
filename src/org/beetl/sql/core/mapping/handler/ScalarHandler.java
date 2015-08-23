@@ -12,6 +12,10 @@
  */ 
 package org.beetl.sql.core.mapping.handler;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.sql.Blob;
+import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -25,101 +29,266 @@ import org.beetl.sql.core.mapping.ResultSetHandler;
  * @date:2015年8月2日 下午13:43:10     
  */
 public class ScalarHandler<T> implements ResultSetHandler<T> {
-
+	
     private final int columnIndex;
     private final String columnName;
-
-    public ScalarHandler() {
-        this(1, null);
+    private final Class<?> requiredType;
+    
+    public ScalarHandler(Class<T> clazz) {
+        this(1, null, clazz);
     }
 
-    public ScalarHandler(int columnIndex) {
-        this(columnIndex, null);
+    public ScalarHandler(int columnIndex, Class<T> clazz) {
+        this(columnIndex, null, clazz);
     }
 
-    public ScalarHandler(String columnName) {
-        this(1, columnName);
+    public ScalarHandler(String columnName, Class<T> clazz) {
+        this(1, columnName, clazz);
     }
 
-    private ScalarHandler(int columnIndex, String columnName) {
+    private ScalarHandler(int columnIndex, String columnName, Class<T> clazz) {
         this.columnIndex = columnIndex;
         this.columnName = columnName;
+        this.requiredType = clazz;
     }
 
-    @SuppressWarnings("unchecked")
 	@Override
     public T handle(ResultSet rs) throws SQLException {
+    	ResultSetMetaData rsmd = rs.getMetaData();
+    	int cloumnCount = rsmd.getColumnCount();
+//    	if(cloumnCount != 1){
+//    		//TODO 需定义一个异常抛出
+//    		throw new SQLException("ResultSet存在多列");
+//    	}
     	
-        if (rs.next()) {
-            if (this.columnName == null) return (T) rs.getObject(this.columnIndex);
-            return (T) rs.getObject(this.columnName);
-        }
-        return null;
+    	rs.next();
+    	
+    	Object result = this.getColumnValue(rs, this.columnIndex, this.requiredType);
+		if (result != null && this.requiredType != null && !this.requiredType.isInstance(result)) {
+			return (T) convertValueToRequiredType(result, this.requiredType);
+		}
+
+        return (T) result;
     	
     }
-    
-   /* private Object getJavaValue(ResultSet rs) throws SQLException{
-    	
-//    	取得字段对应的java类型，如：java.lang.String
-//    	但是ResultSetMetaData的所有方法参数都是int，这样的话就只能默认取 rsmt.getColumnClassName(1);
-//    	也就是说只能支持select id from user这种写法了，只能查询一个字段，应该是满足需求的。
-//    	其他查询方式保留，方便使用者单独取出mapping进行开发
-//    	ResultSetMetaData rsmt = rs.getMetaData();
-//		String a = rsmt.getColumnClassName(1);
-    	
-    	ResultSetMetaData rsmt = rs.getMetaData();
-    	String javaType = rsmt.getColumnClassName(1);
-    	
-    	
-    	return null;
-    }
-    
-    private Object convertType(String javaType, ResultSet rs){
-    	
-//    	Mysql类型和java类型对照表
-//    	http://dev.mysql.com/doc/connector-j/en/connector-j-reference-type-conversions.html
-    	String[] typeArr = {
-    			java.lang.String.class.getName(),
-    			java.lang.Boolean.class.getName(),
-    			java.lang.Integer.class.getName(),
-    			java.lang.Long.class.getName(),
-    			java.math.BigInteger.class.getName(),
-    			java.lang.Float.class.getName(),
-    			java.lang.Double.class.getName(),
-    			java.math.BigDecimal.class.getName(),
-    			java.sql.Date.class.getName(),
-    			java.sql.Timestamp.class.getName(),
-    			java.sql.Time.class.getName(),
-    			byte[].class.getName()
-    	};
-    	
-    	if(javaType.equals(typeArr[0])){
-    		
-    	}else if(javaType.equals(typeArr[1])){
-    		
-    	}else if(javaType.equals(typeArr[2])){
-    		
-    	}else if(javaType.equals(typeArr[3])){
-    		
-    	}else if(javaType.equals(typeArr[4])){
-    		
-    	}else if(javaType.equals(typeArr[5])){
-    		
-    	}else if(javaType.equals(typeArr[6])){
-    		
-    	}else if(javaType.equals(typeArr[7])){
-    		
-    	}else if(javaType.equals(typeArr[8])){
-    		
-    	}else if(javaType.equals(typeArr[9])){
-    		
-    	}else if(javaType.equals(typeArr[10])){
-    		
-    	}else if(javaType.equals(typeArr[11])){
-    		
-    	}else{
-    		return rs.getObject(columnIndex);
-    	}
-    	
-    }*/
+
+	//通过rs.getObject(1)下标的方式取值
+	private Object getColumnValue(ResultSet rs, int columnIndex, Class<?> requiredType) throws SQLException {
+		if(requiredType != null){
+			return this.getResultSetValue(rs, columnIndex, requiredType);
+		}else{
+			return this.getCloumnValue(rs, columnIndex);
+		}
+	}
+
+	private Object getResultSetValue(ResultSet rs, int columnIndex, Class<?> requiredType) throws SQLException {
+		if(requiredType == null){
+			return this.getCloumnValue(rs, columnIndex);
+		}
+		Object value;
+
+		// Explicitly extract typed value, as far as possible.
+		if (String.class == requiredType) {
+			return rs.getString(columnIndex);
+		}
+		else if (boolean.class == requiredType || Boolean.class == requiredType) {
+			value = rs.getBoolean(columnIndex);
+		}
+		else if (byte.class == requiredType || Byte.class == requiredType) {
+			value = rs.getByte(columnIndex);
+		}
+		else if (short.class == requiredType || Short.class == requiredType) {
+			value = rs.getShort(columnIndex);
+		}
+		else if (int.class == requiredType || Integer.class == requiredType) {
+			value = rs.getInt(columnIndex);
+		}
+		else if (long.class == requiredType || Long.class == requiredType) {
+			value = rs.getLong(columnIndex);
+		}
+		else if (float.class == requiredType || Float.class == requiredType) {
+			value = rs.getFloat(columnIndex);
+		}
+		else if (double.class == requiredType || Double.class == requiredType ||
+				Number.class == requiredType) {
+			value = rs.getDouble(columnIndex);
+		}
+		else if (BigDecimal.class == requiredType) {
+			return rs.getBigDecimal(columnIndex);
+		}
+		else if (java.sql.Date.class == requiredType) {
+			return rs.getDate(columnIndex);
+		}
+		else if (java.sql.Time.class == requiredType) {
+			return rs.getTime(columnIndex);
+		}
+		else if (java.sql.Timestamp.class == requiredType || java.util.Date.class == requiredType) {
+			return rs.getTimestamp(columnIndex);
+		}
+		else if (byte[].class == requiredType) {
+			return rs.getBytes(columnIndex);
+		}
+		else if (Blob.class == requiredType) {
+			return rs.getBlob(columnIndex);
+		}
+		else if (Clob.class == requiredType) {
+			return rs.getClob(columnIndex);
+		}
+		else {
+//			TODO 从jdk7开始，JDBC4.1有getObject(int,class)方法。需要判断是否有这个方法
+//			有的话就需要rs.getObject(columnIndex,requiredType)
+//			没有的话就原来的方式getColumnValue(rs, columnIndex)
+			
+			return this.getCloumnValue(rs, columnIndex);
+		}
+
+		// Perform was-null check if necessary (for results that the JDBC driver returns as primitives).
+		return (rs.wasNull() ? null : value);
+	}
+	
+	private Object getCloumnValue(ResultSet rs, int columnIndex) throws SQLException {
+		Object obj = rs.getObject(columnIndex);
+		String className = null;
+		if(obj != null){
+			className = obj.getClass().getName();
+		}
+		
+		if(obj instanceof java.sql.Blob){
+			java.sql.Blob blob = (java.sql.Blob) obj;
+			obj = blob.getBytes(1, (int) blob.length());
+		}
+		else if(obj instanceof java.sql.Clob){
+			java.sql.Clob clob = (java.sql.Clob) obj;
+			obj = clob.getSubString(1, (int) clob.length());
+		}
+		else if("oracle.sql.TIMESTAMP".equals(className) || "oracle.sql.TIMESTAMPTZ".equals(className)){
+			obj = rs.getTimestamp(columnIndex);
+		}
+		else if (className != null && className.startsWith("oracle.sql.DATE")) {
+			String metaDataClassName = rs.getMetaData().getColumnClassName(columnIndex);
+			if ("java.sql.Timestamp".equals(metaDataClassName) || "oracle.sql.TIMESTAMP".equals(metaDataClassName)) {
+				obj = rs.getTimestamp(columnIndex);
+			}
+			else {
+				obj = rs.getDate(columnIndex);
+			}
+		}
+		else if (obj != null && obj instanceof java.sql.Date) {
+			if ("java.sql.Timestamp".equals(rs.getMetaData().getColumnClassName(columnIndex))) {
+				obj = rs.getTimestamp(columnIndex);
+			}
+		}
+		return obj;
+	}
+	
+	//TODO 通过rs.getObject("id")列明的方式取值
+//	private Object getColumnValue(ResultSet rs, String columnName, Class<?> requiredType) {
+//		if(requiredType != null){
+//			return this.getResultSetValue(rs, columnName, requiredType);
+//		}else{
+//			return this.getColumnValue(rs, columnName);
+//		}
+//	}
+	
+//	============================辅助类：整理抽取到util中===================================
+	
+//	AtomicInteger, AtomicLong, BigDecimal, BigInteger, Byte, Double, Float, Integer, Long, Short 
+//	都是java.lang.Number的已知子类
+	private Object convertValueToRequiredType(Object result, Class<?> requiredType) {
+		if(String.class == requiredType){
+			return result.toString();
+		}
+		else if(Number.class.isAssignableFrom(requiredType)){
+			if(result instanceof Number){
+				return convertNumberToTargetClass(((Number) result), (Class<Number>) requiredType);
+			}else{
+				return parseNumber();
+			}
+		}
+		else{
+			throw new IllegalArgumentException("无法转化成期望类型");
+		}
+		
+	}
+	
+	private <T extends Number> T convertNumberToTargetClass(Number number, Class<T> targetClass) {
+		if(number == null){
+			throw new IllegalArgumentException("Number不能为空");
+		}
+		if(targetClass == null){
+			throw new IllegalArgumentException("TargetClass不能为空");
+		}
+		
+		if (targetClass.isInstance(number)) {
+			return (T) number;
+		}
+		else if (Byte.class == targetClass) {
+			long value = number.longValue();
+			if (value < Byte.MIN_VALUE || value > Byte.MAX_VALUE) {
+				throw new IllegalArgumentException(number.getClass().getName()+"无法转化为目标对象"+targetClass.getName());
+			}
+			return (T) new Byte(number.byteValue());
+		}
+		else if (Short.class == targetClass) {
+			long value = number.longValue();
+			if (value < Short.MIN_VALUE || value > Short.MAX_VALUE) {
+				throw new IllegalArgumentException(number.getClass().getName()+"无法转化为目标对象"+targetClass.getName());
+			}
+			return (T) new Short(number.shortValue());
+		}
+		else if (Integer.class == targetClass) {
+			long value = number.longValue();
+			if (value < Integer.MIN_VALUE || value > Integer.MAX_VALUE) {
+				throw new IllegalArgumentException(number.getClass().getName()+"无法转化为目标对象"+targetClass.getName());
+			}
+			return (T) new Integer(number.intValue());
+		}
+		else if (Long.class == targetClass) {
+			BigInteger bigInt = null;
+			if (number instanceof BigInteger) {
+				bigInt = (BigInteger) number;
+			}
+			else if (number instanceof BigDecimal) {
+				bigInt = ((BigDecimal) number).toBigInteger();
+			}
+			// Effectively analogous to JDK 8's BigInteger.longValueExact()
+			if (bigInt != null && (bigInt.compareTo(BigInteger.valueOf(Long.MIN_VALUE)) < 0 || bigInt.compareTo(BigInteger.valueOf(Long.MIN_VALUE)) > 0)) {
+				throw new IllegalArgumentException(number.getClass().getName()+"无法转化为目标对象"+targetClass.getName());
+			}
+			return (T) new Long(number.longValue());
+		}
+		else if (BigInteger.class == targetClass) {
+			if (number instanceof BigDecimal) {
+				// do not lose precision - use BigDecimal's own conversion
+				return (T) ((BigDecimal) number).toBigInteger();
+			}
+			else {
+				// original value is not a Big* number - use standard long conversion
+				return (T) BigInteger.valueOf(number.longValue());
+			}
+		}
+		else if (Float.class == targetClass) {
+			return (T) new Float(number.floatValue());
+		}
+		else if (Double.class == targetClass) {
+			return (T) new Double(number.doubleValue());
+		}
+		else if (BigDecimal.class == targetClass) {
+			// always use BigDecimal(String) here to avoid unpredictability of BigDecimal(double)
+			// (see BigDecimal javadoc for details)
+			return (T) new BigDecimal(number.toString());
+		}
+		else {
+			throw new IllegalArgumentException(number.getClass().getName()+"无法转化为目标对象"+targetClass.getName());
+		}
+	}
+
+	private <T extends Number> T parseNumber() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
+	
+	
 }
