@@ -115,13 +115,13 @@ public class ClasspathLoader implements SQLLoader {
 		try {
 			bf = new BufferedReader(new InputStreamReader(ins));
 			String temp = null;
-			StringBuffer sql = null;
+			StringBuilder sql = null;
 			String key = null;
 			while ((temp = bf.readLine()) != null) {
 				if (temp.startsWith("===")) {// 读取到===号，说明上一行是key，下面是SQL语句
 					if (!list.isEmpty() && list.size() > 1) {// 如果链表里面有多个，说明是上一句的sql+下一句的key
 						String tempKey = list.pollLast();// 取出下一句sql的key先存着
-						sql = new StringBuffer();
+						sql = new StringBuilder();
 						key = list.pollFirst();
 						while (!list.isEmpty()) {// 拼装成一句sql
 							sql.append(list.pollFirst() + lineSeparator);
@@ -135,7 +135,7 @@ public class ClasspathLoader implements SQLLoader {
 				}
 			}
 			// 最后一句sql
-			sql = new StringBuffer();
+			sql = new StringBuilder();
 			key = list.pollFirst();
 			while (!list.isEmpty()) {
 				sql.append(list.pollFirst());

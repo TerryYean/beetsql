@@ -6,7 +6,6 @@ import java.util.List;
 import org.beetl.core.Configuration;
 import org.beetl.sql.core.NameConversion;
 import org.beetl.sql.core.SQLSource;
-import org.beetl.sql.core.annotatoin.Table;
 import org.beetl.sql.core.engine.Beetl;
 import org.beetl.sql.core.kit.StringKit;
 /**
@@ -73,37 +72,37 @@ public abstract class AbstractDBStyle implements DBStyle {
 	public SQLSource genSelectById(Class<?> cls) {
 		String tableName = nameConversion.getTableName(cls);
 		String condition = appendIdCondition(cls);
-		return new SQLSource(new StringBuffer("select * from ").append(tableName).append(condition).toString());
+		return new SQLSource(new StringBuilder("select * from ").append(tableName).append(condition).toString());
 	}
 
 	@Override
 	public SQLSource genSelectByTemplate(Class<?> cls) {
 		String fieldName = null;
 		String condition = " where 1=1 " + lineSeparator;
-		Method[] methods = cls.getDeclaredMethods();
+		Method[] methods = cls.getMethods();
 		String tableName = nameConversion.getTableName(cls);
 		for (Method method : methods) {
-			if(method.getName().startsWith("get")){
+			if(isLegalSelectMethod(method)){
 				fieldName = StringKit.toLowerCaseFirstOne(method.getName().substring(3));
 				condition = condition + appendWhere(cls,tableName, fieldName);
 			}
 		}
-		return new SQLSource(new StringBuffer("select * from ").append(tableName).append(condition).toString());
+		return new SQLSource(new StringBuilder("select * from ").append(tableName).append(condition).toString());
 	}
 	
 	@Override
 	public SQLSource genSelectCountByTemplate(Class<?> cls){
 		String fieldName = null;
 		String condition = " where 1=1 " + lineSeparator;
-		Method[] methods = cls.getDeclaredMethods();
+		Method[] methods = cls.getMethods();
 		String tableName = nameConversion.getTableName(cls);
 		for (Method method : methods) {
-			if(method.getName().startsWith("get")){
-				fieldName = StringKit.toLowerCaseFirstOne(method.getName().substring(3));
-				condition = condition + appendWhere(cls,tableName, fieldName);
-			}
+				if(isLegalSelectMethod(method)){
+					fieldName = StringKit.toLowerCaseFirstOne(method.getName().substring(3));
+					condition = condition + appendWhere(cls,tableName, fieldName);
+				}
 		}
-		return new SQLSource(new StringBuffer("select count(*) from ").append(tableName).append(condition).toString());
+		return new SQLSource(new StringBuilder("select count(*) from ").append(tableName).append(condition).toString());
 
 	}
 
@@ -111,12 +110,12 @@ public abstract class AbstractDBStyle implements DBStyle {
 	public SQLSource genDeleteById(Class<?> cls) {
 		String tableName = nameConversion.getTableName(cls);
 		String condition = appendIdCondition(cls);
-		return new SQLSource(new StringBuffer("delete from ").append(tableName).append(condition).toString());
+		return new SQLSource(new StringBuilder("delete from ").append(tableName).append(condition).toString());
 	}
 
 	@Override
 	public SQLSource genSelectAll(Class<?> cls) {
-		return new SQLSource(new StringBuffer("select * from ").append(nameConversion.getTableName(cls)).toString());
+		return new SQLSource(new StringBuilder("select * from ").append(nameConversion.getTableName(cls)).toString());
 	}
 
 	@Override
@@ -125,12 +124,12 @@ public abstract class AbstractDBStyle implements DBStyle {
 		StringBuilder sql = new StringBuilder("update ").append(tableName).append(" set ").append(lineSeparator);
 		String fieldName = null;
 		
-		Method[] methods = cls.getDeclaredMethods();
+		Method[] methods = cls.getMethods();
 		for (Method method : methods) {
-			if(method.getName().startsWith("get") && !method.getName().endsWith("Id")){//TODO 暂时限定排除ID
-				fieldName = StringKit.toLowerCaseFirstOne(method.getName().substring(3));
-				sql.append(appendSetColumnAbsolute(cls,tableName, fieldName));
-			}
+				if(isLegalOtherMethod(method) && !method.getName().endsWith("Id")){//TODO 暂时限定排除ID
+					fieldName = StringKit.toLowerCaseFirstOne(method.getName().substring(3));
+					sql.append(appendSetColumnAbsolute(cls,tableName, fieldName));
+				}
 		}
 		String condition = appendIdCondition(cls);
 		sql = removeComma(sql, condition);
@@ -143,13 +142,13 @@ public abstract class AbstractDBStyle implements DBStyle {
 		StringBuilder sql = new StringBuilder("update ").append(tableName).append(" set ").append(lineSeparator);
 		String fieldName = null;
 		String condition = " where 1=1 " + lineSeparator;
-		Method[] methods = cls.getDeclaredMethods();
+		Method[] methods = cls.getMethods();
 		for (Method method : methods) {
-			if(method.getName().startsWith("get")){
-				fieldName = StringKit.toLowerCaseFirstOne(method.getName().substring(3));
-				sql.append(appendSetColumn(cls,tableName, fieldName,"para"));
-				condition = condition + appendWhere(cls,tableName, fieldName,"condition");
-			}
+				if(isLegalOtherMethod(method)){
+					fieldName = StringKit.toLowerCaseFirstOne(method.getName().substring(3));
+					sql.append(appendSetColumn(cls,tableName, fieldName,"para"));
+					condition = condition + appendWhere(cls,tableName, fieldName,"condition");
+				}
 		}
 		sql = removeComma(sql, condition);
 		return new SQLSource(sql.toString());
@@ -160,9 +159,9 @@ public abstract class AbstractDBStyle implements DBStyle {
 		String tableName = nameConversion.getTableName(cls);
 		StringBuilder sql = new StringBuilder("update ").append(tableName).append(" set ").append(lineSeparator);
 		String fieldName = null;
-		Method[] methods = cls.getDeclaredMethods();
+		Method[] methods = cls.getMethods();
 		for (Method method : methods) {
-			if(method.getName().startsWith("get")){
+			if(isLegalOtherMethod(method)){
 				fieldName = StringKit.toLowerCaseFirstOne(method.getName().substring(3));
 				sql.append(appendSetColumn(cls,tableName, fieldName));
 			}
@@ -179,9 +178,9 @@ public abstract class AbstractDBStyle implements DBStyle {
 		StringBuilder valSql = new StringBuilder(" VALUES (");
 		String fieldName = null;
 		int idType = DBStyle.ID_ASSIGN ;
-		Method[] methods = cls.getDeclaredMethods();
+		Method[] methods = cls.getMethods();
 		for (Method method : methods) {
-			if(method.getName().startsWith("get")){
+			if(isLegalOtherMethod(method)){
 				fieldName = StringKit.toLowerCaseFirstOne(method.getName().substring(3));
 				List<String> ids = this.metadataManager.getIds(tableName);
 				if(ids.contains(fieldName)){
@@ -336,12 +335,28 @@ public abstract class AbstractDBStyle implements DBStyle {
 				.append(HOLDER_START+ "obj."+idName + HOLDER_END+",").append(lineSeparator)
 				.append(STATEMENT_START).append("}}").append(STATEMENT_END).toString();
 	}
-	
-	private String getTableName(Class c){
+	/****
+	 * 方法是否能用来生成select语句
+	 * @param method
+	 * @return
+	 */
+	private boolean isLegalSelectMethod(Method method){
 		
-		return nameConversion.getTableName(c);
-		
+		return method.getDeclaringClass() != Object.class 
+				&& method.getName().startsWith("get")
+				&& !java.util.Date.class.isAssignableFrom(method.getReturnType())
+				&& !java.sql.Date.class.isAssignableFrom(method.getReturnType())
+				&& !java.util.Calendar.class.isAssignableFrom(method.getReturnType());
 	}
+	/****
+	 * 方法是否能用来生成select之外的语句，如update，insert
+	 * @param method
+	 * @return
+	 */
+	private boolean isLegalOtherMethod(Method method){
+		return method.getDeclaringClass() != Object.class && method.getName().startsWith("get");
+	}
+	
 	
 
 }
