@@ -143,7 +143,11 @@ public class ScalarTest {
 	
 	@Test
 	public void query7() {
-		
+		String sql = "select id from user1 where id=1";
+		ResultSet rs = base.getRs(conn, sql);
+		QueryMapping query = QueryMapping.getInstance();
+		Integer id = query.query(rs, new ScalarHandler<Integer>());
+		System.out.println(id);
 	}
 	
 }

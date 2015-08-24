@@ -53,9 +53,36 @@ public class StringKit {
 		return sb.toString();
 	}
 	
+	/**
+	 * 
+	 * @MethodName: trimAllWhitespace   
+	 * @Description: 去空格  
+	 * @param @param str
+	 * @param @return  
+	 * @return String  
+	 * @throws
+	 */
+	public static String trimAllWhitespace(String str) {
+		if (!((CharSequence) str != null && ((CharSequence) str).length() > 0)) {
+			return str;
+		}
+		StringBuilder sb = new StringBuilder(str);
+		int index = 0;
+		while (sb.length() > index) {
+			if (Character.isWhitespace(sb.charAt(index))) {
+				sb.deleteCharAt(index);
+			}
+			else {
+				index++;
+			}
+		}
+		return sb.toString();
+	}
+	
 	
 	public static void main(String[] args) {
-		System.out.println(deCodeUnderlined("USER_NAME"));
+//		System.out.println(deCodeUnderlined("USER_NAME"));
+		System.out.println(trimAllWhitespace(" fsdfsd sdfds fsd "));
 	}
 	
 }

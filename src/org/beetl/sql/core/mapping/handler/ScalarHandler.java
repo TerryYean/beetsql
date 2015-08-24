@@ -20,6 +20,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
+import org.beetl.sql.core.kit.NumberKit;
 import org.beetl.sql.core.mapping.ResultSetHandler;
 
 /**  
@@ -33,6 +34,10 @@ public class ScalarHandler<T> implements ResultSetHandler<T> {
     private final int columnIndex;
     private final String columnName;
     private final Class<?> requiredType;
+    
+    public ScalarHandler() {
+        this(1, null, null);
+    }
     
     public ScalarHandler(Class<T> clazz) {
         this(1, null, clazz);
@@ -72,7 +77,18 @@ public class ScalarHandler<T> implements ResultSetHandler<T> {
     	
     }
 
-	//通过rs.getObject(1)下标的方式取值
+	/**
+	 * 
+	 * @MethodName: getColumnValue   
+	 * @Description: 获取字段值
+	 * @param @param rs
+	 * @param @param columnIndex
+	 * @param @param requiredType
+	 * @param @return
+	 * @param @throws SQLException  
+	 * @return Object  
+	 * @throws
+	 */
 	private Object getColumnValue(ResultSet rs, int columnIndex, Class<?> requiredType) throws SQLException {
 		if(requiredType != null){
 			return this.getResultSetValue(rs, columnIndex, requiredType);
@@ -81,6 +97,18 @@ public class ScalarHandler<T> implements ResultSetHandler<T> {
 		}
 	}
 
+	/**
+	 * 
+	 * @MethodName: getResultSetValue   
+	 * @Description: 通过rs.getObject(1)下标 + 期望类型的方式取值    
+	 * @param @param rs
+	 * @param @param columnIndex
+	 * @param @param requiredType
+	 * @param @return
+	 * @param @throws SQLException  
+	 * @return Object  
+	 * @throws
+	 */
 	private Object getResultSetValue(ResultSet rs, int columnIndex, Class<?> requiredType) throws SQLException {
 		if(requiredType == null){
 			return this.getCloumnValue(rs, columnIndex);
@@ -146,6 +174,17 @@ public class ScalarHandler<T> implements ResultSetHandler<T> {
 		return (rs.wasNull() ? null : value);
 	}
 	
+	/**
+	 * 
+	 * @MethodName: getCloumnValue   
+	 * @Description: 通过下标的方式取值：取值类型为默认类型  
+	 * @param @param rs
+	 * @param @param columnIndex
+	 * @param @return
+	 * @param @throws SQLException  
+	 * @return Object  
+	 * @throws
+	 */
 	private Object getCloumnValue(ResultSet rs, int columnIndex) throws SQLException {
 		Object obj = rs.getObject(columnIndex);
 		String className = null;
@@ -198,97 +237,17 @@ public class ScalarHandler<T> implements ResultSetHandler<T> {
 		if(String.class == requiredType){
 			return result.toString();
 		}
+		//判断Number对象所表示的类或接口是否与requiredType所表示的类或接口是否相同，或者是否是其超类或者超接口
 		else if(Number.class.isAssignableFrom(requiredType)){
 			if(result instanceof Number){
-				return convertNumberToTargetClass(((Number) result), (Class<Number>) requiredType);
+				return NumberKit.convertNumberToTargetClass(((Number) result), (Class<Number>) requiredType);
 			}else{
-				return parseNumber();
+				return NumberKit.parseNumber(result.toString(), (Class<Number>) requiredType);
 			}
 		}
 		else{
 			throw new IllegalArgumentException("无法转化成期望类型");
 		}
-		
-	}
-	
-	private <T extends Number> T convertNumberToTargetClass(Number number, Class<T> targetClass) {
-		if(number == null){
-			throw new IllegalArgumentException("Number不能为空");
-		}
-		if(targetClass == null){
-			throw new IllegalArgumentException("TargetClass不能为空");
-		}
-		
-		if (targetClass.isInstance(number)) {
-			return (T) number;
-		}
-		else if (Byte.class == targetClass) {
-			long value = number.longValue();
-			if (value < Byte.MIN_VALUE || value > Byte.MAX_VALUE) {
-				throw new IllegalArgumentException(number.getClass().getName()+"无法转化为目标对象"+targetClass.getName());
-			}
-			return (T) new Byte(number.byteValue());
-		}
-		else if (Short.class == targetClass) {
-			long value = number.longValue();
-			if (value < Short.MIN_VALUE || value > Short.MAX_VALUE) {
-				throw new IllegalArgumentException(number.getClass().getName()+"无法转化为目标对象"+targetClass.getName());
-			}
-			return (T) new Short(number.shortValue());
-		}
-		else if (Integer.class == targetClass) {
-			long value = number.longValue();
-			if (value < Integer.MIN_VALUE || value > Integer.MAX_VALUE) {
-				throw new IllegalArgumentException(number.getClass().getName()+"无法转化为目标对象"+targetClass.getName());
-			}
-			return (T) new Integer(number.intValue());
-		}
-		else if (Long.class == targetClass) {
-			BigInteger bigInt = null;
-			if (number instanceof BigInteger) {
-				bigInt = (BigInteger) number;
-			}
-			else if (number instanceof BigDecimal) {
-				bigInt = ((BigDecimal) number).toBigInteger();
-			}
-			// Effectively analogous to JDK 8's BigInteger.longValueExact()
-			if (bigInt != null && (bigInt.compareTo(BigInteger.valueOf(Long.MIN_VALUE)) < 0 || bigInt.compareTo(BigInteger.valueOf(Long.MIN_VALUE)) > 0)) {
-				throw new IllegalArgumentException(number.getClass().getName()+"无法转化为目标对象"+targetClass.getName());
-			}
-			return (T) new Long(number.longValue());
-		}
-		else if (BigInteger.class == targetClass) {
-			if (number instanceof BigDecimal) {
-				// do not lose precision - use BigDecimal's own conversion
-				return (T) ((BigDecimal) number).toBigInteger();
-			}
-			else {
-				// original value is not a Big* number - use standard long conversion
-				return (T) BigInteger.valueOf(number.longValue());
-			}
-		}
-		else if (Float.class == targetClass) {
-			return (T) new Float(number.floatValue());
-		}
-		else if (Double.class == targetClass) {
-			return (T) new Double(number.doubleValue());
-		}
-		else if (BigDecimal.class == targetClass) {
-			// always use BigDecimal(String) here to avoid unpredictability of BigDecimal(double)
-			// (see BigDecimal javadoc for details)
-			return (T) new BigDecimal(number.toString());
-		}
-		else {
-			throw new IllegalArgumentException(number.getClass().getName()+"无法转化为目标对象"+targetClass.getName());
-		}
 	}
 
-	private <T extends Number> T parseNumber() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
-	
-	
 }
