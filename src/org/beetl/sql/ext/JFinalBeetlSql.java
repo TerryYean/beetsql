@@ -63,6 +63,10 @@ public class JFinalBeetlSql {
 		Interceptor[] inters = null;
 		if(ins!=null){
 			inters = new Interceptor[ins.length];
+			//add suxj 2015/08/25
+			for(int i=0 ;i<inters.length ;i++){
+				inters[i] = (Interceptor) instance(ins[i]);
+			}
 		}else{
 			inters = new Interceptor[0];
 		}
