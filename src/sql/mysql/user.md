@@ -23,6 +23,11 @@ selectAll
 ===
     select * from user 
     
+    
+updateName
+===
+    update user set name =#name# where age>#age#
+    
 selectByExample
 ===
     select * from user  

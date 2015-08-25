@@ -330,9 +330,9 @@ public class SQLScript {
 		return this.singleSelect(paras, Long.class);
 	}
 	
-	public int update(Object obj) {
-		Map<String, Object> paras = new HashMap<String, Object>();
-		paras.put("_root", obj);
+	
+	public int update(Map paras){
+		
 		SQLResult result = run(paras);
 		String sql = result.jdbcSql;
 		List<Object> objs = result.jdbcPara;
@@ -363,36 +363,76 @@ public class SQLScript {
 		}
 		return rs;
 	}
+	
+	public int update(Object obj) {
+		Map<String, Object> paras = new HashMap<String, Object>();
+		paras.put("_root", obj);
+		return this.update(paras);
+	}
+	
+	public int[] updateBatch(Map[] maps) {
+		int[] rs = null;
+		PreparedStatement ps = null;
+		// 执行jdbc
+		try {
+			for(int k = 0;k<maps.length;k++ ){
+				Map paras = maps[k];
+				SQLResult result = run(paras);
+				List<Object> objs = result.jdbcPara;
+				InterceptorContext ctx = this.callInterceptorAsBefore(this.id,sql, objs);
+				if(ps==null){
+					ps = sm.getDs().getWriteConn(ctx).prepareStatement(result.jdbcSql);
+				}	
+				for (int i = 0; i < objs.size(); i++)
+					ps.setObject(i + 1, objs.get(i));
+				ps.addBatch();
+				this.callInterceptorAsAfter(ctx);
+			}
+			rs = ps.executeBatch();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} finally {
+			try {
+				if (ps != null)
+					ps.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return rs;
+	}
 	/****
 	 * 批量更新
 	 * @param obj
 	 * @return
 	 */
 	public int[] updateBatch(List<?> list) {
-		Object obj = list.get(0);
-		Map<String, Object> paras = new HashMap<String, Object>();
-		paras.put("_root", obj);
-		SQLResult result = run(paras);
-		String sql = result.jdbcSql;
-		List<Object> objs = result.jdbcPara;
-		InterceptorContext ctx = this.callInterceptorAsBefore(this.id,sql, objs);
-		sql = ctx.getSql();
-		objs = ctx.getParas();
+
 		int[] rs = null;
 		PreparedStatement ps = null;
 		// 执行jdbc
 		try {
-			ps = sm.getDs().getWriteConn(ctx).prepareStatement(sql);
+		
 			for(int k = 0;k<list.size();k++ ){
+				Map paras = new HashMap();
 				paras.put("_root", list.get(k));
-				result = run(paras);
-				objs = result.jdbcPara;
+				SQLResult result = run(paras);
+				List<Object> objs = result.jdbcPara;
+				InterceptorContext ctx = this.callInterceptorAsBefore(this.id,sql, objs);
+				if(ps==null){
+					ps = sm.getDs().getWriteConn(ctx).prepareStatement(result.jdbcSql);
+				}				
+				
 				for (int i = 0; i < objs.size(); i++)
 					ps.setObject(i + 1, objs.get(i));
 				ps.addBatch();
+				this.callInterceptorAsAfter(ctx);
 			}
 			rs = ps.executeBatch();
-			this.callInterceptorAsAfter(ctx);
+			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

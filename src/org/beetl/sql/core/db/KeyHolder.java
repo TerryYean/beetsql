@@ -10,4 +10,14 @@ public class KeyHolder {
 	public Object getKey() {
 		return key;
 	}
+	
+	public int getInt(){
+		return  ((Number)key).intValue();
+	}
+	
+	public long getLong(){
+		return  ((Number)key).longValue();
+	}
+	
+	
 }

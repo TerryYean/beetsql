@@ -348,36 +348,36 @@ public class SQLManager {
 	
 	
 	public Long  selectLong(String id,Map paras) {
-		return this.singleSelect(id, paras, Long.class);
+		return this.selectSingle(id, paras, Long.class);
 	}
 	
 	public Long  selectLong(String id,Object paras) {
-		return this.singleSelect(id, paras, Long.class);
+		return this.selectSingle(id, paras, Long.class);
 	}
 	
 	public Integer  selectInt(String id,Object paras) {
-		return this.singleSelect(id, paras, Integer.class);
+		return this.selectSingle(id, paras, Integer.class);
 	}
 	
 	public Integer  selectInt(String id,Map paras) {
-		return this.singleSelect(id, paras, Integer.class);
+		return this.selectSingle(id, paras, Integer.class);
 	}
 	
 	public BigDecimal  selectBigDecimal(String id,Object paras) {
-		return this.singleSelect(id, paras, BigDecimal.class);
+		return this.selectSingle(id, paras, BigDecimal.class);
 	}
 	
 	public BigDecimal  selectBigDecimal(String id,Map paras) {
-		return this.singleSelect(id, paras, BigDecimal.class);
+		return this.selectSingle(id, paras, BigDecimal.class);
 	}
 	
-	public <T> T singleSelect(String id,Object paras, Class<T> target) {
+	public <T> T selectSingle(String id,Object paras, Class<T> target) {
 		SQLScript script = getScript(id);
 		return script.singleSelect(paras, target);
 	}
 	
 	
-	public <T> T singleSelect(String id,Map paras, Class<T> target) {
+	public <T> T selectSingle(String id,Map paras, Class<T> target) {
 		SQLScript script = getScript(id);
 		return script.singleSelect(paras, target);
 	}
@@ -440,9 +440,10 @@ public class SQLManager {
 		SQLScript script = getScript(obj.getClass(), UPDATE_BY_ID);
 		return script.update(obj);
 	}
+	
 	/****
 	 * 批量更新
-	 * @param list
+	 * @param list ,包含pojo（不支持map）
 	 * @return
 	 */
 	public int[] updateByIdBatch(List<?> list){
@@ -452,6 +453,50 @@ public class SQLManager {
 		SQLScript script = getScript(list.get(0).getClass(), UPDATE_BY_ID);
 		return script.updateBatch(list);
 	}
+	
+	
+	/**  执行sql更新语句
+	 * @param sqlId
+	 * @param obj
+	 * @return
+	 */
+	public int update(String sqlId,Object obj){
+		SQLScript script = getScript(sqlId);
+		return script.update(obj);
+	}
+	
+	
+	/**  执行sql更新语句
+	 * @param sqlId
+	 * @param paras
+	 * @return
+	 */
+	public int update(String sqlId,Map paras){
+		SQLScript script = getScript(sqlId);
+		return script.update(paras);
+	}
+	
+	
+	/**  对pojo批量更新执行sql更新语句
+	 * @param sqlId 
+	 * @param paras 
+	 * @return
+	 */
+	public int[] updateBatch(String sqlId,List list){
+		SQLScript script = getScript(sqlId);
+		return script.updateBatch(list);
+	}
+	
+	/**批量更新
+	 * @param sqlId
+	 * @param maps  参数放在map里
+	 * @return
+	 */
+	public int[] updateBatch(String sqlId,Map[] maps){
+		SQLScript script = getScript(sqlId);
+		return script.updateBatch(maps);
+	}
+	
 	
 	/**
 	 * 
