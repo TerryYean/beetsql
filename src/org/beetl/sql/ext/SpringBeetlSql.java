@@ -125,8 +125,5 @@ public class SpringBeetlSql {
 		this.tagFactorys = tagFactorys;
 	}
 
-	
-	
-	
-	
 }
+	

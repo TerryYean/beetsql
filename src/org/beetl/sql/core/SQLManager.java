@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.beetl.sql.core.db.DBStyle;
+import org.beetl.sql.core.db.KeyHolder;
 import org.beetl.sql.core.db.MetadataManager;
 import org.beetl.sql.core.engine.Beetl;
 
@@ -397,6 +398,24 @@ public class SQLManager {
 		SQLScript script = getScript(clazz, DELETE_BY_ID);
 		return script.deleteById(clazz, value);
 	}
+	
+	//============= 插入 ===================  //
+	
+	public void insert(Class clazz,Object paras){
+		SQLScript script = getScript(clazz,INSERT );
+		script.insert(paras);
+	}
+	
+	/** 插入，并获取主键
+	 * @param clazz
+	 * @param paras
+	 * @param holder
+	 */
+	public void insert(Class clazz,Object paras,KeyHolder holder){
+		SQLScript script = getScript(clazz,INSERT);
+		script.insert(paras,holder );
+	}
+	
 	
 	/**
 	 * 
