@@ -78,21 +78,15 @@ public class SQLScript {
 		objs = ctx.getParas();
 		PreparedStatement ps = null;
 		try {
-			ps = sm.getDs().getWriteConn(ctx).prepareStatement(sql);
+			ps = sm.getDs().getConn(this.id,true,sql,objs).prepareStatement(sql);
 			for (int i = 0; i < objs.size(); i++)
 				ps.setObject(i + 1, objs.get(i));
 			ps.executeUpdate();
 			this.callInterceptorAsAfter(ctx);
 		} catch (SQLException e) {
-			//@todo: 异常处理
-			throw new RuntimeException(e);
+			throw new BeetlSQLException(BeetlSQLException.SQL_EXCEPTION,e);
 		} finally {
-			try {
-				if (ps != null)
-					ps.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			clean(ps);
 		}
 	}
 	
@@ -103,7 +97,8 @@ public class SQLScript {
 		try {
 			if(this.sqlSource.getIdType()==DBStyle.ID_SEQ){
 				String seqName = sqlSource.getSeqName();
-				PreparedStatement seqPs = sm.getDs().getWriteConn(null).prepareStatement("select "+seqName+".NEXTVAL from dual");
+				//序列。
+				PreparedStatement seqPs = sm.getDs().getMaster().prepareStatement("select "+seqName+".NEXTVAL from dual");
 				ResultSet seqRs = seqPs.executeQuery();
 				
 				if(seqRs.next()){
@@ -123,11 +118,11 @@ public class SQLScript {
 	
 		
 			if(this.sqlSource.getIdType()==DBStyle.ID_ASSIGN){
-				ps = sm.getDs().getWriteConn(ctx).prepareStatement(sql);
+				ps = sm.getDs().getConn(id,true,sql,objs).prepareStatement(sql);
 			}else if(this.sqlSource.getIdType()==DBStyle.ID_AUTO){
-				ps = sm.getDs().getWriteConn(ctx).prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+				ps = sm.getDs().getConn(id,true,sql,objs).prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
 			}else{
-				ps = sm.getDs().getWriteConn(ctx).prepareStatement(sql);
+				ps = sm.getDs().getConn(id,true,sql,objs).prepareStatement(sql);
 			}
 			
 			for (int i = 0; i < objs.size(); i++)
@@ -139,18 +134,13 @@ public class SQLScript {
 				seqRs.next();
 				Object key =seqRs.getObject(1);
 				holder.setKey(key);
+				seqRs.close();
 			}
 			this.callInterceptorAsAfter(ctx);
 		} catch (SQLException e) {
-			//@todo: 异常处理
-			throw new RuntimeException(e);
+			throw new BeetlSQLException(BeetlSQLException.SQL_EXCEPTION,e);
 		} finally {
-			try {
-				if (ps != null)
-					ps.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			clean(ps);
 		}
 	}
 	
@@ -196,7 +186,7 @@ public class SQLScript {
 		sql = ctx.getSql();
 		objs = ctx.getParas();
 		try {
-			ps = sm.getDs().getReadConn(ctx).prepareStatement(sql);
+			ps = sm.getDs().getConn(id,false,sql,objs).prepareStatement(sql);
 			for (int i = 0; i < objs.size(); i++)
 				ps.setObject(i + 1, objs.get(i));
 			rs = ps.executeQuery();
@@ -209,16 +199,9 @@ public class SQLScript {
 			
 			this.callInterceptorAsAfter(ctx);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new BeetlSQLException(BeetlSQLException.SQL_EXCEPTION,e);
 		} finally {
-			try {
-				if (rs != null)
-					rs.close();
-				if (ps != null)
-					ps.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			clean(ps,rs);
 		}
 		return resultList;
 	}
@@ -330,9 +313,9 @@ public class SQLScript {
 		return this.singleSelect(paras, Long.class);
 	}
 	
-	public int update(Object obj) {
-		Map<String, Object> paras = new HashMap<String, Object>();
-		paras.put("_root", obj);
+	
+	public int update(Map paras){
+		
 		SQLResult result = run(paras);
 		String sql = result.jdbcSql;
 		List<Object> objs = result.jdbcPara;
@@ -344,22 +327,51 @@ public class SQLScript {
 		PreparedStatement ps = null;
 		// 执行jdbc
 		try {
-			ps = sm.getDs().getWriteConn(ctx).prepareStatement(sql);
+			ps = sm.getDs().getConn(id,true,sql,objs).prepareStatement(sql);
 			for (int i = 0; i < objs.size(); i++)
 				ps.setObject(i + 1, objs.get(i));
 			rs = ps.executeUpdate();
 			this.callInterceptorAsAfter(ctx);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new BeetlSQLException(BeetlSQLException.SQL_EXCEPTION,e);
 		} finally {
-			try {
-				if (ps != null)
-					ps.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			clean(ps);
+		}
+		return rs;
+	}
+	
+	public int update(Object obj) {
+		Map<String, Object> paras = new HashMap<String, Object>();
+		paras.put("_root", obj);
+		return this.update(paras);
+	}
+	
+	public int[] updateBatch(Map[] maps) {
+		int[] rs = null;
+		PreparedStatement ps = null;
+		// 执行jdbc
+		try {
+			for(int k = 0;k<maps.length;k++ ){
+				Map paras = maps[k];
+				SQLResult result = run(paras);
+				List<Object> objs = result.jdbcPara;
+				InterceptorContext ctx = this.callInterceptorAsBefore(this.id,sql, objs);
+				if(ps==null){
+					ps = sm.getDs().getConn(id,true,sql,objs).prepareStatement(result.jdbcSql);
+				}	
+				for (int i = 0; i < objs.size(); i++)
+					ps.setObject(i + 1, objs.get(i));
+				ps.addBatch();
+				this.callInterceptorAsAfter(ctx);
 			}
+			rs = ps.executeBatch();
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			throw new BeetlSQLException(BeetlSQLException.SQL_EXCEPTION,e);
+		} finally {
+			clean(ps);
 		}
 		return rs;
 	}
@@ -369,41 +381,34 @@ public class SQLScript {
 	 * @return
 	 */
 	public int[] updateBatch(List<?> list) {
-		Object obj = list.get(0);
-		Map<String, Object> paras = new HashMap<String, Object>();
-		paras.put("_root", obj);
-		SQLResult result = run(paras);
-		String sql = result.jdbcSql;
-		List<Object> objs = result.jdbcPara;
-		InterceptorContext ctx = this.callInterceptorAsBefore(this.id,sql, objs);
-		sql = ctx.getSql();
-		objs = ctx.getParas();
+
 		int[] rs = null;
 		PreparedStatement ps = null;
 		// 执行jdbc
 		try {
-			ps = sm.getDs().getWriteConn(ctx).prepareStatement(sql);
+		
 			for(int k = 0;k<list.size();k++ ){
+				Map paras = new HashMap();
 				paras.put("_root", list.get(k));
-				result = run(paras);
-				objs = result.jdbcPara;
+				SQLResult result = run(paras);
+				List<Object> objs = result.jdbcPara;
+				InterceptorContext ctx = this.callInterceptorAsBefore(this.id,sql, objs);
+				if(ps==null){
+					ps = sm.getDs().getConn(id,true,sql,objs).prepareStatement(result.jdbcSql);
+				}				
+				
 				for (int i = 0; i < objs.size(); i++)
 					ps.setObject(i + 1, objs.get(i));
 				ps.addBatch();
+				this.callInterceptorAsAfter(ctx);
 			}
 			rs = ps.executeBatch();
-			this.callInterceptorAsAfter(ctx);
+			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new BeetlSQLException(BeetlSQLException.SQL_EXCEPTION,e);
 		} finally {
-			try {
-				if (ps != null)
-					ps.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			clean(ps);
 		}
 		return rs;
 	}
@@ -431,23 +436,16 @@ public class SQLScript {
 		sql = ctx.getSql();
 		objs = ctx.getParas();
 		try {
-			ps = sm.getDs().getReadConn(ctx).prepareStatement(sql);
+			ps = sm.getDs().getConn(id,false,sql,objs).prepareStatement(sql);
 			for (int i = 0; i < objs.size(); i++)
 				ps.setObject(i + 1, objs.get(i));
 			rs = ps.executeQuery();
 			model = queryMapping.query(rs, new BeanHandler<T>(clazz, this.sm.getNc()));
 			this.callInterceptorAsAfter(ctx);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new BeetlSQLException(BeetlSQLException.SQL_EXCEPTION,e);
 		} finally {
-			try {
-				if (rs != null)
-					rs.close();
-				if (ps != null)
-					ps.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			clean(ps,rs);
 		}
 		return model;
 	}
@@ -475,33 +473,36 @@ public class SQLScript {
 		int rs = 0;
 		PreparedStatement ps = null;
 		try {
-			ps = sm.getDs().getWriteConn(ctx).prepareStatement(sql);
+			ps = sm.getDs().getConn(id,true,sql,objs).prepareStatement(sql);
 			for (int i = 0; i < objs.size(); i++)
 				ps.setObject(i + 1, objs.get(i));
 			rs = ps.executeUpdate();
 			this.callInterceptorAsAfter(ctx);
 		} catch (SQLException e) {
-			e.printStackTrace();
+			throw new BeetlSQLException(BeetlSQLException.SQL_EXCEPTION,e);
 		} finally {
-			try {
-				if (ps != null)
-					ps.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			clean(ps);
 		}
 		return rs;
 	}
 	
-//	public String getFieldValue(Field field, Object obj)
-//			throws IllegalArgumentException, IllegalAccessException {
-//		if (field.getType().equals(java.sql.Date.class)
-//				|| field.getType().equals(java.util.Date.class)) {
-//			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-//			return sdf.format(field.get(obj));
-//		}
-//		return field.get(obj).toString();
-//	}
+	private void clean(PreparedStatement ps){
+		try {
+			ps.close();
+		} catch (SQLException e) {
+		
+		}
+	}
+	
+	private void clean(PreparedStatement ps,ResultSet rs){
+		try {
+			rs.close();
+			ps.close();
+			
+		} catch (SQLException e) {
+		
+		}
+	}
 
 	private InterceptorContext callInterceptorAsBefore(String sqlId,String sql,List<Object> paras){
 		

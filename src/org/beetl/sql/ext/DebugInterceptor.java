@@ -32,7 +32,9 @@ public class DebugInterceptor implements Interceptor {
 
 	@Override
 	public void after(InterceptorContext ctx) {
-		
+		long time = System.currentTimeMillis();
+		long start = (Long)ctx.get("debug.time");
+		System.out.println("success:sqlId="+ctx.getSqlId()+",("+(time-start)+")");
 
 	}
 	

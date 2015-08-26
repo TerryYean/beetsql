@@ -48,7 +48,7 @@ public class PageSelectTest {
 	public void selectAll(){
 		User user = new User();
 		user.setAge(11);
-		long total = manager.singleSelect("user.selectCountUser2", user, Long.class);
+		long total = manager.selectSingle("user.selectCountUser2", user, Long.class);
 		System.out.println(total);
 		List<User> userList  = manager.select("user.selectUser2", User.class, user, 1,2);
 		

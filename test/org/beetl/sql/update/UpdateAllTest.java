@@ -3,6 +3,9 @@
  */
 package org.beetl.sql.update;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.beetl.sql.buildsql.MySqlConnectoinSource;
 import org.beetl.sql.core.ClasspathLoader;
 import org.beetl.sql.core.SQLLoader;
@@ -32,7 +35,7 @@ public class UpdateAllTest {
 	 * 
 	 * TODO 新增trim方法修改后测试
 	 */
-	@Test
+//	@Test
 	public void updateAll(){
 		
 		User user = new User();
@@ -42,6 +45,34 @@ public class UpdateAllTest {
 //		user.setUserName("aaa");
 		
 		int i = manager.updateAll(User.class, user);
+		System.out.println(i);
+	}
+	
+	
+//	@Test
+	public void updateName(){
+		
+		User user = new User();
+		user.setAge(7);
+		user.setName("hellogo");
+		int i = manager.update("user.updateName", user);
+		System.out.println(i);
+	}
+	
+	@Test
+	public void batchUpdateName(){
+		
+		User user = new User();
+		user.setAge(7);
+		user.setName("hellogo123");
+		
+		List<User> list = new ArrayList<User>();
+		list.add(user);
+		
+		
+		
+		
+		int[] i = manager.updateBatch ("user.updateName", list);
 		System.out.println(i);
 	}
 	

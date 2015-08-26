@@ -19,7 +19,7 @@ public class MetadataManager {
 		this.ds = ds;
 		try {
 
-			this.dbmd = ds.getReadConn(null).getMetaData();
+			this.dbmd = ds.getMaster().getMetaData();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
