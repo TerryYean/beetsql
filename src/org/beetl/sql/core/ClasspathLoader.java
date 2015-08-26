@@ -59,6 +59,7 @@ public class ClasspathLoader implements SQLLoader {
 		if(this.autoCheck&&isModified(id)){
 			loadSql(id);
 		}
+		
 		ss = sqlSourceMap.get(id);
 		if(ss == null){
 			try {

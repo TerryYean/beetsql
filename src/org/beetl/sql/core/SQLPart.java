@@ -1,5 +1,6 @@
 package org.beetl.sql.core;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -11,7 +12,9 @@ import java.util.Map;
 public class SQLPart {
 	
 	public Map getUpdateValue(String colName,Object value){
-		return null;
+		Map<String,Object> map = new HashMap<String, Object>();
+		map.put(colName, value);
+		return map;
 	}
 	
 	public String getSelectSuffix(){
