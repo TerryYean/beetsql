@@ -62,5 +62,5 @@ public class ManagerGeneraTest {
 //    	System.out.println("=====count=====\n"+script.getSql());
     	System.out.println("=====batchUpdate=====\n"+script.getSql());
 	}
-
+	
 }

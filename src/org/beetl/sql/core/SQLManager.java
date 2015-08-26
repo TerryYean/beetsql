@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.beetl.sql.core.db.DBStyle;
+import org.beetl.sql.core.db.KeyHolder;
 import org.beetl.sql.core.db.MetadataManager;
 import org.beetl.sql.core.engine.Beetl;
 
@@ -25,6 +26,7 @@ public class SQLManager {
 	private SQLLoader sqlLoader;
 	private ConnectionSource ds = null;//数据库连接管理 TODO 应该指定一个默认数据库连接管理
 	private NameConversion nc = null;//名字转换器
+	private static MetadataManager metaDataManager;
 	Interceptor[] inters = {};
 	Beetl beetl = null;
 
@@ -35,7 +37,7 @@ public class SQLManager {
 		this.ds = ds;
 		this.nc = new HumpNameConversion();
 		this.dbStyle.setNameConversion(this.nc);
-		this.dbStyle.setMetadataManager(new MetadataManager(this.ds));
+		this.dbStyle.setMetadataManager(getMetadataManager());
 		this.dbStyle.init(beetl);
 		
 	}
@@ -49,9 +51,33 @@ public class SQLManager {
 		this.nc = nc;
 		this.inters = inters;
 		this.dbStyle.setNameConversion(this.nc);
-		this.dbStyle.setMetadataManager(new MetadataManager(this.ds));
+		this.dbStyle.setMetadataManager(getMetadataManager());
 		this.dbStyle.init(beetl);
 	}
+	
+	/**
+	 * 
+	 * @MethodName: getMetadataManager   
+	 * @Description: 获取MetaDataManager  
+	 * @param @return  
+	 * @return MetadataManager  
+	 * @throws
+	 */
+	private MetadataManager getMetadataManager(){
+		if(isProductMode(this.sqlLoader)){
+			if(metaDataManager == null){
+				return new MetadataManager(this.ds);
+			}
+			return metaDataManager;
+		}
+		return new MetadataManager(this.ds);
+	}
+	
+	//是否是生产模式:生产模式无需new MetadataManager
+	private boolean isProductMode(SQLLoader sqlLoader){
+		return !sqlLoader.isAutoCheck();
+	}
+	
 
 	public SQLResult getSQLResult(String id, Map<String, Object> paras) {
 		SQLScript script = getScript(id);
@@ -347,36 +373,36 @@ public class SQLManager {
 	
 	
 	public Long  selectLong(String id,Map paras) {
-		return this.singleSelect(id, paras, Long.class);
+		return this.selectSingle(id, paras, Long.class);
 	}
 	
 	public Long  selectLong(String id,Object paras) {
-		return this.singleSelect(id, paras, Long.class);
+		return this.selectSingle(id, paras, Long.class);
 	}
 	
 	public Integer  selectInt(String id,Object paras) {
-		return this.singleSelect(id, paras, Integer.class);
+		return this.selectSingle(id, paras, Integer.class);
 	}
 	
 	public Integer  selectInt(String id,Map paras) {
-		return this.singleSelect(id, paras, Integer.class);
+		return this.selectSingle(id, paras, Integer.class);
 	}
 	
 	public BigDecimal  selectBigDecimal(String id,Object paras) {
-		return this.singleSelect(id, paras, BigDecimal.class);
+		return this.selectSingle(id, paras, BigDecimal.class);
 	}
 	
 	public BigDecimal  selectBigDecimal(String id,Map paras) {
-		return this.singleSelect(id, paras, BigDecimal.class);
+		return this.selectSingle(id, paras, BigDecimal.class);
 	}
 	
-	public <T> T singleSelect(String id,Object paras, Class<T> target) {
+	public <T> T selectSingle(String id,Object paras, Class<T> target) {
 		SQLScript script = getScript(id);
 		return script.singleSelect(paras, target);
 	}
 	
 	
-	public <T> T singleSelect(String id,Map paras, Class<T> target) {
+	public <T> T selectSingle(String id,Map paras, Class<T> target) {
 		SQLScript script = getScript(id);
 		return script.singleSelect(paras, target);
 	}
@@ -397,6 +423,24 @@ public class SQLManager {
 		SQLScript script = getScript(clazz, DELETE_BY_ID);
 		return script.deleteById(clazz, value);
 	}
+	
+	//============= 插入 ===================  //
+	
+	public void insert(Class clazz,Object paras){
+		SQLScript script = getScript(clazz,INSERT );
+		script.insert(paras);
+	}
+	
+	/** 插入，并获取主键
+	 * @param clazz
+	 * @param paras
+	 * @param holder
+	 */
+	public void insert(Class clazz,Object paras,KeyHolder holder){
+		SQLScript script = getScript(clazz,INSERT);
+		script.insert(paras,holder );
+	}
+	
 	
 	/**
 	 * 
@@ -421,9 +465,10 @@ public class SQLManager {
 		SQLScript script = getScript(obj.getClass(), UPDATE_BY_ID);
 		return script.update(obj);
 	}
+	
 	/****
 	 * 批量更新
-	 * @param list
+	 * @param list ,包含pojo（不支持map）
 	 * @return
 	 */
 	public int[] updateByIdBatch(List<?> list){
@@ -433,6 +478,50 @@ public class SQLManager {
 		SQLScript script = getScript(list.get(0).getClass(), UPDATE_BY_ID);
 		return script.updateBatch(list);
 	}
+	
+	
+	/**  执行sql更新语句
+	 * @param sqlId
+	 * @param obj
+	 * @return
+	 */
+	public int update(String sqlId,Object obj){
+		SQLScript script = getScript(sqlId);
+		return script.update(obj);
+	}
+	
+	
+	/**  执行sql更新语句
+	 * @param sqlId
+	 * @param paras
+	 * @return
+	 */
+	public int update(String sqlId,Map paras){
+		SQLScript script = getScript(sqlId);
+		return script.update(paras);
+	}
+	
+	
+	/**  对pojo批量更新执行sql更新语句
+	 * @param sqlId 
+	 * @param paras 
+	 * @return
+	 */
+	public int[] updateBatch(String sqlId,List list){
+		SQLScript script = getScript(sqlId);
+		return script.updateBatch(list);
+	}
+	
+	/**批量更新
+	 * @param sqlId
+	 * @param maps  参数放在map里
+	 * @return
+	 */
+	public int[] updateBatch(String sqlId,Map[] maps){
+		SQLScript script = getScript(sqlId);
+		return script.updateBatch(maps);
+	}
+	
 	
 	/**
 	 * 

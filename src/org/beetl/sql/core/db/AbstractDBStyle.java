@@ -222,7 +222,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 	 * @param fieldName
 	 * @return
 	 */
-	private String appendSetColumnAbsolute(Class c,String tableName,String fieldName) {
+	private String appendSetColumnAbsolute(Class<?> c,String tableName,String fieldName) {
 		String colName = nameConversion.getColName(c,fieldName);
 		if (metadataManager.existColName(tableName, colName)) {
 			return colName + "="+HOLDER_START + fieldName + HOLDER_END+",";
@@ -236,7 +236,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 	 * @param fieldName
 	 * @return
 	 */
-	private String appendSetColumn(Class c,String tableName,String fieldName,String...prefixs) {
+	private String appendSetColumn(Class<?> c,String tableName,String fieldName,String...prefixs) {
 		String prefix = "";
 		if(prefixs.length > 0){
 			prefix = prefixs[0]+".";
@@ -256,7 +256,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 	 * @param fieldName
 	 * @return
 	 */
-	private String appendWhere(Class c,String tableName,String fieldName,String...prefixs) {
+	private String appendWhere(Class<?> c,String tableName,String fieldName,String...prefixs) {
 		String prefix = "";
 		if(prefixs.length > 0){
 			prefix = prefixs[0]+".";
@@ -277,7 +277,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 	 * @param fieldName
 	 * @return
 	 */
-	private String appendInsertColumn(Class c,String tableName,String fieldName) {
+	private String appendInsertColumn(Class<?> c,String tableName,String fieldName) {
 		String colName = nameConversion.getColName(c,fieldName);
 		if (metadataManager.existColName(tableName, colName)) {
 			return  colName + ",";
@@ -291,7 +291,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 	 * @param fieldName
 	 * @return
 	 */
-	private String appendInsertVlaue(Class c,String tableName,String fieldName) {
+	private String appendInsertVlaue(Class<?> c,String tableName,String fieldName) {
 		String colName = nameConversion.getColName(c,fieldName);
 		if (metadataManager.existColName(tableName, colName)) {
 			return  HOLDER_START+ fieldName + HOLDER_END+",";
@@ -328,13 +328,15 @@ public abstract class AbstractDBStyle implements DBStyle {
 	 * @param tableName
 	 * @param fieldName
 	 * @return
-	 */
+	 
 	private String appendIdList(String idName) {
 		return new StringBuilder(lineSeparator).append(STATEMENT_START)
 				.append("trim(){for(obj in map){").append(STATEMENT_END)
 				.append(HOLDER_START+ "obj."+idName + HOLDER_END+",").append(lineSeparator)
 				.append(STATEMENT_START).append("}}").append(STATEMENT_END).toString();
 	}
+	*/
+	
 	/****
 	 * 方法是否能用来生成select语句
 	 * @param method
@@ -348,6 +350,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 				&& !java.sql.Date.class.isAssignableFrom(method.getReturnType())
 				&& !java.util.Calendar.class.isAssignableFrom(method.getReturnType());
 	}
+	
 	/****
 	 * 方法是否能用来生成select之外的语句，如update，insert
 	 * @param method
@@ -356,7 +359,5 @@ public abstract class AbstractDBStyle implements DBStyle {
 	private boolean isLegalOtherMethod(Method method){
 		return method.getDeclaringClass() != Object.class && method.getName().startsWith("get");
 	}
-	
-	
 
 }
