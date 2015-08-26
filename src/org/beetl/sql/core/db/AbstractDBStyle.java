@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.beetl.core.Configuration;
 import org.beetl.sql.core.NameConversion;
+import org.beetl.sql.core.SQLPart;
 import org.beetl.sql.core.SQLSource;
 import org.beetl.sql.core.engine.Beetl;
 import org.beetl.sql.core.kit.StringKit;
@@ -138,6 +139,7 @@ public abstract class AbstractDBStyle implements DBStyle {
 	
 	@Override
 	public SQLSource genUpdateTemplate (Class<?> cls) {
+		//SQLPart s = new SQLPart();
 		String tableName = nameConversion.getTableName(cls);
 		StringBuilder sql = new StringBuilder("update ").append(tableName).append(" set ").append(lineSeparator);
 		String fieldName = null;

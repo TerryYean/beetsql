@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.HashMap;
+import java.rmi.UnexpectedException;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -27,17 +27,14 @@ import org.beetl.sql.core.db.MySqlStyle;
  */
 public class ClasspathLoader implements SQLLoader {
 
-
-
 	String sqlRoot = null;
 
 	private String lineSeparator = System.getProperty("line.separator", "\n");
 
 	private static Map<String, SQLSource> sqlSourceMap = new ConcurrentHashMap<String, SQLSource>();
 	private static Map<String, Long> sqlSourceVersion = new ConcurrentHashMap<String, Long> ();
-	
 
-//	private DBStyle dbs = null;
+	private DBStyle dbs = null;
 	
 	private boolean autoCheck = true;
 
@@ -46,6 +43,11 @@ public class ClasspathLoader implements SQLLoader {
 	}
 	public  ClasspathLoader(String root) {
 		this.sqlRoot = root;
+		dbs = new MySqlStyle();
+	}
+	public  ClasspathLoader(String root,DBStyle dbs) {
+		this.sqlRoot = root;
+		this.dbs = dbs;
 	}
 
 	@Override
@@ -58,6 +60,13 @@ public class ClasspathLoader implements SQLLoader {
 			loadSql(id);
 		}
 		ss = sqlSourceMap.get(id);
+		if(ss == null){
+			try {
+				throw new UnexpectedException("在"+sqlRoot+"和"+sqlRoot + File.separator+dbs.getName()+"未找到"+id+"相关的SQL");
+			} catch (UnexpectedException e) {
+				e.printStackTrace();
+			}
+		}
 		return ss;
 		
 	
@@ -65,7 +74,7 @@ public class ClasspathLoader implements SQLLoader {
 	
 	@Override
 	public boolean isModified(String id) {
-		File file = this.getFile(id);	//TODO 可能会有问题：感觉应该是处理id，id可能是user.selectUser ，应该处理为user.md
+		File file = this.getFile(id);//TODO 可能会有问题：感觉应该是处理id，id可能是user.selectUser ，应该处理为user.md
 		if(file==null) return true;
 		long lastModify = file.lastModified();
 		Long oldVersion = sqlSourceVersion.get(id);
@@ -169,12 +178,36 @@ public class ClasspathLoader implements SQLLoader {
 	public void setSqlRoot(String sqlRoot) {
 		this.sqlRoot = sqlRoot;
 	}
+	/***
+	 * 获取.md文件
+	 * @param id
+	 * @return
+	 * @throws UnexpectedException 
+	 */
 	private File getFile(String id){
 		String modelName = id.substring(0, id.lastIndexOf(".") + 1);
 		URL  url = this.getClass().getResource(
-				sqlRoot + "/"+ modelName + "md");
-		if(url==null) return null;
-		File file = new File( url.getFile());
+				sqlRoot + File.separator+dbs.getName()
+				+File.separator+ modelName + "md");
+		
+		if(url==null) url = this.getClass().getResource(
+				sqlRoot + File.separator+ modelName + "md");
+		try {
+			if(url==null) 
+				throw new UnexpectedException("在"+sqlRoot+"和"+sqlRoot + File.separator+dbs.getName()+"未找到"+id+"相关的SQL");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		File file = new File(url.getFile());
+		try {
+			if(file == null){
+				url = this.getClass().getResource(sqlRoot + File.separator+ modelName + "md");
+				file = new File(url.getFile());
+				if(file==null)throw new UnexpectedException("在"+sqlRoot+"和"+sqlRoot + File.separator+dbs.getName()+"未找到相关SQL");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return file;
 	}
 	@Override
