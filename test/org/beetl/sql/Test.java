@@ -1,24 +1,24 @@
 package org.beetl.sql;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import static org.beetl.sql.core.kit.Constants.DELETE_BY_ID;
+import static org.beetl.sql.core.kit.Constants.INSERT;
+import static org.beetl.sql.core.kit.Constants.SELECT_ALL;
+import static org.beetl.sql.core.kit.Constants.SELECT_BY_ID;
+import static org.beetl.sql.core.kit.Constants.SELECT_BY_TEMPLATE;
+import static org.beetl.sql.core.kit.Constants.UPDATE_ALL;
+import static org.beetl.sql.core.kit.Constants.UPDATE_BY_ID;
+
 import java.util.HashMap;
 import java.util.Map;
 
+import org.beetl.sql.buildsql.MySqlConnectoinSource;
 import org.beetl.sql.core.ClasspathLoader;
-import org.beetl.sql.core.ConnectionSource;
-import org.beetl.sql.core.HumpNameConversion;
-import org.beetl.sql.core.InterceptorContext;
-import org.beetl.sql.core.NameConversion;
 import org.beetl.sql.core.SQLLoader;
 import org.beetl.sql.core.SQLManager;
 import org.beetl.sql.core.SQLScript;
-import org.beetl.sql.core.UnderlinedNameConversion;
 import org.beetl.sql.core.db.DBStyle;
 import org.beetl.sql.core.db.MySqlStyle;
 import org.beetl.sql.pojo.User;
-import static org.beetl.sql.core.kit.Constants.*;
 
 /** 简单快速的功能测试类
  * @author xiandafu
@@ -93,43 +93,7 @@ public class Test {
 	
 	
 	
-	static class MySqlConnectoinSource implements ConnectionSource{
 
-//		@Override
-		private  Connection getConn() {
-			String driver = "com.mysql.jdbc.Driver";
-	        String dbName = "test";
-	        String passwrod = "root";
-	        String userName = "root";
-	        String url = "jdbc:mysql://localhost:3306/" + dbName;
-	        String sql = "select * from users";
-	        Connection conn = null;
-	        try {
-				Class.forName(driver);
-				conn = DriverManager.getConnection(url, userName,
-		                passwrod);
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return conn;
-		}
-
-		@Override
-		public Connection getReadConn(InterceptorContext ctx) {
-			return this.getConn();
-		}
-
-		@Override
-		public Connection getWriteConn(InterceptorContext ctx) {
-			return this.getConn();
-		}
-		
-	}
-	
 	
 	
 	private static Map<String, Object> getUserParas(){

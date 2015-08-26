@@ -26,6 +26,7 @@ public class SQLManager {
 	private SQLLoader sqlLoader;
 	private ConnectionSource ds = null;//数据库连接管理 TODO 应该指定一个默认数据库连接管理
 	private NameConversion nc = null;//名字转换器
+	private static MetadataManager metaDataManager;
 	Interceptor[] inters = {};
 	Beetl beetl = null;
 
@@ -36,7 +37,7 @@ public class SQLManager {
 		this.ds = ds;
 		this.nc = new HumpNameConversion();
 		this.dbStyle.setNameConversion(this.nc);
-		this.dbStyle.setMetadataManager(new MetadataManager(this.ds));
+		this.dbStyle.setMetadataManager(getMetadataManager());
 		this.dbStyle.init(beetl);
 		
 	}
@@ -50,9 +51,33 @@ public class SQLManager {
 		this.nc = nc;
 		this.inters = inters;
 		this.dbStyle.setNameConversion(this.nc);
-		this.dbStyle.setMetadataManager(new MetadataManager(this.ds));
+		this.dbStyle.setMetadataManager(getMetadataManager());
 		this.dbStyle.init(beetl);
 	}
+	
+	/**
+	 * 
+	 * @MethodName: getMetadataManager   
+	 * @Description: 获取MetaDataManager  
+	 * @param @return  
+	 * @return MetadataManager  
+	 * @throws
+	 */
+	private MetadataManager getMetadataManager(){
+		if(isProductMode(this.sqlLoader)){
+			if(metaDataManager == null){
+				return new MetadataManager(this.ds);
+			}
+			return metaDataManager;
+		}
+		return new MetadataManager(this.ds);
+	}
+	
+	//是否是生产模式:生产模式无需new MetadataManager
+	private boolean isProductMode(SQLLoader sqlLoader){
+		return !sqlLoader.isAutoCheck();
+	}
+	
 
 	public SQLResult getSQLResult(String id, Map<String, Object> paras) {
 		SQLScript script = getScript(id);

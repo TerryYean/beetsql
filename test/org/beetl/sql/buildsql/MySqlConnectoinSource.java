@@ -6,6 +6,7 @@ package org.beetl.sql.buildsql;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.beetl.sql.core.ConnectionSource;
 import org.beetl.sql.core.InterceptorContext;
@@ -16,7 +17,7 @@ import org.beetl.sql.core.InterceptorContext;
  */
 public class MySqlConnectoinSource implements ConnectionSource {
 	
-	private Connection getConn(){
+	private Connection _getConn(){
 		String driver = "com.mysql.jdbc.Driver";
         String dbName = "test";
         String passwrod = "lijzh780214";
@@ -36,13 +37,15 @@ public class MySqlConnectoinSource implements ConnectionSource {
 	}
 
 	@Override
-	public Connection getReadConn(InterceptorContext ctx) {
-		return this.getConn();
+	public Connection getMaster() {
+		return _getConn();
 	}
 
 	@Override
-	public Connection getWriteConn(InterceptorContext ctx) {
-		return this.getConn();
+	public Connection getConn(String sqlId, boolean isUpdate, String sql, List paras) {
+		return _getConn();
 	}
+
+	
 
 }
