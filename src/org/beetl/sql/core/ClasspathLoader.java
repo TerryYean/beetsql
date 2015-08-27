@@ -60,22 +60,12 @@ public class ClasspathLoader implements SQLLoader {
 			loadSql(id);
 		}
 		
-		ss = sqlSourceMap.get(id);
-		if(ss == null){
-			try {
-				throw new UnexpectedException("在"+sqlRoot+"和"+sqlRoot + File.separator+dbs.getName()+"未找到"+id+"相关的SQL");
-			} catch (UnexpectedException e) {
-				e.printStackTrace();
-			}
-		}
 		return ss;
-		
-	
 	}
 	
 	@Override
 	public boolean isModified(String id) {
-		File file = this.getFile(id);//TODO 可能会有问题：感觉应该是处理id，id可能是user.selectUser ，应该处理为user.md
+		File file = this.getFile(id);
 		if(file==null) return true;
 		long lastModify = file.lastModified();
 		Long oldVersion = sqlSourceVersion.get(id);
@@ -99,7 +89,13 @@ public class ClasspathLoader implements SQLLoader {
 	}
 
 	/***
-	 * 加载sql文件，并放入sqlSourceMap中
+	 *  考虑到夸数据库支持，ClasspathLoader加载SQL顺序如下：
+		首先根据DBStyle.getName() 找到对应的数据库名称，然后在ROOT/dbName 下找对应的sql，
+		如果ROOT/dbName 文件目录不存在，或者相应的sql文件不存在，再搜索ROOT目录下的sql文件。
+		如mysql 里查找user.select2,顺序如下：
+		- 先找ROOT/mysql/user.md 文件，如果有此文件，且包含了select2，则返回此sql语句，
+		- 如果没有，下一步查找ROOT/user.md,如果有此文件，且包含了slect2，则返回sql语句
+		- 都没有，抛错，告诉用户未在ROOT/,或者ROOT/mysql 下找到相关sql
 	 * 
 	 * @param file
 	 * @return
@@ -171,11 +167,10 @@ public class ClasspathLoader implements SQLLoader {
 		return sqlSourceMap;
 	}
 
-	
-	
 	public String getSqlRoot() {
 		return sqlRoot;
 	}
+	
 	public void setSqlRoot(String sqlRoot) {
 		this.sqlRoot = sqlRoot;
 	}
@@ -187,39 +182,43 @@ public class ClasspathLoader implements SQLLoader {
 	 */
 	private File getFile(String id){
 		String modelName = id.substring(0, id.lastIndexOf(".") + 1);
-		URL  url = this.getClass().getResource(
-				sqlRoot + File.separator+dbs.getName()
-				+File.separator+ modelName + "md");
+		String filePath = sqlRoot + "/" + dbs.getName() + "/" + modelName + "md";
+		URL url = this.getClass().getResource(filePath);
+		File file = null;
 		
-		if(url==null) url = this.getClass().getResource(
-				sqlRoot + File.separator+ modelName + "md");
-		try {
-			if(url==null) 
-				throw new UnexpectedException("在"+sqlRoot+"和"+sqlRoot + File.separator+dbs.getName()+"未找到"+id+"相关的SQL");
-		} catch (Exception e) {
-			e.printStackTrace();
+		if(url == null){
+			url = this.getClass().getResource(sqlRoot + "/" + modelName + "md");
 		}
-		File file = new File(url.getFile());
+		
 		try {
+			if(url==null) {
+				throw new UnexpectedException("在"+sqlRoot+"和"+sqlRoot + "/" +dbs.getName()+"未找到[id="+id+"]相关的SQL");
+			}
+			
+			file = new File(url.getFile());
 			if(file == null){
-				url = this.getClass().getResource(sqlRoot + File.separator+ modelName + "md");
+				url = this.getClass().getResource(sqlRoot + "/" + modelName + "md");
 				file = new File(url.getFile());
-				if(file==null)throw new UnexpectedException("在"+sqlRoot+"和"+sqlRoot + File.separator+dbs.getName()+"未找到相关SQL");
+				if(file==null){
+					throw new UnexpectedException("在"+sqlRoot+"和"+sqlRoot + "/" +dbs.getName()+"未找到[id="+id+"]相关的SQL");
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
 		return file;
 	}
+	
 	@Override
 	public boolean isAutoCheck() {
 		return this.autoCheck;
 	}
+	
 	@Override
 	public void setAutoCheck(boolean check) {
 		this.autoCheck = check;
 		
 	}
-	
 	
 }

@@ -44,23 +44,28 @@ public class ManagerGeneraTest {
 		
 		SQLScript script = manager.getScript(User.class,SELECT_BY_ID);
 		System.out.println("===SELECT_BY_ID===\n"+script.getSql());
-    	script = manager.getScript(User.class,DELETE_BY_ID);
-    	System.out.println("===DELETE_BY_ID===\n"+script.getSql());
-    	script = manager.getScript(User.class,SELECT_ALL);
+		
+		script = manager.getScript(User.class,SELECT_ALL);
     	System.out.println("===SELECT_ALL===\n"+script.getSql());
+    	
     	script = manager.getScript(User.class,SELECT_BY_TEMPLATE);
     	System.out.println("===SELECT_BY_TEMPLATE===\n"+script.getSql());
+    	
+    	script = manager.getScript(User.class,SELECT_COUNT_BY_TEMPLATE);
+    	System.out.println("===SELECT_COUNT_BY_TEMPLATE===\n"+script.getSql());
+    	
+    	script = manager.getScript(User.class,DELETE_BY_ID);
+    	System.out.println("===DELETE_BY_ID===\n"+script.getSql());
+    	
     	script = manager.getScript(User.class,UPDATE_ALL);
     	System.out.println("===UPDATE_ALL===\n"+script.getSql());
+    	
     	script = manager.getScript(User.class,UPDATE_BY_ID);
     	System.out.println("===UPDATE_BY_ID===\n"+script.getSql());
+    	
     	script = manager.getScript(User.class,INSERT);
     	System.out.println("===INSERT===\n"+script.getSql());
-    	script = manager.getPageSqlScript(manager.getScript(User.class,SELECT_BY_TEMPLATE).getSql());
-    	System.out.println("=====page=====\n"+script.getSql());
-//    	script = manager.getCountSqlScript(manager.getScript(User.class,SELECT_BY_TEMPLATE).getSql());
-//    	System.out.println("=====count=====\n"+script.getSql());
-    	System.out.println("=====batchUpdate=====\n"+script.getSql());
+    	
 	}
 	
 }

@@ -157,7 +157,7 @@ public class SQLManager {
 		if(source!=null){
 			return  new SQLScript(source, this);
 		}
-		SQLSource script = sqlLoader.getSQL(selectId); //TOOD 没猜错的话，应该会是个NullException,参数selectId是个模板语句
+		SQLSource script = sqlLoader.getSQL(selectId);
 		String template = script.getTemplate();
 		String pageTemplate = dbStyle.getPageSQL(template);
 		source = new SQLSource(pageId,pageTemplate);
@@ -334,11 +334,6 @@ public class SQLManager {
 		return (List<T>) script.select(t.getClass(), param,mapper);
 	}
 	
-	
-	
-	
-
-	
 	public <T> List<T> selectByTemplate(T t,int start,int size) {
 		
 		return this.selectByTemplate(t, null, start, size);
@@ -406,8 +401,6 @@ public class SQLManager {
 		SQLScript script = getScript(id);
 		return script.singleSelect(paras, target);
 	}
-	
-	
 	
 	/**
 	 * 

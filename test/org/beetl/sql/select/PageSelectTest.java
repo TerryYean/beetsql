@@ -13,7 +13,6 @@ import org.beetl.sql.core.db.MySqlStyle;
 import org.beetl.sql.pojo.User;
 import org.junit.Before;
 import org.junit.Test;
-import static org.beetl.sql.core.kit.Constants.*;
 /**
  * @author suxinjie
  *
@@ -29,7 +28,7 @@ public class PageSelectTest {
 		manager = new SQLManager(new MySqlStyle(), loader, new MySqlConnectoinSource());
 	}
 
-//	@Test
+	@Test
 	public void selectPageByTemplate(){
 		User user = new User();
 		user.setAge(11);
