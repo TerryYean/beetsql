@@ -60,6 +60,8 @@ public class ClasspathLoader implements SQLLoader {
 			loadSql(id);
 		}
 		
+		//处理完后再次获取
+		ss = sqlSourceMap.get(id);
 		return ss;
 	}
 	
@@ -192,7 +194,7 @@ public class ClasspathLoader implements SQLLoader {
 		
 		try {
 			if(url==null) {
-				throw new UnexpectedException("在"+sqlRoot+"和"+sqlRoot + "/" +dbs.getName()+"未找到[id="+id+"]相关的SQL");
+				throw new BeetlSQLException(BeetlSQLException.CANNOT_GET_SQL, "在"+sqlRoot+"和"+sqlRoot + "/" +dbs.getName()+"未找到[id="+id+"]相关的SQL");
 			}
 			
 			file = new File(url.getFile());
@@ -200,7 +202,7 @@ public class ClasspathLoader implements SQLLoader {
 				url = this.getClass().getResource(sqlRoot + "/" + modelName + "md");
 				file = new File(url.getFile());
 				if(file==null){
-					throw new UnexpectedException("在"+sqlRoot+"和"+sqlRoot + "/" +dbs.getName()+"未找到[id="+id+"]相关的SQL");
+					throw new BeetlSQLException(BeetlSQLException.CANNOT_GET_SQL, "在"+sqlRoot+"和"+sqlRoot + "/" +dbs.getName()+"未找到[id="+id+"]相关的SQL");
 				}
 			}
 		} catch (Exception e) {

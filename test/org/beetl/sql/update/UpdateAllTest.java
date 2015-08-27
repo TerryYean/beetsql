@@ -8,9 +8,12 @@ import java.util.List;
 
 import org.beetl.sql.buildsql.MySqlConnectoinSource;
 import org.beetl.sql.core.ClasspathLoader;
+import org.beetl.sql.core.HumpNameConversion;
+import org.beetl.sql.core.Interceptor;
 import org.beetl.sql.core.SQLLoader;
 import org.beetl.sql.core.SQLManager;
 import org.beetl.sql.core.db.MySqlStyle;
+import org.beetl.sql.ext.DebugInterceptor;
 import org.beetl.sql.pojo.User;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +30,8 @@ public class UpdateAllTest {
 	@Before
 	public void before(){
 		loader = new ClasspathLoader("/sql/mysql");
-		manager = new SQLManager(new MySqlStyle(), loader, new MySqlConnectoinSource());
+		//manager = new SQLManager(new MySqlStyle(), loader, new MySqlConnectoinSource());
+		manager = new SQLManager(new MySqlStyle(), loader, new MySqlConnectoinSource(), new HumpNameConversion(), new Interceptor[]{new DebugInterceptor()});
 	}
 
 	/**
@@ -49,11 +53,11 @@ public class UpdateAllTest {
 	}
 	
 	
-//	@Test
+	@Test
 	public void updateName(){
 		
 		User user = new User();
-		user.setAge(7);
+//		user.setAge(12);
 		user.setName("hellogo");
 		int i = manager.update("user.updateName", user);
 		System.out.println(i);

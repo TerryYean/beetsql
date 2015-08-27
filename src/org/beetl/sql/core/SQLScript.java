@@ -517,7 +517,7 @@ public class SQLScript {
 		if(sm.inters==null) return  ;
 		
 		for(Interceptor in:sm.inters){
-			in.befor(ctx);
+			in.after(ctx);
 		}
 		return ;
 	}

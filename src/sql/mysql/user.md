@@ -26,7 +26,7 @@ selectAll
     
 updateName
 ===
-    update user set name =#name# where age>#age#
+    update user set name =#name# where age<#age#
     
 selectByExample
 ===

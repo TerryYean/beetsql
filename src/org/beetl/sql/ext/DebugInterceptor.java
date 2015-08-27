@@ -34,17 +34,23 @@ public class DebugInterceptor implements Interceptor {
 	public void after(InterceptorContext ctx) {
 		long time = System.currentTimeMillis();
 		long start = (Long)ctx.get("debug.time");
-		System.out.println("success:sqlId="+ctx.getSqlId()+",("+(time-start)+")");
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append("======DebugInterceptor After======\n")
+			.append("sqlId : " + ctx.getSqlId()).append("\n")
+			.append("execution time : "+(time-start)+"ms").append("\n")
+			.append("result : success");
+		System.out.println(sb.toString());
 
 	}
 	
 	protected void print(String sqlId,String sql,List<Object> paras){
-		System.out.println("sqlId="+sqlId);
-		System.out.println("=====================");
-		System.out.println(sql);
-		System.out.println(paras);
-		
-		
+		StringBuilder sb = new StringBuilder();
+		sb.append("======DebugInterceptor Before======\n")
+			.append("sqlId : "+sqlId).append("\n")
+			.append("sql ： " + sql)
+			.append("paras : " + paras);
+		System.out.println(sb.toString());
 	}
 	
 	protected boolean isDebugEanble(String sqlId){

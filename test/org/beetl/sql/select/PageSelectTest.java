@@ -3,13 +3,17 @@
  */
 package org.beetl.sql.select;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.beetl.sql.buildsql.MySqlConnectoinSource;
 import org.beetl.sql.core.ClasspathLoader;
+import org.beetl.sql.core.RowMapper;
 import org.beetl.sql.core.SQLLoader;
 import org.beetl.sql.core.SQLManager;
 import org.beetl.sql.core.db.MySqlStyle;
+import org.beetl.sql.pojo.Role;
 import org.beetl.sql.pojo.User;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,10 +50,36 @@ public class PageSelectTest {
 	@Test
 	public void selectAll(){
 		User user = new User();
-		user.setAge(11);
-		long total = manager.selectSingle("user.selectCountUser2", user, Long.class);
+		user.setAge(12);
+		Integer total = manager.selectSingle("user.selectCountUser2", user, Integer.class);
 		System.out.println(total);
 		List<User> userList  = manager.select("user.selectUser2", User.class, user, 1,2);
+		
+//		List<User> userList = manager.selectAll(User.class);
+		for(User t : userList){
+			System.out.println(t);
+		}
+		
+	}
+	
+	@Test
+	public void selectAllOfRowMapper(){
+		User user = new User();
+		user.setAge(12);
+		Integer total = manager.selectSingle("user.selectCountUser2", user, Integer.class);
+		System.out.println(total);
+		List<User> userList  = manager.select("user.selectCountUser2", User.class, user, new RowMapper<User>() {
+
+			@Override
+			public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+				User u = new User();
+				u.setId(rs.getInt(3));
+				u.setName(rs.getString(4));
+				Role r = manager.selectById(Role.class, rs.getInt(5));
+				u.setRole(r);
+				return u;
+			}
+		}, 1, 2);
 		
 //		List<User> userList = manager.selectAll(User.class);
 		for(User t : userList){
