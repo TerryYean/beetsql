@@ -16,6 +16,7 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.ResultSet;
@@ -144,17 +145,33 @@ public class BeanProcessor {
 		Map<String, Object> result = new CaseInsensitiveHashMap();
 		ResultSetMetaData rsmd = rs.getMetaData();
 		int cols = rsmd.getColumnCount();
-		String tableName = nc.getTableName(c);
+//		String tableName = nc.getTableName(c);
 		for (int i = 1; i <= cols; i++) {
+			
 			String columnName = rsmd.getColumnLabel(i);
 			if (null == columnName || 0 == columnName.length()) {
 				columnName = rsmd.getColumnName(i);
 			}
-			result.put(this.nc.getPropertyName(c,columnName), rs.getObject(i)); //个人感觉此处不转换会好一些，直观
+			
+			// 通过ResultSetMetaData类，可判断该列数据类型
+			if (columnName.equals("BLOB")) {
+				java.sql.Blob bb = rs.getBlob(i);
+				byte[] b = bb.getBytes(1, (int) bb.length());
+
+				// 将结果放到Map中
+				//TODO 是该放String还是byte[]
+				//result.put(this.nc.getPropertyName(c,columnName), new String(b, "utf-8"));
+				//result.put(this.nc.getPropertyName(c,columnName), b);
+				
+				//rs.getObject()在取Blob的时候会是乱码~
+				result.put(this.nc.getPropertyName(c,columnName), rs.getObject(i));
+			} else {
+				// 不是则按原来逻辑运算
+				result.put(this.nc.getPropertyName(c,columnName), rs.getObject(i));
+			}
 		}
 
 		return result;
-
 	}
 	
 	/**
