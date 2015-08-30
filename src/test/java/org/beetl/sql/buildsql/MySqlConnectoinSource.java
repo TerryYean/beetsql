@@ -8,6 +8,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.beetl.sql.DBConfig;
 import org.beetl.sql.core.ConnectionSource;
 import org.beetl.sql.core.InterceptorContext;
 
@@ -18,16 +19,16 @@ import org.beetl.sql.core.InterceptorContext;
 public class MySqlConnectoinSource implements ConnectionSource {
 	
 	private Connection _getConn(){
-		String driver = "com.mysql.jdbc.Driver";
-        String dbName = "test";
-        String passwrod = "123456";
-        String userName = "root";
-        String url = "jdbc:mysql://127.0.0.1:3306/" + dbName;
+		String driver = DBConfig.driver;
+        String dbName = DBConfig.dbName;
+        String password = DBConfig.password;
+        String userName = DBConfig.userName;
+        String url = DBConfig.url;
         Connection conn = null;
         try {
 			Class.forName(driver);
 			conn = DriverManager.getConnection(url, userName,
-	                passwrod);
+	                password);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {

@@ -11,6 +11,6 @@ public class Constants {
 	//public static final int UPDATE_BY_ID_BATCH =7;
 	public static final int INSERT = 8;
 	
-	public static  String[] classSQL = new String[]{"Auto_SelectById","Auto_SelectByTemplate","Auto_SelectCountByTemplate","Auto_DelById","Auto_SelectAll","Auto_UpdateAll","Auto_UpdateById","Auto_UpdateBatchById","Auto_Insert"};
+	public static  String[] classSQL = new String[]{"_gen_selectById","_gen_selectByTemplate","_gen_selectCountByTemplate","_gen_delById","_gen_selectAll","gen_updateAll","_gen_updateById","_gen_updateBatchById","_gen_insert"};
 
 }

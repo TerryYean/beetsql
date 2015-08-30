@@ -32,36 +32,36 @@ public class KeyTest {
 
 		Role role = new Role();
 		role.setName("manager");
-		SQLScript script = manager.getScript(Role.class, INSERT);
 		KeyHolder holder = new KeyHolder();
-		script.insert(role, holder);
+		manager.insert(Role.class, role, holder);
+		
 		System.out.println(holder.getKey());
 		
 	}
 	
-//	@Test
-//	public void addRole1() {
-//		
-//		try{
-//			Connection conn = new MySqlConnectoinSource() .getWriteConn(null);
-//			PreparedStatement ps = conn.prepareStatement("update role set name =? where id=?");
-//			Role role = new Role();
-//			role.setId(1);
-//			role.setName("ac");
-//			List list = new ArrayList();
-//			list.add(role);
-//			list.add(role);
-//			for(int i=0;i<list.size();i++){
-//				Role data = (Role)list.get(i);
-//				ps.setString(1, data.getName());
-//				ps.setInt(2, data.getId());
-//				ps.addBatch();
-//			}
-//			int[] result = ps.executeBatch();
-//			
-//		}catch(Exception ex){
-//			
-//		}
-//		
-//	}
+	@Test
+	public void addRole1() {
+		
+		try{
+			Connection conn = new MySqlConnectoinSource().getMaster();
+			PreparedStatement ps = conn.prepareStatement("update role set name =? where id=?");
+			Role role = new Role();
+			role.setId(1);
+			role.setName("ac");
+			List list = new ArrayList();
+			list.add(role);
+			list.add(role);
+			for(int i=0;i<list.size();i++){
+				Role data = (Role)list.get(i);
+				ps.setString(1, data.getName());
+				ps.setInt(2, data.getId());
+				ps.addBatch();
+			}
+			int[] result = ps.executeBatch();
+			
+		}catch(Exception ex){
+			
+		}
+		
+	}
 }

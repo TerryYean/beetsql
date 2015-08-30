@@ -67,6 +67,13 @@ public class ClasspathLoader implements SQLLoader {
 	
 	@Override
 	public boolean isModified(String id) {
+		int index = id.indexOf('.');
+		if(index!=-1){
+			String sqlName = id.substring(index);
+			if(sqlName.startsWith("._gen")){
+				return false;
+			}
+		}
 		File file = this.getFile(id);
 		if(file==null) return true;
 		long lastModify = file.lastModified();
@@ -84,7 +91,7 @@ public class ClasspathLoader implements SQLLoader {
 	}
 	
 	@Override
-	public void addSQL(String id, SQLSource source) {
+	public void addGenSQL(String id, SQLSource source) {
 		sqlSourceVersion.put(id, 0l); //never change
 		sqlSourceMap.put(id, source);
 		
@@ -221,6 +228,10 @@ public class ClasspathLoader implements SQLLoader {
 	public void setAutoCheck(boolean check) {
 		this.autoCheck = check;
 		
+	}
+	@Override
+	public SQLSource getGenSQL(String id) {
+		return this.sqlSourceMap.get(id);
 	}
 	
 }

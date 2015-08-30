@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.beetl.sql.DBConfig;
+
 public class DBBase {
 	
 	private DBBase(){}
@@ -15,15 +17,15 @@ public class DBBase {
 	}
 	
 	public Connection getConn(){
-		String driver = "com.mysql.jdbc.Driver";
-        String dbName = "test";
-        String passwrod = "123456";
-        String userName = "sue";
-        String url = "jdbc:mysql://localhost:3306/" + dbName;
+		String driver = DBConfig.driver;
+        String dbName = DBConfig.dbName;
+        String password = DBConfig.password;
+        String userName = DBConfig.userName;
+        String url = DBConfig.url;
         Connection conn = null;
         try {
 			Class.forName(driver);
-			conn = DriverManager.getConnection(url, userName,passwrod);
+			conn = DriverManager.getConnection(url, userName,password);
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

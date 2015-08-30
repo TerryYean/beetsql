@@ -99,7 +99,8 @@ public class SQLManager {
 	public SQLScript getScript(Class<?> cls, int tempId) {
 		String className = cls.getSimpleName().toLowerCase();
 		String id = className +"."+ classSQL[tempId];
-		SQLSource tempSource = this.sqlLoader.getSQL(id);
+		
+		SQLSource tempSource = this.sqlLoader.getGenSQL(id);
 		if (tempSource != null) {
 			return new SQLScript(tempSource,this);
 		}
@@ -142,7 +143,7 @@ public class SQLManager {
 		}
 		
 		tempSource.setId(id);
-		sqlLoader.addSQL(id, tempSource);
+		sqlLoader.addGenSQL(id, tempSource);
 		return new SQLScript(tempSource,this);
 	}
 	
@@ -161,7 +162,7 @@ public class SQLManager {
 		String template = script.getTemplate();
 		String pageTemplate = dbStyle.getPageSQL(template);
 		source = new SQLSource(pageId,pageTemplate);
-		sqlLoader.addSQL(pageId, source);
+		sqlLoader.addGenSQL(pageId, source);
 		return new SQLScript(source, this);
 	}
 	
