@@ -20,6 +20,7 @@ import org.beetl.sql.core.db.DBStyle;
 import org.beetl.sql.core.db.KeyHolder;
 import org.beetl.sql.core.db.MetadataManager;
 import org.beetl.sql.core.kit.MapKit;
+import org.beetl.sql.core.mapping.BeanProcessor;
 import org.beetl.sql.core.mapping.QueryMapping;
 import org.beetl.sql.core.mapping.RowMapperResultSetExt;
 import org.beetl.sql.core.mapping.handler.BeanHandler;
@@ -192,7 +193,8 @@ public class SQLScript {
 			rs = ps.executeQuery();
 			
 			if(mapper != null){
-				return new RowMapperResultSetExt<T>(mapper).handleResultSet(rs);
+				BeanProcessor beanProcessor = new BeanProcessor(this.sm.getNc());
+				return new RowMapperResultSetExt<T>(mapper,beanProcessor).handleResultSet(rs,clazz);
 			}
 			
 			resultList = mappingSelect(rs, clazz);

@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.beetl.sql.core.BeetlSQLException;
+
 /**  
  * @ClassName: PojoKit   
  * @Description: TODO  
@@ -74,7 +76,8 @@ public class MapKit {
 	public static Map<String, Object> pksSetValue(List<String> pkNames, Object ...value){
 		
 		if(pkNames.size() != value.length){
-			return null;
+			throw new BeetlSQLException(BeetlSQLException.ID_NUM_ERROR);
+//			return null;
 		}
 		
 		Map<String, Object> paras = new HashMap<String, Object>(value.length);

@@ -70,7 +70,7 @@ public class SelectBySqlIdTest {
 		Map<String, Object> paras = new HashMap<String, Object>();
 		paras.put("age", 12);
 		List<User> result = manager.select("user.selectUser2", User.class, paras);
-		System.out.println(result.get(0));
+		System.out.println(result);
 	}
 	
 	@Test
@@ -79,7 +79,7 @@ public class SelectBySqlIdTest {
 		Map<String, Object> paras = new HashMap<String, Object>();
 		paras.put("age", 12);
 		List<Map> result = manager.select("user.selectUser2", Map.class, paras);
-		System.out.println(result.get(0));
+		System.out.println(result);
 	}
 	
 }

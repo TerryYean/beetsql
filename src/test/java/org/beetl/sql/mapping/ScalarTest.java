@@ -128,7 +128,7 @@ public class ScalarTest {
 //		Integer result = query.query(rs, new ScalarHandler<Integer>("t_smallint"));
 //		Integer result = query.query(rs, new ScalarHandler<Integer>("t_mediumint"));
 //		Boolean result = query.query(rs, new ScalarHandler<Boolean>("t_bit"));
-		Long result = query.query(rs, new ScalarHandler<Long>("t_bigint" ,Long.class));
+//		Long result = query.query(rs, new ScalarHandler<Long>("t_bigint" ,Long.class));
 //		Float result = query.query(rs, new ScalarHandler<Float>("t_float"));
 //		Double result = query.query(rs, new ScalarHandler<Double>("t_double"));
 //		java.math.BigDecimal result = query.query(rs, new ScalarHandler<java.math.BigDecimal>("t_decimal"));
@@ -138,7 +138,7 @@ public class ScalarTest {
 //		java.sql.Timestamp result = query.query(rs, new ScalarHandler<java.sql.Timestamp>("t_timestamp"));
 //		java.sql.Date result = query.query(rs, new ScalarHandler<java.sql.Date>("t_year"));
 		
-		System.out.println(result);
+//		System.out.println(result);
 	}
 	
 	@Test

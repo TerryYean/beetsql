@@ -56,11 +56,9 @@ public class SelectByTemplementTest {
 		user.setAge(11);
 		List<User> userList = manager.selectByTemplate(user, new RowMapper<User>() {
 			@Override
-			public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-				User u = new User();
-				u.setId(rs.getInt(3));
-				u.setName(rs.getString(4));
-				Role r = manager.selectById(Role.class, rs.getInt(5));
+			public User mapRow(Object o,ResultSet rs, int rowNum) throws SQLException {
+				User u = (User)o;
+				Role r = manager.selectById(Role.class, rs.getInt("roleId"));
 				u.setRole(r);
 				return u;
 			}

@@ -29,7 +29,7 @@ import org.junit.Before;
 public class BaseTest {
 	
 	@Before
-	protected void setUp(){
+	public void setUp(){
 		rs = this.createMockResultSet();
 		emptyResultSet = this.createMockEmptyResultSet();
 	}

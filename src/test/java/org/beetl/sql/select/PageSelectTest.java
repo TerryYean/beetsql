@@ -68,14 +68,13 @@ public class PageSelectTest {
 		user.setAge(12);
 		Integer total = manager.selectSingle("user.selectCountUser2", user, Integer.class);
 		System.out.println(total);
-		List<User> userList  = manager.select("user.selectCountUser2", User.class, user, new RowMapper<User>() {
+		List<User> userList  = manager.select("user.selectUser2", User.class, user, new RowMapper<User>() {
 
 			@Override
-			public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-				User u = new User();
-				u.setId(rs.getInt(3));
+			public User mapRow(Object o,ResultSet rs, int rowNum) throws SQLException {
+				User u =(User)o;			
 				u.setName(rs.getString(4));
-				Role r = manager.selectById(Role.class, rs.getInt(5));
+				Role r = manager.selectById(Role.class, rs.getInt("roleId"));
 				u.setRole(r);
 				return u;
 			}

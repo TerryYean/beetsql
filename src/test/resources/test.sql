@@ -24,15 +24,17 @@ CREATE TABLE `user` (
   `name` varchar(64) DEFAULT NULL,
   `age` int(4) DEFAULT NULL,
   `userName` varchar(64) DEFAULT NULL,
+  `roleId` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES ('1', 'name1', '11', 'username1');
-INSERT INTO `user` VALUES ('2', 'name2', '12', 'username2');
-INSERT INTO `user` VALUES ('3', 'name3', '13', 'username3');
+INSERT INTO `user` VALUES ('1', 'name1', '11', 'username1',1);
+INSERT INTO `user` VALUES ('2', 'name2', '12', 'username2',1);
+INSERT INTO `user` VALUES ('3', 'name3', '13', 'username3',1);
 
 -- ----------------------------
 -- Table structure for user1
@@ -99,13 +101,12 @@ CREATE TABLE `user3` (
   `t_double` double(22,0) DEFAULT NULL,
   `t_decimal` decimal(11,0) DEFAULT NULL,
   `t_date` date DEFAULT NULL,
-  `t_time` time(6) DEFAULT NULL,
+  `t_time` time DEFAULT NULL,   -- 数据库不支持？？time(6)
   `t_datetime` datetime DEFAULT NULL,
   `t_timestamp` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
-  `t_year` year(4) DEFAULT NULL,
+  `t_year` year DEFAULT NULL,
   PRIMARY KEY (`t_varchar`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 -- ----------------------------
 -- Records of user3
 -- ----------------------------
@@ -119,3 +120,6 @@ CREATE TABLE `role` (
   `name` varchar(20) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1
+
+INSERT INTO `role`  (id,name) VALUES (null,"mananger"); 
+

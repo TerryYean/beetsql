@@ -30,7 +30,7 @@ public class SelectByIdTest {
 	@Test
 	public void selectById(){
 		
-		User result = manager.selectById(User.class, 4, 5);//4,5为联合主键值
+		User result = manager.selectById(User.class, 1);//4,5为联合主键值
 		System.out.println(result);
 	}
 	

@@ -21,17 +21,20 @@ import org.beetl.sql.core.RowMapper;
 public class RowMapperResultSetExt<T> implements ResultSetExt<List<T>>{
 	
 	private RowMapper<T> rowMapper;
-	
-	public RowMapperResultSetExt(RowMapper<T> _rowMapper){
+	BeanProcessor beanProcessor  = null;
+	public RowMapperResultSetExt(RowMapper<T> _rowMapper,BeanProcessor beanProcessor  ){
 		this.rowMapper = _rowMapper;
+		this.beanProcessor = beanProcessor;
 	}
 
 	@Override
-	public List<T> handleResultSet(ResultSet rs) throws SQLException {
+	public List<T> handleResultSet(ResultSet rs,Class z) throws SQLException {
 		int rowNum = 0;
 		List<T> resultList = new ArrayList<T>();
 		while(rs.next()){
-			resultList.add(this.rowMapper.mapRow(rs, rowNum++));
+			
+			Object o = beanProcessor.toBean(rs, z);
+			resultList.add(this.rowMapper.mapRow(o,rs, rowNum++));
 		}
 		return resultList;
 	}

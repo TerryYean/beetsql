@@ -13,5 +13,5 @@ public interface RowMapper<T> {
 //	 还是要再次处理，如果是List，还是要在循环。
 //	 T mapRow(T obj,ResultSet rs) throws SQLException;
 	 
-	 T mapRow(ResultSet rs, int rowNum) throws SQLException;
+	 T mapRow(Object o,ResultSet rs, int rowNum) throws SQLException;
 }
