@@ -29,6 +29,8 @@ public class SQLManager {
 	private static MetadataManager metaDataManager;
 	Interceptor[] inters = {};
 	Beetl beetl = null;
+	
+	
 
 	public SQLManager(DBStyle dbStyle, SQLLoader sqlLoader, ConnectionSource ds) {
 		beetl = new Beetl(sqlLoader);

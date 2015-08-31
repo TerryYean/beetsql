@@ -8,8 +8,15 @@ import java.util.Random;
 import javax.sql.DataSource;
 
 public class DefaultConnectionSource implements ConnectionSource{
-	DataSource master = null;
-	DataSource[] slaves = null;
+	protected DataSource master = null;
+	protected DataSource[] slaves = null;
+	protected ThreadLocal<Boolean> local = new ThreadLocal<Boolean>(){
+		protected Boolean initialValue() {
+	        return false;
+	    }
+
+	};
+	
 	public DefaultConnectionSource(){
 		
 	}
@@ -21,8 +28,11 @@ public class DefaultConnectionSource implements ConnectionSource{
 	
 	@Override
 	public Connection getConn(String sqlId,boolean isUpdate,String sql,List paras){
+		if(this.slaves==null||this.slaves.length==0) return this.getWriteConn(sqlId,sql,paras);		
 		if(isUpdate) return this.getWriteConn(sqlId,sql,paras);
-		else return this.getReadConn(sqlId, sql, paras);
+		boolean onlyMaster = local.get();
+		if(onlyMaster) return this.getMaster();	
+		return this.getReadConn(sqlId, sql, paras);
 	}
 	
 	@Override
@@ -68,6 +78,16 @@ public class DefaultConnectionSource implements ConnectionSource{
 	}
 	public void setSlaves(DataSource[] slaves) {
 		this.slaves = slaves;
+	}
+	@Override
+	public void onlyMasterBegin() {
+		local.set(true);
+		
+	}
+	@Override
+	public void onlyMasterEnd() {
+		local.set(false);
+		
 	}
 	
 	

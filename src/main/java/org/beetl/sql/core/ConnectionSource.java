@@ -19,4 +19,15 @@ public interface ConnectionSource {
 	 */
 	public Connection getConn(String sqlId,boolean isUpdate,String sql,List paras);
 	
+	/**
+	 * 强迫使用master
+	 */
+	public void onlyMasterBegin();
+	
+	/**
+	 * 结束master选择，如果调用了onlyMasterBegin，则必须调用onlyMasterEnd
+	 */
+	public void onlyMasterEnd();
+	
+	
 }

@@ -37,7 +37,7 @@ public class Beetl {
 	 */
 	public Properties loadDefaultConfig () {
 		Properties ps  = new Properties();
-		InputStream ins = this.getClass().getResourceAsStream(
+		InputStream ins = Thread.currentThread().getContextClassLoader().getResourceAsStream(
 				"/btsql.properties");
 		if(ins==null) return ps;
 		try {
@@ -51,7 +51,7 @@ public class Beetl {
 	
 	public Properties loadExtConfig () {
 		Properties ps  = new Properties();
-		InputStream ins = this.getClass().getResourceAsStream(
+		InputStream ins = Thread.currentThread().getContextClassLoader().getResourceAsStream(
 				"/btsql-ext.properties");
 		if(ins==null) return ps;
 		try {

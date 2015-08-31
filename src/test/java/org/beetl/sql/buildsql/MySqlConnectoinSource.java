@@ -47,6 +47,18 @@ public class MySqlConnectoinSource implements ConnectionSource {
 		return _getConn();
 	}
 
+	@Override
+	public void onlyMasterBegin() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onlyMasterEnd() {
+		// TODO Auto-generated method stub
+		
+	}
+
 	
 
 }
